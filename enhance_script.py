@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 import cv2
-from enhance import enhance_medical_image, enchance_by_gaussian_threshold
+from enhance import enhance_medical_image
 import numpy as np
 
 scaleX = 1

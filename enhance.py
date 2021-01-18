@@ -1,6 +1,5 @@
 import cv2
 from anisotropic_difussion import anisodiff
-import matplotlib.pyplot as plt
 import numpy as np
 
 
@@ -20,3 +19,4 @@ def enhance_medical_image(image):
     image = clahe.apply(image.astype(np.uint8))
     del clahe
     return image.astype(float)
+
