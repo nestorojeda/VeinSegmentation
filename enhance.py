@@ -20,10 +20,3 @@ def enhance_medical_image(image):
     image = clahe.apply(image.astype(np.uint8))
     del clahe
     return image.astype(float)
-
-
-def enchance_by_gaussian_threshold(image):
-    image = image.astype(np.uint8)
-    image = cv2.medianBlur(image, 5)
-    image = cv2.adaptiveThreshold(image, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
-    return image.astype(float)
