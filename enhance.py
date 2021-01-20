@@ -13,8 +13,8 @@ import numpy as np
 # Output: Enhanced Medical Image
 
 def enhance_medical_image(image):
-    clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
-    image = cv2.morphologyEx(image, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_RECT, (5, 5)))
+    clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(20, 20))
+    image = cv2.morphologyEx(image, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_RECT, (10, 10)))
     image = anisodiff(image)
     image = clahe.apply(image.astype(np.uint8))
     del clahe
