@@ -25,5 +25,6 @@ th, im_gray_th_otsu = cv2.threshold(denoised_enhanced, 128, 192, cv2.THRESH_OTSU
 pictures.append(Picture(zoom, "Original"))
 pictures.append(Picture(enhanced, "Enhanced"))
 pictures.append(Picture(denoised_enhanced, "Enhanced + denoise"))
+pictures.append(Picture(im_gray_th_otsu,"Enhanced + denoise + threshold"))
 
 show(pictures)
