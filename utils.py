@@ -1,15 +1,27 @@
 import cv2
 import numpy as np
+from PIL.Image import Image
 from skimage.feature import hessian_matrix, hessian_matrix_eigvals
 
 
-def detect_ridges(gray, sigma=3.0):
+def OpenCVToPIL(img):
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    im_pil = Image.fromarray(img)
+    return im_pil;
+
+
+def PILToOpenCV(img):
+    im_np = np.asarray(img)
+    return im_np
+
+
+def DetectRidges(gray, sigma=3.0):
     h_elems = hessian_matrix(gray, sigma)
     eigenvalues = hessian_matrix_eigvals(h_elems)
     return eigenvalues
 
 
-def auto_canny(image, sigma=0.33):
+def AutoCanny(image, sigma=0.33):
     v = np.median(image)
     lower = int(max(0, (1.0 - sigma) * v))
     upper = int(min(255, (1.0 + sigma) * v))
