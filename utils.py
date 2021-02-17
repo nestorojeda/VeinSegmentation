@@ -4,15 +4,6 @@ from PIL import Image
 from skimage.feature import hessian_matrix, hessian_matrix_eigvals
 
 
-def OpenCVToPIL(img):
-    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-    im_pil = Image.fromarray(img)
-    return im_pil
-
-
-def PILToOpenCV(img):
-    im_np = np.asarray(img)
-    return im_np
 
 
 def DetectRidges(gray, sigma=3.0):
