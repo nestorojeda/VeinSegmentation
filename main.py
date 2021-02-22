@@ -4,9 +4,7 @@ import cv2
 import matplotlib.pyplot as plt
 import numpy as np
 from time import time
-
 from subpixel_edges import init, subpixel_edges
-from anisotropic_difussion import anisodiff
 
 scaleX = 1
 scaleY = 1

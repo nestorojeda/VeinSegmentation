@@ -4,8 +4,6 @@ from PIL import Image
 from skimage.feature import hessian_matrix, hessian_matrix_eigvals
 
 
-
-
 def DetectRidges(gray, sigma=3.0):
     h_elems = hessian_matrix(gray, sigma)
     eigenvalues = hessian_matrix_eigvals(h_elems)
