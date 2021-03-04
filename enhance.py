@@ -1,14 +1,14 @@
 import warnings
+
 import cv2
 import numpy as np
 import scipy.ndimage.filters as flt
-import skimage.filters as flt
 from sklearn import cluster
 
 
 def skeletonization(img, niter):
     img = img.astype(np.uint8)
-    ret, img = cv2.threshold(img, 127, 255, 0)
+    ret, img = cv2.threshold(img, 200, 255, 0)
     size = np.size(img)
     skel = np.zeros(img.shape, np.uint8)
 
@@ -29,12 +29,8 @@ def skeletonization(img, niter):
         # Step 5: If there are no white pixels left ie.. the image has been completely eroded, quit the loop
         if cv2.countNonZero(img) == 0:
             break
-
-    cv2.imshow("Skeleton", skel)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
-
     return skel
+
 
 def km_clust(array, n_clusters):
     # Create a line array, the lazy way
@@ -50,7 +46,7 @@ def km_clust(array, n_clusters):
     return values, labels
 
 
-def enhance_medical_image(image, clip_limit=10, tile_grid_size=20):
+def enhance_medical_image(image, clip_limit=5, tile_grid_size=5):
     """
     # Based in https://ieeexplore.ieee.org/document/6246971
 

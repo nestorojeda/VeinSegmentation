@@ -16,7 +16,7 @@ def get_img_from_fig(fig):
 
 
 def show(pictures):
-    max_rows = round((len(pictures) / 2)) + 2
+    max_rows = round((len(pictures) / 2))
     figure = plt.figure()
     figure.tight_layout()
     figure.subplots_adjust(top=0.92, bottom=0.08, left=0.10, right=0.95, hspace=0.25,
