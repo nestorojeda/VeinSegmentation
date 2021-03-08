@@ -4,20 +4,34 @@ import matplotlib.pyplot as plt
 
 image = (cv2.imread('imagenes_orginales/Caso A BN.png'))
 gray = (cv2.cvtColor(image, cv2.COLOR_BGR2GRAY))
-ret, thresh = cv2.threshold(gray, 127, 255, 0)
-contours, hierarchy = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
-cv2.drawContours(gray, contours, -1, (0, 255, 0), 3)
-
-plt.imshow(gray, cmap='gray')
-plt.show()
 
 ratio = image.shape[0] / 300.0
 orig = image.copy()
-image = imutils.resize(image, height = 300)
+image = imutils.resize(image, height=300)
 
 gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 gray = cv2.bilateralFilter(gray, 11, 17, 17)
 edged = cv2.Canny(gray, 30, 200)
 
 plt.imshow(edged, cmap='gray')
+plt.show()
+
+# find contours in the edged image, keep only the largest
+# ones, and initialize our screen contour
+contours = cv2.findContours(edged.copy(), mode=cv2.RETR_TREE, method=cv2.CHAIN_APPROX_NONE)
+contours = imutils.grab_contours(contours)
+contours = sorted(contours, key=cv2.contourArea, reverse=True)
+
+# loop over our contours
+closed_contours = []
+open_contours = []
+
+for c in contours:
+    if cv2.contourArea(c) > cv2.arcLength(c, True):
+        closed_contours.append(c)
+    else:
+        open_contours.append(c)
+
+cv2.drawContours(image, open_contours, -1, (255, 0, 0), 3)
+plt.imshow(image, cmap='gray')
 plt.show()
