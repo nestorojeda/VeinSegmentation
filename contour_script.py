@@ -1,37 +1,36 @@
 import cv2
-import imutils as imutils
+from contour import contour
 import matplotlib.pyplot as plt
+import numpy as np
+from enhance import enhance_medical_image, segmentation, skeletonization
+
+y = 1300  # donde empieza el corte en y
+x = 1600  # donde empieza el corte en x
+h = 600  # tamaño del corte en h
+w = 600  # tamaño del corte en y
 
 image = (cv2.imread('imagenes_orginales/Caso A BN.png'))
-gray = (cv2.cvtColor(image, cv2.COLOR_BGR2GRAY))
+zoom = image[y:y + h, x:x + w]
 
-ratio = image.shape[0] / 300.0
-orig = image.copy()
-image = imutils.resize(image, height=300)
+enhanced = enhance_medical_image(zoom)
+enhanced_segm = segmentation(enhanced, n_clusters=2)
 
-gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-gray = cv2.bilateralFilter(gray, 11, 17, 17)
-edged = cv2.Canny(gray, 30, 200)
+ret, img = cv2.threshold(enhanced_segm.astype(np.uint8), 127, 255, 0)
+inverted_segm_th = cv2.bitwise_not(img)
+skel = skeletonization(inverted_segm_th)
 
-plt.imshow(edged, cmap='gray')
+open_contours, closed_contours = contour(enhanced_segm.astype(np.uint8))
+black = np.zeros((h,w,3), np.uint8)
+black_countour = cv2.drawContours(black, open_contours, -1, (255, 255, 255), 3)
+contour_image = cv2.drawContours(zoom, open_contours, -1, (255, 0, 0), 3)
+
+plt.title("Contorno sobre original")
+plt.imshow(contour_image)
+plt.show()
+plt.title("Contorno sobre negro")
+plt.imshow(black_countour)
+plt.show()
+plt.title('Esqueleto')
+plt.imshow(skel, cmap='gray')
 plt.show()
 
-# find contours in the edged image, keep only the largest
-# ones, and initialize our screen contour
-contours = cv2.findContours(edged.copy(), mode=cv2.RETR_TREE, method=cv2.CHAIN_APPROX_NONE)
-contours = imutils.grab_contours(contours)
-contours = sorted(contours, key=cv2.contourArea, reverse=True)
-
-# loop over our contours
-closed_contours = []
-open_contours = []
-
-for c in contours:
-    if cv2.contourArea(c) > cv2.arcLength(c, True):
-        closed_contours.append(c)
-    else:
-        open_contours.append(c)
-
-cv2.drawContours(image, open_contours, -1, (255, 0, 0), 3)
-plt.imshow(image, cmap='gray')
-plt.show()

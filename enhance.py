@@ -6,7 +6,14 @@ import scipy.ndimage.filters as flt
 from sklearn import cluster
 
 
-def skeletonization(img, niter):
+def segmentation(img, n_clusters=2):
+    values, labels = km_clust(img.astype('float32'), n_clusters=n_clusters)
+    enhanced_segm = np.choose(labels, values)
+    enhanced_segm.shape = img.shape
+    return enhanced_segm
+
+
+def skeletonization(img, niter=100):
     img = img.astype(np.uint8)
     ret, img = cv2.threshold(img, 200, 255, 0)
     size = np.size(img)

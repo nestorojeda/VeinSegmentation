@@ -1,15 +1,21 @@
 import cv2
 import imutils
+import matplotlib.pyplot as plt
 
 
 def contour(image):
-    gray = (cv2.cvtColor(image, cv2.COLOR_BGR2GRAY))
+    if len(image.shape) == 3:
+        gray = (cv2.cvtColor(image, cv2.COLOR_BGR2GRAY))
+    else:
+        gray = image
 
     ratio = image.shape[0] / 300.0
     orig = image.copy()
-    image = imutils.resize(image, height=300)
 
-    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    if len(image.shape) == 3:
+        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    else:
+        gray = image
     gray = cv2.bilateralFilter(gray, 11, 17, 17)
     edged = cv2.Canny(gray, 30, 200)
 
@@ -29,6 +35,4 @@ def contour(image):
         else:
             open_contours.append(c)
 
-    contour_image = cv2.drawContours(image, open_contours, -1, (255, 0, 0), 3)
-    return contour_image;
-
+    return open_contours, closed_contours
