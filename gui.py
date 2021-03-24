@@ -4,7 +4,7 @@ import PIL.Image
 import PIL.ImageTk
 import cv2
 
-from enhance import enhance_medical_image
+from VeinSegmentation.enhance import enhance_medical_image
 
 y = 1300  # donde empieza el corte en y
 x = 1600  # donde empieza el corte en x

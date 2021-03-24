@@ -2,8 +2,9 @@ import os
 
 import cv2
 import matplotlib.pyplot as plt
-import numpy as np
 from time import time
+
+from VeinSegmentation.enhance import anisodiff
 from subpixel_edges import init, subpixel_edges
 
 scaleX = 1

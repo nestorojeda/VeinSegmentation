@@ -1,8 +1,6 @@
 import cv2
-import matplotlib.pyplot as plt
 import numpy as np
-from sklearn import cluster
-from enhance import enhance_medical_image, km_clust, skeletonization
+from VeinSegmentation.enhance import enhance_medical_image, km_clust, skeletonization
 from pictures import Picture, show
 
 scaleX = 1
