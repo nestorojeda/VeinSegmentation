@@ -1,8 +1,5 @@
 /venv/
-./imagenes_orginales
-./images
-./.vscode
-./.idea
+/.idea
 /images/
 /imagenes_orginales/
 /.vscode/
