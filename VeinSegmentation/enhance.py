@@ -1,9 +1,18 @@
 import warnings
 
 import cv2
+import math
 import numpy as np
 import scipy.ndimage.filters as flt
 from sklearn import cluster
+
+
+def gaborFiltering(img):
+    img = img.astype(np.float32) / 255
+    kernel = cv2.getGaborKernel((21, 21), 5, 1, 10, 1, 0, cv2.CV_32F)
+    kernel /= math.sqrt((kernel * kernel).sum())
+    filtered = cv2.filter2D(img, -1, kernel)
+    return filtered
 
 
 def segmentation(img, n_clusters=2):
