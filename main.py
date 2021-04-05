@@ -25,12 +25,19 @@ black = 0.
 if __name__ == '__main__':
     this_path = os.path.dirname(os.path.realpath(__file__))
     img = cv2.imread(os.path.join(this_path, 'imagenes_orginales/Caso A BN.png'))
-
     img_gray = (cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)).astype(float)
+
     zoom = img_gray[y:y + h, x:x + w]
+    plt.imshow(zoom, cmap='gray')
+    plt.title("Original")
+    plt.show()
 
     enhanced = enhance_medical_image(zoom, clip_limit=8, tile_grid_size=8)
-    enhanced_segm = segmentation(enhanced, n_clusters=3)
+    plt.imshow(enhanced, cmap='gray')
+    plt.title("Enhanced")
+    plt.show()
+
+    enhanced_segm = segmentation(enhanced, n_clusters=10)
     plt.title("Segmented")
     plt.imshow(enhanced_segm, cmap='gray')
     plt.show()
@@ -82,9 +89,9 @@ if __name__ == '__main__':
     smoothed_images = []
     for image in each_filled_picture:
         smoothed = smooth_thresholded_image(image)
-        plt.imshow(smoothed, cmap='gray')
-        plt.title("Smoothed skeleton")
-        plt.show()
+        # plt.imshow(smoothed, cmap='gray')
+        # plt.title("Smoothed skeleton")
+        # plt.show()
         smoothed_images.append(smoothed)
 
     # SKELETON
@@ -92,12 +99,12 @@ if __name__ == '__main__':
     for image in smoothed_images:
         skel = skeletonization(image)
         skeletons.append(skel)
-        plt.imshow(skel, cmap='gray')
-        plt.title("Skeleton")
-        plt.show()
+        # plt.imshow(skel, cmap='gray')
+        # plt.title("Skeleton")
+        # plt.show()
         del skel
 
-    #ENHANCE SKELETONS
+    # ENHANCE SKELETONS
     enhanced_skeletons = []
     for image in skeletons:
         enhanced_skeleton = np.zeros((zoom.shape[0], zoom.shape[1]))
@@ -109,11 +116,10 @@ if __name__ == '__main__':
                     enhanced_skeleton[y, x] = white
 
         enhanced_skeletons.append(enhanced_skeleton)
-        plt.imshow(enhanced_skeleton, cmap='gray')
-        plt.title("Enhanced skeleton")
-        plt.show()
+        # plt.imshow(enhanced_skeleton, cmap='gray')
+        # plt.title("Enhanced skeleton")
+        # plt.show()
         del enhanced_skeleton
-
 
     # MERGE SKELETON
     canvas = np.zeros((zoom.shape[0], zoom.shape[1]))
