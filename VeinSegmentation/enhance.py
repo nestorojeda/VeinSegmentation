@@ -4,6 +4,7 @@ import cv2
 import math
 import numpy as np
 import scipy.ndimage.filters as flt
+from skimage import exposure
 from sklearn import cluster
 
 
@@ -24,7 +25,6 @@ def segmentation(img, n_clusters=2):
 
 def skeletonization(img, niter=100):
     img = img.astype(np.uint8)
-    ret, img = cv2.threshold(img, 200, 255, 0)
     size = np.size(img)
     skel = np.zeros(img.shape, np.uint8)
 
@@ -358,3 +358,17 @@ def anisodiff3(stack, niter=1, kappa=50, gamma=0.1, step=(1., 1., 1.), option=1,
         # sleep(0.01)
 
     return stackout
+
+
+def smooth_thresholded_image(img):
+    # blur threshold image
+    blur = cv2.GaussianBlur(img, (0, 0), sigmaX=3, sigmaY=3, borderType=cv2.BORDER_DEFAULT)
+
+    # stretch so that 255 -> 255 and 127.5 -> 0
+    # C = A*X+B
+    # 255 = A*255+B
+    # 0 = A*127.5+B
+    # Thus A=2 and B=-127.5
+    # aa = a*2.0-255.0 does not work correctly, so use skimage
+    result = exposure.rescale_intensity(blur, in_range=(127.5, 255), out_range=(0, 255))
+    return result

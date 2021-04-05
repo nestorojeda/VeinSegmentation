@@ -2,13 +2,10 @@ import copy
 import os
 
 import cv2
-import numpy as np
 import matplotlib.pyplot as plt
-from time import time
+import numpy as np
 
-from VeinSegmentation.contour import contour
-from VeinSegmentation.enhance import anisodiff, enhance_medical_image, segmentation, skeletonization, gaborFiltering
-from subpixel_edges import init, subpixel_edges
+from VeinSegmentation.enhance import enhance_medical_image, segmentation, smooth_thresholded_image, skeletonization
 
 scaleX = 1
 scaleY = 1
@@ -61,7 +58,6 @@ if __name__ == '__main__':
         each_color_picture.append(color_layer)
 
     # TODO PASARLO A UN METODO
-    # TODO SACAR LOS ESQUELETOS
     each_filled_picture = []  # Con el valor y los menores al valor a 1 y el resto a 0
 
     for value in colors:
@@ -78,22 +74,60 @@ if __name__ == '__main__':
                 else:
                     filled_color_layer[y, x] = black
 
-        if cv2.countNonZero(filled_color_layer) != 0:  # Desechamos las imagenes que sean completamente negras
+        # Desechamos las imagenes que sean completamente negras
+        if cv2.countNonZero(filled_color_layer) != (filled_color_layer.shape[0] * filled_color_layer.shape[1]):
             each_filled_picture.append(filled_color_layer)
-            plt.imshow(filled_color_layer, cmap='gray')
-            plt.title("Filled Layer {}".format(value))
-            plt.show()
 
-    ret, img = cv2.threshold(enhanced_segm.astype(np.uint8), 127, 255, 0)
-    inverted_segm_th = cv2.bitwise_not(img)
-    skel = skeletonization(inverted_segm_th)
+    # SMOOTHING
+    smoothed_images = []
+    for image in each_filled_picture:
+        smoothed = smooth_thresholded_image(image)
+        plt.imshow(smoothed, cmap='gray')
+        plt.title("Smoothed skeleton")
+        plt.show()
+        smoothed_images.append(smoothed)
 
-    open_contours, closed_contours = contour(enhanced_segm.astype(np.uint8))
-    black = np.zeros((h, w, 3), np.uint8)
+    # SKELETON
+    skeletons = []
+    for image in smoothed_images:
+        skel = skeletonization(image)
+        skeletons.append(skel)
+        plt.imshow(skel, cmap='gray')
+        plt.title("Skeleton")
+        plt.show()
+        del skel
 
-    black_countour = cv2.drawContours(black, open_contours, -1, (255, 255, 255), 3)
+    #ENHANCE SKELETONS
+    enhanced_skeletons = []
+    for image in skeletons:
+        enhanced_skeleton = np.zeros((zoom.shape[0], zoom.shape[1]))
+        h = zoom.shape[0]
+        w = zoom.shape[1]
+        for y in range(0, h):
+            for x in range(0, w):
+                if image[y, x] != black:
+                    enhanced_skeleton[y, x] = white
 
-    gabor_filtered_enhanced = gaborFiltering(enhanced)
+        enhanced_skeletons.append(enhanced_skeleton)
+        plt.imshow(enhanced_skeleton, cmap='gray')
+        plt.title("Enhanced skeleton")
+        plt.show()
+        del enhanced_skeleton
+
+
+    # MERGE SKELETON
+    canvas = np.zeros((zoom.shape[0], zoom.shape[1]))
+    for image in enhanced_skeletons:
+        h = zoom.shape[0]
+        w = zoom.shape[1]
+        for y in range(0, h):
+            for x in range(0, w):
+                if image[y, x] == white:
+                    canvas[y, x] = white
+
+    plt.imshow(canvas, cmap='gray')
+    plt.title("Merged skeleton")
+    plt.show()
 
     # print("Processing original image...")
     # now = time()
