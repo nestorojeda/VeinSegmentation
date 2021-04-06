@@ -1,3 +1,4 @@
+import copy
 import warnings
 
 import cv2
@@ -6,6 +7,9 @@ import numpy as np
 import scipy.ndimage.filters as flt
 from skimage import exposure
 from sklearn import cluster
+
+white = 255.
+black = 0.
 
 
 def gaborFiltering(img):
@@ -372,3 +376,52 @@ def smooth_thresholded_image(img):
     # aa = a*2.0-255.0 does not work correctly, so use skimage
     result = exposure.rescale_intensity(blur, in_range=(127.5, 255), out_range=(0, 255))
     return result
+
+
+def color_layer_segmentation(img):
+    colors = np.unique(img)  # De mas oscuro a mas claro
+
+    each_color_picture = []  # Con el valor a 1 y el resto a 0
+
+    for value in colors:
+        color_layer = copy.deepcopy(img)  # Con el valor a 1 y el resto a 0
+        h = img.shape[0]
+        w = img.shape[1]
+
+        # iteramos sobre cada pixel
+        for y in range(0, h):
+            for x in range(0, w):
+                if img[y, x] == value:
+                    color_layer[y, x] = white
+                else:
+                    color_layer[y, x] = black
+
+        each_color_picture.append(color_layer)
+
+    return each_color_picture
+
+
+def color_layer_segmantation_filled(img):
+    colors = np.unique(img)  # De mas oscuro a mas claro
+
+    each_filled_picture = []  # Con el valor y los menores al valor a 1 y el resto a 0
+
+    for value in colors:
+        filled_color_layer = copy.deepcopy(img)
+
+        h = img.shape[0]
+        w = img.shape[1]
+
+        # iteramos sobre cada pixel
+        for y in range(0, h):
+            for x in range(0, w):
+                if img[y, x] <= value:
+                    filled_color_layer[y, x] = white
+                else:
+                    filled_color_layer[y, x] = black
+
+        # Desechamos las imagenes que sean completamente negras
+        if cv2.countNonZero(filled_color_layer) != (filled_color_layer.shape[0] * filled_color_layer.shape[1]):
+            each_filled_picture.append(filled_color_layer)
+
+    return each_filled_picture

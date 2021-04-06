@@ -5,7 +5,9 @@ import cv2
 import matplotlib.pyplot as plt
 import numpy as np
 
-from VeinSegmentation.enhance import enhance_medical_image, segmentation, smooth_thresholded_image, skeletonization
+from VeinSegmentation.enhance import enhance_medical_image, segmentation, smooth_thresholded_image, skeletonization, \
+    color_layer_segmentation, color_layer_segmantation_filled
+from plotting import plotArray
 
 scaleX = 1
 scaleY = 1
@@ -21,6 +23,7 @@ order = 2
 
 white = 255.
 black = 0.
+
 
 if __name__ == '__main__':
     this_path = os.path.dirname(os.path.realpath(__file__))
@@ -42,48 +45,7 @@ if __name__ == '__main__':
     plt.imshow(enhanced_segm, cmap='gray')
     plt.show()
 
-    colors = np.unique(enhanced_segm)  # De mas oscuro a mas claro
-    print(colors)
-
-    # TODO PASARLO A UN METODO
-
-    each_color_picture = []  # Con el valor a 1 y el resto a 0
-
-    for value in colors:
-        color_layer = copy.deepcopy(enhanced_segm)  # Con el valor a 1 y el resto a 0
-        h = enhanced_segm.shape[0]
-        w = enhanced_segm.shape[1]
-
-        # iteramos sobre cada pixel
-        for y in range(0, h):
-            for x in range(0, w):
-                if enhanced_segm[y, x] == value:
-                    color_layer[y, x] = white
-                else:
-                    color_layer[y, x] = black
-
-        each_color_picture.append(color_layer)
-
-    # TODO PASARLO A UN METODO
-    each_filled_picture = []  # Con el valor y los menores al valor a 1 y el resto a 0
-
-    for value in colors:
-        filled_color_layer = copy.deepcopy(enhanced_segm)
-
-        h = enhanced_segm.shape[0]
-        w = enhanced_segm.shape[1]
-
-        # iteramos sobre cada pixel
-        for y in range(0, h):
-            for x in range(0, w):
-                if enhanced_segm[y, x] <= value:
-                    filled_color_layer[y, x] = white
-                else:
-                    filled_color_layer[y, x] = black
-
-        # Desechamos las imagenes que sean completamente negras
-        if cv2.countNonZero(filled_color_layer) != (filled_color_layer.shape[0] * filled_color_layer.shape[1]):
-            each_filled_picture.append(filled_color_layer)
+    each_filled_picture = color_layer_segmantation_filled(enhanced_segm)
 
     # SMOOTHING
     smoothed_images = []
@@ -134,6 +96,8 @@ if __name__ == '__main__':
     plt.imshow(canvas, cmap='gray')
     plt.title("Merged skeleton")
     plt.show()
+
+    plotArray(each_filled_picture)
 
     # print("Processing original image...")
     # now = time()

@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="624e4b3f-726a-4aef-83f6-8e6812c5fd03" name="Default Changelist" comment="operaciones con las capas segmentadas para posteriormente aplicar el esqueleto de cada una">
+    <list default="true" id="624e4b3f-726a-4aef-83f6-8e6812c5fd03" name="Default Changelist" comment="Smoothing de los skeletos y union. Modularización de algunos componentes">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/VeinSegmentation/enhance.py" beforeDir="false" afterPath="$PROJECT_DIR$/VeinSegmentation/enhance.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pictures.py" beforeDir="false" afterPath="$PROJECT_DIR$/plotting.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -266,7 +267,9 @@
       <workItem from="1617121235612" duration="3040000" />
       <workItem from="1617141701845" duration="2862000" />
       <workItem from="1617144602340" duration="312000" />
-      <workItem from="1617636685523" duration="4335000" />
+      <workItem from="1617636685523" duration="4658000" />
+      <workItem from="1617643452656" duration="1406000" />
+      <workItem from="1617721577383" duration="2820000" />
     </task>
     <task id="LOCAL-00001" summary="testeo y mejoras en el modulo de imagenes">
       <created>1612292936352</created>
@@ -359,7 +362,21 @@
       <option name="project" value="LOCAL" />
       <updated>1617144585465</updated>
     </task>
-    <option name="localTasksCounter" value="14" />
+    <task id="LOCAL-00014" summary="Smoothing de los skeletos y union. Modularización de algunos componentes">
+      <created>1617641103010</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1617641103010</updated>
+    </task>
+    <task id="LOCAL-00015" summary="Comentarios para tenerlo al dia">
+      <created>1617644863403</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1617644863403</updated>
+    </task>
+    <option name="localTasksCounter" value="16" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -390,7 +407,9 @@
     <MESSAGE value="modularización y pruebas con el" />
     <MESSAGE value="gitignore y algunos cambios en los scripts de prueba" />
     <MESSAGE value="operaciones con las capas segmentadas para posteriormente aplicar el esqueleto de cada una" />
-    <option name="LAST_COMMIT_MESSAGE" value="operaciones con las capas segmentadas para posteriormente aplicar el esqueleto de cada una" />
+    <MESSAGE value="Smoothing de los skeletos y union. Modularización de algunos componentes" />
+    <MESSAGE value="Comentarios para tenerlo al dia" />
+    <option name="LAST_COMMIT_MESSAGE" value="Comentarios para tenerlo al dia" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -405,7 +424,7 @@
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/repo_tfg$enhance_script.coverage" NAME="enhance_script Coverage Results" MODIFIED="1615229194367" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/repo_tfg$main.coverage" NAME="main Coverage Results" MODIFIED="1617640914176" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/repo_tfg$main.coverage" NAME="main Coverage Results" MODIFIED="1617724848936" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/repo_tfg$image_slicer.coverage" NAME="image_slicer Coverage Results" MODIFIED="1613383629078" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/repo_tfg$gui.coverage" NAME="gui Coverage Results" MODIFIED="1612980231315" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/repo_tfg$contour_script.coverage" NAME="contour_script Coverage Results" MODIFIED="1616695183091" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
