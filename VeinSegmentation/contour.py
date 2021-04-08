@@ -1,21 +1,18 @@
 import cv2
 import imutils
-import matplotlib.pyplot as plt
+import numpy as np
 
 
 def contour(image):
+
     if len(image.shape) == 3:
-        gray = (cv2.cvtColor(image, cv2.COLOR_BGR2GRAY))
+        gray = (cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)).astype(np.uint8)
     else:
-        gray = image
+        gray = image.astype(np.uint8)
 
     ratio = image.shape[0] / 300.0
     orig = image.copy()
 
-    if len(image.shape) == 3:
-        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    else:
-        gray = image
     gray = cv2.bilateralFilter(gray, 11, 17, 17)
     edged = cv2.Canny(gray, 30, 200)
 
