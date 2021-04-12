@@ -5,9 +5,8 @@ import cv2
 import matplotlib.pyplot as plt
 import numpy as np
 
-from VeinSegmentation.contour import contour
 from VeinSegmentation.enhance import enhance_medical_image, segmentation, smooth_thresholded_image, skeletonization, \
-    color_layer_segmantation_filled, anisodiff
+    color_layer_segmantation_filled
 from plotting import plotArray
 
 scaleX = 1
@@ -25,7 +24,9 @@ order = 2
 white = 255.
 black = 0.
 
-plotting = True
+plotting = False
+dissmiss_whites = False
+result_over_enhanced = True
 if __name__ == '__main__':
     this_path = os.path.dirname(os.path.realpath(__file__))
     img = cv2.imread(os.path.join(this_path, 'imagenes_orginales/Caso A BN.png'))
@@ -36,12 +37,12 @@ if __name__ == '__main__':
     plt.title("Original")
     plt.show()
 
-    enhanced = enhance_medical_image(zoom, clip_limit=8, tile_grid_size=8)
+    enhanced = enhance_medical_image(zoom, clip_limit=8, tile_grid_size=8, use_clahe=True)
     plt.imshow(enhanced, cmap='gray')
     plt.title("Enhanced")
     plt.show()
 
-    enhanced_segm = segmentation(enhanced, n_clusters=7)
+    enhanced_segm = segmentation(enhanced, n_clusters=20)
     plt.title("Segmented")
     plt.imshow(enhanced_segm, cmap='gray')
     plt.show()
@@ -51,11 +52,14 @@ if __name__ == '__main__':
         plotArray(each_filled_picture, "Filled color layers")
 
     filled = []
-    # Desechamos las imagenes blancas
-    for image in each_filled_picture:
-        uniques, counts = np.unique(image, return_counts=True)
-        if counts[1] < counts[0]:
-            filled.append(image)
+    if dissmiss_whites:
+        # Desechamos las imagenes blancas
+        for image in each_filled_picture:
+            uniques, counts = np.unique(image, return_counts=True)
+            if counts[1] < counts[0]:
+                filled.append(image)
+    else:
+        filled = each_filled_picture
 
     # SMOOTHING
     smoothed_images = []
@@ -125,7 +129,10 @@ if __name__ == '__main__':
     plt.title("Merged enhanced skeleton")
     plt.show()
 
-    skeleton_over = copy.deepcopy(enhanced)
+    if result_over_enhanced:
+        skeleton_over = copy.deepcopy(enhanced)
+    else:
+        skeleton_over = copy.deepcopy(zoom)
     skeleton_over = cv2.cvtColor(skeleton_over.astype(np.uint8), cv2.COLOR_GRAY2RGB)
     for y in range(0, h):
         for x in range(0, w):
@@ -134,6 +141,12 @@ if __name__ == '__main__':
 
     plt.imshow(skeleton_over, cmap="gray")
     plt.title("Skeleton over original")
+    plt.show()
+    del skeleton_over
+
+    clean_skeleton = cv2.morphologyEx(merged_skeleton, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3)))
+    plt.imshow(clean_skeleton, cmap="gray")
+    plt.title("Clean skeleton")
     plt.show()
 
     # print("Processing original image...")

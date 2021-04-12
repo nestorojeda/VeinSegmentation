@@ -66,7 +66,7 @@ def km_clust(array, n_clusters):
     return values, labels
 
 
-def enhance_medical_image(image, clip_limit=5, tile_grid_size=5):
+def enhance_medical_image(image, clip_limit=5, tile_grid_size=5, use_clahe=True):
     """
     # Based in https://ieeexplore.ieee.org/document/6246971
 
@@ -85,11 +85,14 @@ def enhance_medical_image(image, clip_limit=5, tile_grid_size=5):
 
     """
     image = cv2.fastNlMeansDenoising(image.astype(np.uint8))
-    clahe = cv2.createCLAHE(clipLimit=clip_limit, tileGridSize=(tile_grid_size, tile_grid_size))
     image = cv2.morphologyEx(image, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_RECT, (5, 5)))
-    image = anisodiff(image, niter=1)
-    image = clahe.apply(image.astype(np.uint8))
-    del clahe
+    image = anisodiff(image, niter=1, kappa=50, gamma=0.25, step=(1., 1.), sigma=0, option=1)
+    if use_clahe:
+        clahe = cv2.createCLAHE(clipLimit=clip_limit, tileGridSize=(tile_grid_size, tile_grid_size))
+        image = clahe.apply(image.astype(np.uint8))
+        del clahe
+    else:
+        image = cv2.equalizeHist(image.astype(np.uint8))
     return image.astype(float)
 
 
