@@ -1,9 +1,10 @@
 import tkinter
-
+import sys
 import PIL.Image
 import PIL.ImageTk
 import cv2
 
+from tkinter import Tk, Frame, Menu, messagebox
 from VeinSegmentation.enhance import enhance_medical_image
 from components.ResizableCanvas import ResizingCanvas
 
@@ -12,10 +13,9 @@ x = 1600  # donde empieza el corte en x
 h = 600  # tamaño del corte en h
 w = 600  # tamaño del corte en y
 
+
 # https://zetcode.com/tkinter/menustoolbars/
 # https://solarianprogrammer.com/2018/04/20/python-opencv-show-image-tkinter-window/
-from tkinter import Tk, Frame, Menu, messagebox
-
 
 class App(Frame):
 
@@ -27,7 +27,6 @@ class App(Frame):
         self.initUI(image_path)
 
     def initUI(self, image_path):
-        self.master.title("Simple menu")
 
         menubar = Menu(self.master)
         self.master.config(menu=menubar)
@@ -55,12 +54,14 @@ class App(Frame):
         self.window.mainloop()
 
     def onExit(self):
-        if messagebox.askokcancel("Quit", "Do you want to quit?"):
+        if messagebox.askokcancel("Salir", "¿De seguro que quieres salir?"):
             self.window.destroy()
+            sys.exit()
 
 
 def main():
     root = Tk()
+    root.title('Segmentación de venas')
     root.geometry("1000x500")
     app = App(root)
     app.mainloop()
