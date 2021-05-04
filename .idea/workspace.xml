@@ -1,15 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="624e4b3f-726a-4aef-83f6-8e6812c5fd03" name="Default Changelist" comment="Limpieza del esqueleto y añadida posibilidad de ecualizacion por historgrama y algunos flags al programa principal.">
-      <change afterPath="$PROJECT_DIR$/components/ResizableCanvas.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/contour_script.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/enhance_script.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/subpixel_script.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test_gui.py" afterDir="false" />
+    <list default="true" id="624e4b3f-726a-4aef-83f6-8e6812c5fd03" name="Default Changelist" comment="recuperacion de scripts y vista principal de la iu">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/gui.py" beforeDir="false" afterPath="$PROJECT_DIR$/gui.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -87,7 +81,7 @@
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
-    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
+    <property name="settings.editor.selected.configurable" value="terminal" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
@@ -306,7 +300,7 @@
       <workItem from="1619186470746" duration="1278000" />
       <workItem from="1619452672343" duration="2332000" />
       <workItem from="1620063629996" duration="1492000" />
-      <workItem from="1620146687354" duration="1451000" />
+      <workItem from="1620146687354" duration="1846000" />
     </task>
     <task id="LOCAL-00001" summary="testeo y mejoras en el modulo de imagenes">
       <created>1612292936352</created>
@@ -434,7 +428,14 @@
       <option name="project" value="LOCAL" />
       <updated>1618253221470</updated>
     </task>
-    <option name="localTasksCounter" value="19" />
+    <task id="LOCAL-00019" summary="recuperacion de scripts y vista principal de la iu">
+      <created>1620148352436</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1620148352436</updated>
+    </task>
+    <option name="localTasksCounter" value="20" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -470,14 +471,15 @@
     <MESSAGE value="modularización del codigo" />
     <MESSAGE value="mejora en la visualizacion de las imagenes, y mejoras en la skeletonización y visualizacion de los resultados. Optimizaciones de memoria y correccion de errores" />
     <MESSAGE value="Limpieza del esqueleto y añadida posibilidad de ecualizacion por historgrama y algunos flags al programa principal." />
-    <option name="LAST_COMMIT_MESSAGE" value="Limpieza del esqueleto y añadida posibilidad de ecualizacion por historgrama y algunos flags al programa principal." />
+    <MESSAGE value="recuperacion de scripts y vista principal de la iu" />
+    <option name="LAST_COMMIT_MESSAGE" value="recuperacion de scripts y vista principal de la iu" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/gui.py</url>
-          <line>21</line>
+          <line>22</line>
           <option name="timeStamp" value="2" />
         </line-breakpoint>
       </breakpoints>

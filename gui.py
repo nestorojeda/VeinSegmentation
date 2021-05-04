@@ -14,16 +14,16 @@ w = 600  # tamaño del corte en y
 
 # https://zetcode.com/tkinter/menustoolbars/
 # https://solarianprogrammer.com/2018/04/20/python-opencv-show-image-tkinter-window/
-from tkinter import Tk, Frame, Menu
+from tkinter import Tk, Frame, Menu, messagebox
 
 
 class App(Frame):
 
     def __init__(self, window, image_path="imagenes_orginales/Caso A BN.png"):
         super().__init__(window)
-
         self._job = None
         self.window = window
+        self.window.protocol("WM_DELETE_WINDOW", self.onExit)
         self.initUI(image_path)
 
     def initUI(self, image_path):
@@ -55,7 +55,8 @@ class App(Frame):
         self.window.mainloop()
 
     def onExit(self):
-        self.quit()
+        if messagebox.askokcancel("Quit", "Do you want to quit?"):
+            self.window.destroy()
 
 
 def main():
