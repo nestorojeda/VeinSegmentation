@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="624e4b3f-726a-4aef-83f6-8e6812c5fd03" name="Default Changelist" comment="recuperacion de scripts y vista principal de la iu">
+    <list default="true" id="624e4b3f-726a-4aef-83f6-8e6812c5fd03" name="Default Changelist" comment="update ignore">
       <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
@@ -10,490 +10,44 @@
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="FileTemplateManagerImpl">
-    <option name="RECENT_TEMPLATES">
-      <list>
-        <option value="Python Script" />
-      </list>
-    </option>
-  </component>
   <component name="Git.Settings">
-    <excluded-from-favorite>
-      <branch-storage>
-        <map>
-          <entry type="REMOTE">
-            <value>
-              <list>
-                <branch-info repo="$PROJECT_DIR$" source="origin/master" />
-              </list>
-            </value>
-          </entry>
-        </map>
-      </branch-storage>
-    </excluded-from-favorite>
-    <favorite-branches>
-      <branch-storage>
-        <map>
-          <entry type="REMOTE">
-            <value>
-              <list>
-                <branch-info repo="$PROJECT_DIR$" source="origin/main" />
-              </list>
-            </value>
-          </entry>
-        </map>
-      </branch-storage>
-    </favorite-branches>
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
         <entry key="$PROJECT_DIR$" value="develop" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
-    <option name="RESET_MODE" value="MIXED" />
   </component>
-  <component name="GitSEFilterConfiguration">
-    <file-type-list>
-      <filtered-out-file-type name="LOCAL_BRANCH" />
-      <filtered-out-file-type name="REMOTE_BRANCH" />
-      <filtered-out-file-type name="TAG" />
-      <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
-    </file-type-list>
-  </component>
-  <component name="GithubPullRequestsUISettings">
-    <option name="hiddenUrls">
-      <set>
-        <option value="https://github.com/nestorojeda/VeinSegmentation" />
-      </set>
-    </option>
-  </component>
-  <component name="ProjectId" id="1nknGaqXDmWBWtdeb5mWFjtciHD" />
+  <component name="ProjectId" id="1s7hrTRRQu43DQuz3bDcGz9Ov7o" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
-    <property name="ASKED_MARK_IGNORED_FILES_AS_EXCLUDED" value="true" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
-    <property name="settings.editor.selected.configurable" value="terminal" />
-  </component>
-  <component name="RecentsManager">
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="D:\TFG\repo-tfg\subpixel_edges" />
-    </key>
-  </component>
-  <component name="RunManager" selected="Python.gui">
-    <configuration default="true" type="PythonConfigurationType" factoryName="Python">
-      <module name="repo-tfg" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="" />
-      <option name="IS_MODULE_SDK" value="false" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="true" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration name="contour_script" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="repo-tfg" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/contour_script.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="true" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration name="gui" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="repo-tfg" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/gui.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="true" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration name="main" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="repo-tfg" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/main.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration name="subpixel_script" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="repo-tfg" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/subpixel_script.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="true" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration name="test_gui" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="repo-tfg" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="D:\TFG\repo-tfg\test_gui.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <list>
-      <item itemvalue="Python.contour_script" />
-      <item itemvalue="Python.gui" />
-      <item itemvalue="Python.main" />
-      <item itemvalue="Python.subpixel_script" />
-      <item itemvalue="Python.test_gui" />
-    </list>
-    <recent_temporary>
-      <list>
-        <item itemvalue="Python.gui" />
-        <item itemvalue="Python.test_gui" />
-        <item itemvalue="Python.main" />
-        <item itemvalue="Python.subpixel_script" />
-        <item itemvalue="Python.contour_script" />
-      </list>
-    </recent_temporary>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="624e4b3f-726a-4aef-83f6-8e6812c5fd03" name="Default Changelist" comment="" />
-      <created>1611942863480</created>
+      <changelist id="624e4b3f-726a-4aef-83f6-8e6812c5fd03" name="Default Changelist" comment="update ignore" />
+      <created>1620229736100</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1611942863480</updated>
-      <workItem from="1611942864779" duration="2111000" />
-      <workItem from="1612200156569" duration="2779000" />
-      <workItem from="1612203429307" duration="3210000" />
-      <workItem from="1612287273268" duration="4747000" />
-      <workItem from="1612550513908" duration="861000" />
-      <workItem from="1612552271275" duration="3124000" />
-      <workItem from="1612805109214" duration="3874000" />
-      <workItem from="1612895237394" duration="5144000" />
-      <workItem from="1612979255661" duration="5708000" />
-      <workItem from="1613383116191" duration="2583000" />
-      <workItem from="1613408519815" duration="4306000" />
-      <workItem from="1613414712437" duration="1642000" />
-      <workItem from="1613582965238" duration="3303000" />
-      <workItem from="1613669617363" duration="2133000" />
-      <workItem from="1613903916224" duration="3724000" />
-      <workItem from="1614015918585" duration="3650000" />
-      <workItem from="1614185412253" duration="4397000" />
-      <workItem from="1614190376215" duration="2661000" />
-      <workItem from="1614365117174" duration="2669000" />
-      <workItem from="1614703846852" duration="6078000" />
-      <workItem from="1614872322085" duration="127000" />
-      <workItem from="1614879886884" duration="6188000" />
-      <workItem from="1615218902308" duration="126000" />
-      <workItem from="1615219035755" duration="499000" />
-      <workItem from="1615219545760" duration="7144000" />
-      <workItem from="1615310251651" duration="1771000" />
-      <workItem from="1615395325086" duration="1501000" />
-      <workItem from="1615398857567" duration="641000" />
-      <workItem from="1615402895368" duration="1879000" />
-      <workItem from="1615489619717" duration="1504000" />
-      <workItem from="1615824158571" duration="4544000" />
-      <workItem from="1616089456047" duration="4120000" />
-      <workItem from="1616530571925" duration="594000" />
-      <workItem from="1616603667570" duration="4186000" />
-      <workItem from="1616608996410" duration="1111000" />
-      <workItem from="1616695016236" duration="81000" />
-      <workItem from="1616695103564" duration="6608000" />
-      <workItem from="1617031298492" duration="3383000" />
-      <workItem from="1617121235612" duration="3040000" />
-      <workItem from="1617141701845" duration="2862000" />
-      <workItem from="1617144602340" duration="312000" />
-      <workItem from="1617636685523" duration="4658000" />
-      <workItem from="1617643452656" duration="1406000" />
-      <workItem from="1617721577383" duration="2978000" />
-      <workItem from="1617728003922" duration="1762000" />
-      <workItem from="1617819475942" duration="1095000" />
-      <workItem from="1617896851666" duration="8736000" />
-      <workItem from="1618234311501" duration="36000" />
-      <workItem from="1618249715460" duration="3802000" />
-      <workItem from="1618413927032" duration="2328000" />
-      <workItem from="1618501554986" duration="5199000" />
-      <workItem from="1618847541666" duration="43000" />
-      <workItem from="1618849363097" duration="789000" />
-      <workItem from="1619176838273" duration="1146000" />
-      <workItem from="1619186470746" duration="1278000" />
-      <workItem from="1619452672343" duration="2332000" />
-      <workItem from="1620063629996" duration="1492000" />
-      <workItem from="1620146687354" duration="1846000" />
+      <updated>1620229736100</updated>
+      <workItem from="1620229737743" duration="24000" />
     </task>
-    <task id="LOCAL-00001" summary="testeo y mejoras en el modulo de imagenes">
-      <created>1612292936352</created>
-      <option name="number" value="00001" />
-      <option name="presentableId" value="LOCAL-00001" />
-      <option name="project" value="LOCAL" />
-      <updated>1612292936352</updated>
-    </task>
-    <task id="LOCAL-00002" summary="gui para testeo y algunos fixes">
-      <created>1612902586606</created>
-      <option name="number" value="00002" />
-      <option name="presentableId" value="LOCAL-00002" />
-      <option name="project" value="LOCAL" />
-      <updated>1612902586606</updated>
-    </task>
-    <task id="LOCAL-00003" summary="updated utils">
-      <created>1613415394138</created>
-      <option name="number" value="00003" />
-      <option name="presentableId" value="LOCAL-00003" />
-      <option name="project" value="LOCAL" />
-      <updated>1613415394138</updated>
-    </task>
-    <task id="LOCAL-00004" summary="fix">
-      <created>1613415483650</created>
-      <option name="number" value="00004" />
-      <option name="presentableId" value="LOCAL-00004" />
-      <option name="project" value="LOCAL" />
-      <updated>1613415483650</updated>
-    </task>
-    <task id="LOCAL-00005" summary="cuantificacion">
-      <created>1613415740877</created>
-      <option name="number" value="00005" />
-      <option name="presentableId" value="LOCAL-00005" />
-      <option name="project" value="LOCAL" />
-      <updated>1613415740877</updated>
-    </task>
-    <task id="LOCAL-00006" summary="mejorada la cuantificacion mediante kmeans">
-      <created>1613587489996</created>
-      <option name="number" value="00006" />
-      <option name="presentableId" value="LOCAL-00006" />
-      <option name="project" value="LOCAL" />
-      <updated>1613587489996</updated>
-    </task>
-    <task id="LOCAL-00007" summary="mejorada la cuantificacion mediante kmeans">
-      <created>1614019682639</created>
-      <option name="number" value="00007" />
-      <option name="presentableId" value="LOCAL-00007" />
-      <option name="project" value="LOCAL" />
-      <updated>1614019682639</updated>
-    </task>
-    <task id="LOCAL-00008" summary="prototipo de contouring">
-      <created>1614884791282</created>
-      <option name="number" value="00008" />
-      <option name="presentableId" value="LOCAL-00008" />
-      <option name="project" value="LOCAL" />
-      <updated>1614884791282</updated>
-    </task>
-    <task id="LOCAL-00009" summary="contorno para encontrar la ubicacion de la pierna">
-      <created>1615232288390</created>
-      <option name="number" value="00009" />
-      <option name="presentableId" value="LOCAL-00009" />
-      <option name="project" value="LOCAL" />
-      <updated>1615232288390</updated>
-    </task>
-    <task id="LOCAL-00010" summary="contour module">
-      <created>1615403951691</created>
-      <option name="number" value="00010" />
-      <option name="presentableId" value="LOCAL-00010" />
-      <option name="project" value="LOCAL" />
-      <updated>1615403951691</updated>
-    </task>
-    <task id="LOCAL-00011" summary="modularización y pruebas con el">
-      <created>1615833362806</created>
-      <option name="number" value="00011" />
-      <option name="presentableId" value="LOCAL-00011" />
-      <option name="project" value="LOCAL" />
-      <updated>1615833362806</updated>
-    </task>
-    <task id="LOCAL-00012" summary="gitignore y algunos cambios en los scripts de prueba">
-      <created>1616608510153</created>
-      <option name="number" value="00012" />
-      <option name="presentableId" value="LOCAL-00012" />
-      <option name="project" value="LOCAL" />
-      <updated>1616608510153</updated>
-    </task>
-    <task id="LOCAL-00013" summary="operaciones con las capas segmentadas para posteriormente aplicar el esqueleto de cada una">
-      <created>1617144585465</created>
-      <option name="number" value="00013" />
-      <option name="presentableId" value="LOCAL-00013" />
-      <option name="project" value="LOCAL" />
-      <updated>1617144585465</updated>
-    </task>
-    <task id="LOCAL-00014" summary="Smoothing de los skeletos y union. Modularización de algunos componentes">
-      <created>1617641103010</created>
-      <option name="number" value="00014" />
-      <option name="presentableId" value="LOCAL-00014" />
-      <option name="project" value="LOCAL" />
-      <updated>1617641103010</updated>
-    </task>
-    <task id="LOCAL-00015" summary="Comentarios para tenerlo al dia">
-      <created>1617644863403</created>
-      <option name="number" value="00015" />
-      <option name="presentableId" value="LOCAL-00015" />
-      <option name="project" value="LOCAL" />
-      <updated>1617644863403</updated>
-    </task>
-    <task id="LOCAL-00016" summary="modularización del codigo">
-      <created>1617724917555</created>
-      <option name="number" value="00016" />
-      <option name="presentableId" value="LOCAL-00016" />
-      <option name="project" value="LOCAL" />
-      <updated>1617724917555</updated>
-    </task>
-    <task id="LOCAL-00017" summary="mejora en la visualizacion de las imagenes, y mejoras en la skeletonización y visualizacion de los resultados. Optimizaciones de memoria y correccion de errores">
-      <created>1617905282980</created>
-      <option name="number" value="00017" />
-      <option name="presentableId" value="LOCAL-00017" />
-      <option name="project" value="LOCAL" />
-      <updated>1617905282980</updated>
-    </task>
-    <task id="LOCAL-00018" summary="Limpieza del esqueleto y añadida posibilidad de ecualizacion por historgrama y algunos flags al programa principal.">
-      <created>1618253221470</created>
-      <option name="number" value="00018" />
-      <option name="presentableId" value="LOCAL-00018" />
-      <option name="project" value="LOCAL" />
-      <updated>1618253221470</updated>
-    </task>
-    <task id="LOCAL-00019" summary="recuperacion de scripts y vista principal de la iu">
-      <created>1620148352436</created>
-      <option name="number" value="00019" />
-      <option name="presentableId" value="LOCAL-00019" />
-      <option name="project" value="LOCAL" />
-      <updated>1620148352436</updated>
-    </task>
-    <option name="localTasksCounter" value="20" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
-    <option name="TAB_STATES">
-      <map>
-        <entry key="MAIN">
-          <value>
-            <State />
-          </value>
-        </entry>
-      </map>
-    </option>
     <option name="oldMeFiltersMigrated" value="true" />
-  </component>
-  <component name="VcsManagerConfiguration">
-    <MESSAGE value="testeo y mejoras en el modulo de imagenes" />
-    <MESSAGE value="gui para testeo y algunos fixes" />
-    <MESSAGE value="updated utils" />
-    <MESSAGE value="fix" />
-    <MESSAGE value="cuantificacion" />
-    <MESSAGE value="mejorada la cuantificacion mediante kmeans" />
-    <MESSAGE value="prototipo de contouring" />
-    <MESSAGE value="contorno para encontrar la ubicacion de la pierna" />
-    <MESSAGE value="contour module" />
-    <MESSAGE value="modularización y pruebas con el" />
-    <MESSAGE value="gitignore y algunos cambios en los scripts de prueba" />
-    <MESSAGE value="operaciones con las capas segmentadas para posteriormente aplicar el esqueleto de cada una" />
-    <MESSAGE value="Smoothing de los skeletos y union. Modularización de algunos componentes" />
-    <MESSAGE value="Comentarios para tenerlo al dia" />
-    <MESSAGE value="modularización del codigo" />
-    <MESSAGE value="mejora en la visualizacion de las imagenes, y mejoras en la skeletonización y visualizacion de los resultados. Optimizaciones de memoria y correccion de errores" />
-    <MESSAGE value="Limpieza del esqueleto y añadida posibilidad de ecualizacion por historgrama y algunos flags al programa principal." />
-    <MESSAGE value="recuperacion de scripts y vista principal de la iu" />
-    <option name="LAST_COMMIT_MESSAGE" value="recuperacion de scripts y vista principal de la iu" />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/gui.py</url>
-          <line>22</line>
-          <option name="timeStamp" value="2" />
-        </line-breakpoint>
-      </breakpoints>
-      <default-breakpoints>
-        <breakpoint type="python-exception">
-          <properties notifyOnTerminate="true" exception="BaseException">
-            <option name="notifyOnTerminate" value="true" />
-          </properties>
-        </breakpoint>
-      </default-breakpoints>
-    </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/repo_tfg$enhance_script.coverage" NAME="enhance_script Coverage Results" MODIFIED="1615229194367" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
