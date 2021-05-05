@@ -13,6 +13,8 @@ x = 1600  # donde empieza el corte en x
 h = 600  # tamaño del corte en h
 w = 600  # tamaño del corte en y
 
+moving = True
+drawing = False
 
 # https://zetcode.com/tkinter/menustoolbars/
 # https://solarianprogrammer.com/2018/04/20/python-opencv-show-image-tkinter-window/
@@ -68,7 +70,7 @@ class App(Frame):
     def bindCanvasEvents(self):
         """ Bind events to the Canvas """
         self.canvas.bind('<Configure>', self.show_image)  # canvas is resized
-        self.canvas.bind('<ButtonPress-1>', self.move_from)
+        self.canvas.bind('<ButtonPress-1>', self.clicked)
         self.canvas.bind('<B1-Motion>', self.move_to)
         self.canvas.bind('<MouseWheel>', self.wheel)  # with Windows and MacOS, but not Linux
         self.canvas.bind('<Button-5>', self.wheel)  # only with Linux, wheel scroll down
@@ -83,6 +85,15 @@ class App(Frame):
         """ Scroll canvas horizontally and redraw the image """
         self.canvas.xview(*args, **kwargs)  # scroll horizontally
         self.show_image()  # redraw the image
+
+    def clicked(self, event):
+        if moving:
+            self.move_from(event)
+        if drawing:
+            self.drawing(event)
+
+    def drawing(self, event):
+        print('drawing')
 
     def move_from(self, event):
         """ Remember previous coordinates for scrolling with the mouse """

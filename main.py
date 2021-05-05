@@ -9,7 +9,6 @@ import numpy as np
 from VeinSegmentation.enhance import enhance_medical_image, segmentation, smooth_thresholded_image, skeletonization, \
     color_layer_segmantation_filled
 from plotting import plotArray
-from subpixel_edges import subpixel_edges
 
 scaleX = 1
 scaleY = 1
