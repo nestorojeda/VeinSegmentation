@@ -2,16 +2,12 @@ import sys
 import tkinter as tk
 from tkinter import Tk, Frame, messagebox, ttk, Menu
 from tkinter import filedialog as fd
-
+from VeinSegmentation import enhance
+import cv2
 from PIL import Image
 from PIL import ImageTk
 
 from components.AutoScrollbar import AutoScrollbar
-
-y = 1300  # donde empieza el corte en y
-x = 1600  # donde empieza el corte en x
-h = 600  # tamaño del corte en h
-w = 600  # tamaño del corte en y
 
 moving = True
 drawing = False
@@ -30,6 +26,7 @@ class App(Frame):
         self.master.title('Segmentación de venas')
         self.master.protocol("WM_DELETE_WINDOW", self.onExit)
         self.filename = path
+        self.opencv_image = cv2.imread(self.filename)
         self.initUiComponents()
 
     def initUiComponents(self):
@@ -46,6 +43,11 @@ class App(Frame):
         fileMenu.add_command(label="Abrir Archivo", command=self.openFileMenu)
         fileMenu.add_command(label="Salir", command=self.onExit)
         menubar.add_cascade(label="Archivo", menu=fileMenu)
+
+        editMenu = Menu(menubar)
+        editMenu.add_command(label="Auto mejorar", command=self.enhance)
+        editMenu.add_command(label="Esqueletonizar", command=self.skeletonize)
+        menubar.add_cascade(label="Edicion", menu=editMenu)
 
         # Create canvas and put image on it
         self.canvas = tk.Canvas(self.master, highlightthickness=0,
@@ -87,13 +89,7 @@ class App(Frame):
         self.show_image()  # redraw the image
 
     def clicked(self, event):
-        if moving:
-            self.move_from(event)
-        if drawing:
-            self.drawing(event)
-
-    def drawing(self, event):
-        print('drawing')
+        self.move_from(event)
 
     def move_from(self, event):
         """ Remember previous coordinates for scrolling with the mouse """
@@ -165,12 +161,23 @@ class App(Frame):
             self.master.destroy()
             sys.exit()
 
+    def enhance(self):
+        self.opencv_enhanced = enhance.enhance_medical_image(self.opencv_image)
+        self.image = Image.fromarray(self.opencv_enhanced)
+        self.width, self.height = self.image.size
+        self.show_image()
+
+    def skeletonize(self):
+        print('Skeletonice command')
+
     def openFileMenu(self):
         file = fd.askopenfilename()
         if file:
             self.filename = file
+            self.opencv_image = cv2.imread(self.filename)
             self.image = Image.open(self.filename)  # open image
             self.width, self.height = self.image.size
+            self.show_image()
 
 
 def main():
