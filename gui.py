@@ -6,6 +6,7 @@ from VeinSegmentation import enhance
 import cv2
 from PIL import Image
 from PIL import ImageTk
+import numpy as np
 
 from components.AutoScrollbar import AutoScrollbar
 
@@ -29,6 +30,7 @@ class App(Frame):
         self.filename = path
         self.opencv_image = cv2.imread(self.filename)
         self.initUiComponents()
+        self.polygon_points = []
 
     def initUiComponents(self):
         # Vertical and horizontal scrollbars for canvas
@@ -95,9 +97,20 @@ class App(Frame):
     def clicked2(self, event):
         print('Event::mouse2')
         print('Event click position is x={} y={}'.format(event.x, event.y))
-        print('Real click position is x={} y={}'.format(event.x+self.x1, event.y+self.y1))
+        print('Real click position is x={} y={}'.format(event.x + self.x1, event.y + self.y1))
         print('Scale is {}'.format(self.imscale))
         print('Offset is x1={} y1={} x2={} y2={}'.format(self.x1, self.y1, self.x2, self.y2))
+        self.polygon_points.append([event.x + self.x1, event.y + self.y1])
+        pts = np.array(self.polygon_points).reshape((-1, 1, 2))
+        print('Polygon array: ', pts)
+
+        isClosed = True
+        # Blue color in BGR
+        color = (255, 0, 0)
+        # Line thickness of 2 px
+        thickness = 2
+        # TODO PINTAR EL POLIGONO
+        #image_with_polygon = cv2.polylines(self.opencv_image, pts, isClosed, color, thickness)
 
     def clicked1(self, event):
         print('Event::mouse1')
