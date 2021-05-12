@@ -12,6 +12,7 @@ from components.AutoScrollbar import AutoScrollbar
 moving = True
 drawing = False
 
+
 # https://zetcode.com/tkinter/menustoolbars/
 # https://solarianprogrammer.com/2018/04/20/python-opencv-show-image-tkinter-window/
 # https://www.semicolonworld.com/question/55637/how-to-get-tkinter-canvas-to-dynamically-resize-to-window-width
@@ -72,36 +73,51 @@ class App(Frame):
     def bindCanvasEvents(self):
         """ Bind events to the Canvas """
         self.canvas.bind('<Configure>', self.show_image)  # canvas is resized
-        self.canvas.bind('<ButtonPress-1>', self.clicked)
+        self.canvas.bind('<ButtonPress-1>', self.clicked1)
+        self.canvas.bind('<ButtonPress-3>', self.clicked2)
         self.canvas.bind('<B1-Motion>', self.move_to)
         self.canvas.bind('<MouseWheel>', self.wheel)  # with Windows and MacOS, but not Linux
         self.canvas.bind('<Button-5>', self.wheel)  # only with Linux, wheel scroll down
         self.canvas.bind('<Button-4>', self.wheel)  # only with Linux, wheel scroll up
 
     def scroll_y(self, *args, **kwargs):
+        print('Event::scroll_y')
         """ Scroll canvas vertically and redraw the image """
         self.canvas.yview(*args, **kwargs)  # scroll vertically
         self.show_image()  # redraw the image
 
     def scroll_x(self, *args, **kwargs):
         """ Scroll canvas horizontally and redraw the image """
+        print('Event::scroll_x')
         self.canvas.xview(*args, **kwargs)  # scroll horizontally
         self.show_image()  # redraw the image
 
-    def clicked(self, event):
+    def clicked2(self, event):
+        print('Event::mouse2')
+        print('Event click position is x={} y={}'.format(event.x, event.y))
+        print('Real click position is x={} y={}'.format(event.x+self.x1, event.y+self.y1))
+        print('Scale is {}'.format(self.imscale))
+        print('Offset is x1={} y1={} x2={} y2={}'.format(self.x1, self.y1, self.x2, self.y2))
+
+    def clicked1(self, event):
+        print('Event::mouse1')
         self.move_from(event)
 
     def move_from(self, event):
         """ Remember previous coordinates for scrolling with the mouse """
+        print('Event::move_from')
         self.canvas.scan_mark(event.x, event.y)
 
     def move_to(self, event):
         """ Drag (move) canvas to the new position """
+        print('Event::move_to')
         self.canvas.scan_dragto(event.x, event.y, gain=1)
         self.show_image()  # redraw the image
 
     def wheel(self, event):
         """ Zoom with mouse wheel """
+        print('Event::wheel')
+        # TODO DESECHAR DATOS DEL POLIGONO
         x = self.canvas.canvasx(event.x)
         y = self.canvas.canvasy(event.y)
         bbox = self.canvas.bbox(self.container)  # get image area
@@ -126,6 +142,7 @@ class App(Frame):
 
     def show_image(self, event=None):
         """ Show image on the Canvas """
+        print('Event::show_image')
         bbox1 = self.canvas.bbox(self.container)  # get image area
         # Remove 1 pixel shift at the sides of the bbox1
         bbox1 = (bbox1[0] + 1, bbox1[1] + 1, bbox1[2] - 1, bbox1[3] - 1)
@@ -146,6 +163,12 @@ class App(Frame):
         y1 = max(bbox2[1] - bbox1[1], 0)
         x2 = min(bbox2[2], bbox1[2]) - bbox1[0]
         y2 = min(bbox2[3], bbox1[3]) - bbox1[1]
+
+        self.x1 = x1
+        self.y1 = y1
+        self.x2 = x2
+        self.y2 = y2
+
         if int(x2 - x1) > 0 and int(y2 - y1) > 0:  # show image if it in the visible area
             x = min(int(x2 / self.imscale), self.width)  # sometimes it is larger on 1 pixel...
             y = min(int(y2 / self.imscale), self.height)  # ...and sometimes not
