@@ -83,59 +83,54 @@ class App(Frame):
         self.canvas.bind('<Button-4>', self.wheel)  # only with Linux, wheel scroll up
 
     def scroll_y(self, *args, **kwargs):
-        print('Event::scroll_y')
         """ Scroll canvas vertically and redraw the image """
         self.canvas.yview(*args, **kwargs)  # scroll vertically
         self.show_image()  # redraw the image
 
     def scroll_x(self, *args, **kwargs):
         """ Scroll canvas horizontally and redraw the image """
-        print('Event::scroll_x')
         self.canvas.xview(*args, **kwargs)  # scroll horizontally
         self.show_image()  # redraw the image
 
     def clicked2(self, event):
         print('Event::mouse2')
         print('Event click position is x={} y={}'.format(event.x, event.y))
-        print('Real click position is x={} y={}'.format(event.x + self.x1, event.y + self.y1))
-        print('Scale is {}'.format(self.imscale))
+        print('Real click position is x={} y={}'.format((event.x + self.x1)/self.imscale, (event.y + self.y1)/self.imscale))
         print('Offset is x1={} y1={} x2={} y2={}'.format(self.x1, self.y1, self.x2, self.y2))
-        self.polygon_points = np.append(self.polygon_points, [event.x + self.x1, event.y + self.y1])
-        print('polygon_points array: ', self.polygon_points)
+        self.polygon_points = np.append(self.polygon_points,
+                                        [(event.x + self.x1)/self.imscale, (event.y + self.y1)/self.imscale])
+
+        print('Scale is {}'.format(self.imscale))
+
         pts = np.array(self.polygon_points).reshape((-1, 1, 2))
-        print('Pts array: ', pts)
 
         isClosed = True
         # Blue color in BGR
         color = (255, 0, 0)
         # Line thickness of 2 px
         thickness = 2
-        # TODO PINTAR EL POLIGONO
+
         image_with_polygon = cv2.polylines(self.opencv_image, [pts.astype(np.int32)], isClosed, color, thickness)
-        self.image = self.openCVToPIL(image_with_polygon) # open image
+        # TODO crear mascara a partir del poligono
+        self.image = self.openCVToPIL(image_with_polygon)  # open image
         self.width, self.height = self.image.size
         self.show_image()
 
-
     def clicked1(self, event):
-        print('Event::mouse1')
         self.move_from(event)
 
     def move_from(self, event):
         """ Remember previous coordinates for scrolling with the mouse """
-        print('Event::move_from')
         self.canvas.scan_mark(event.x, event.y)
 
     def move_to(self, event):
         """ Drag (move) canvas to the new position """
-        print('Event::move_to')
         self.canvas.scan_dragto(event.x, event.y, gain=1)
         self.show_image()  # redraw the image
 
     def wheel(self, event):
         """ Zoom with mouse wheel """
         print('Event::wheel')
-        # TODO DESECHAR DATOS DEL POLIGONO
         x = self.canvas.canvasx(event.x)
         y = self.canvas.canvasy(event.y)
         bbox = self.canvas.bbox(self.container)  # get image area
@@ -160,7 +155,6 @@ class App(Frame):
 
     def show_image(self, event=None):
         """ Show image on the Canvas """
-        print('Event::show_image')
         bbox1 = self.canvas.bbox(self.container)  # get image area
         # Remove 1 pixel shift at the sides of the bbox1
         bbox1 = (bbox1[0] + 1, bbox1[1] + 1, bbox1[2] - 1, bbox1[3] - 1)
