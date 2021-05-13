@@ -69,7 +69,6 @@ class App(Frame):
         self.delta = 1.3  # zoom magnitude
         # Put image into container rectangle and use it to set proper coordinates to the image
         self.container = self.canvas.create_rectangle(0, 0, self.width, self.height, width=0)
-
         self.show_image()
 
     def bindCanvasEvents(self):
@@ -97,24 +96,25 @@ class App(Frame):
         print('Event click position is x={} y={}'.format(event.x, event.y))
         print('Real click position is x={} y={}'.format((event.x + self.x1)/self.imscale, (event.y + self.y1)/self.imscale))
         print('Offset is x1={} y1={} x2={} y2={}'.format(self.x1, self.y1, self.x2, self.y2))
-        self.polygon_points = np.append(self.polygon_points,
+        if (event.x + self.x1)/self.imscale >= 0 and (event.y + self.y1)/self.imscale >= 0:
+            self.polygon_points = np.append(self.polygon_points,
                                         [(event.x + self.x1)/self.imscale, (event.y + self.y1)/self.imscale])
 
-        print('Scale is {}'.format(self.imscale))
+            print('Scale is {}'.format(self.imscale))
 
-        pts = np.array(self.polygon_points).reshape((-1, 1, 2))
+            pts = np.array(self.polygon_points).reshape((-1, 1, 2))
 
-        isClosed = True
-        # Blue color in BGR
-        color = (255, 0, 0)
-        # Line thickness of 2 px
-        thickness = 2
+            isClosed = True
+            # Blue color in BGR
+            color = (255, 0, 0)
+            # Line thickness of 2 px
+            thickness = 2
 
-        image_with_polygon = cv2.polylines(self.opencv_image, [pts.astype(np.int32)], isClosed, color, thickness)
-        # TODO crear mascara a partir del poligono
-        self.image = self.openCVToPIL(image_with_polygon)  # open image
-        self.width, self.height = self.image.size
-        self.show_image()
+            image_with_polygon = cv2.polylines(self.opencv_image, [pts.astype(np.int32)], isClosed, color, thickness)
+            # TODO crear mascara a partir del poligono
+            self.image = self.openCVToPIL(image_with_polygon)  # open image
+            self.width, self.height = self.image.size
+            self.show_image()
 
     def clicked1(self, event):
         self.move_from(event)
@@ -176,8 +176,8 @@ class App(Frame):
         x2 = min(bbox2[2], bbox1[2]) - bbox1[0]
         y2 = min(bbox2[3], bbox1[3]) - bbox1[1]
 
-        self.x1 = x1
-        self.y1 = y1
+        self.x1 = bbox2[0] - bbox1[0]
+        self.y1 = bbox2[1] - bbox1[1]
         self.x2 = x2
         self.y2 = y2
 
