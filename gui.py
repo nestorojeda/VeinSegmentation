@@ -30,7 +30,7 @@ class App(Frame):
         self.filename = path
         self.opencv_image = cv2.imread(self.filename)
         self.initUiComponents()
-        self.polygon_points = []
+        self.polygon_points = np.array([])
 
     def initUiComponents(self):
         # Vertical and horizontal scrollbars for canvas
@@ -100,9 +100,10 @@ class App(Frame):
         print('Real click position is x={} y={}'.format(event.x + self.x1, event.y + self.y1))
         print('Scale is {}'.format(self.imscale))
         print('Offset is x1={} y1={} x2={} y2={}'.format(self.x1, self.y1, self.x2, self.y2))
-        self.polygon_points.append([event.x + self.x1, event.y + self.y1])
+        self.polygon_points = np.append(self.polygon_points, [event.x + self.x1, event.y + self.y1])
+        print('polygon_points array: ', self.polygon_points)
         pts = np.array(self.polygon_points).reshape((-1, 1, 2))
-        print('Polygon array: ', pts)
+        print('Pts array: ', pts)
 
         isClosed = True
         # Blue color in BGR
@@ -110,7 +111,11 @@ class App(Frame):
         # Line thickness of 2 px
         thickness = 2
         # TODO PINTAR EL POLIGONO
-        #image_with_polygon = cv2.polylines(self.opencv_image, pts, isClosed, color, thickness)
+        image_with_polygon = cv2.polylines(self.opencv_image, [pts.astype(np.int32)], isClosed, color, thickness)
+        self.image = self.openCVToPIL(image_with_polygon) # open image
+        self.width, self.height = self.image.size
+        self.show_image()
+
 
     def clicked1(self, event):
         print('Event::mouse1')
@@ -214,6 +219,11 @@ class App(Frame):
             self.image = Image.open(self.filename)  # open image
             self.width, self.height = self.image.size
             self.show_image()
+
+    def openCVToPIL(self, img):
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        im_pil = Image.fromarray(img)
+        return im_pil
 
 
 def main():
