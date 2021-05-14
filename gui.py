@@ -1,3 +1,4 @@
+import copy
 import sys
 import tkinter as tk
 from tkinter import Tk, Frame, messagebox, ttk, Menu
@@ -7,6 +8,8 @@ import cv2
 from PIL import Image
 from PIL import ImageTk
 import numpy as np
+import matplotlib.pyplot as plt
+import constants.colors as color
 
 from components.AutoScrollbar import AutoScrollbar
 
@@ -31,6 +34,7 @@ class App(Frame):
         self.opencv_image = cv2.imread(self.filename)
         self.initUiComponents()
         self.polygon_points = np.array([])
+        self.bind("<c>", self.clean())
 
     def initUiComponents(self):
         # Vertical and horizontal scrollbars for canvas
@@ -94,27 +98,36 @@ class App(Frame):
     def clicked2(self, event):
         print('Event::mouse2')
         print('Event click position is x={} y={}'.format(event.x, event.y))
-        print('Real click position is x={} y={}'.format((event.x + self.x1)/self.imscale, (event.y + self.y1)/self.imscale))
+        print('Real click position is x={} y={}'.format((event.x + self.x1) / self.imscale,
+                                                        (event.y + self.y1) / self.imscale))
         print('Offset is x1={} y1={} x2={} y2={}'.format(self.x1, self.y1, self.x2, self.y2))
-        if (event.x + self.x1)/self.imscale >= 0 and (event.y + self.y1)/self.imscale >= 0:
+        # We only use positive real points
+        if (event.x + self.x1) / self.imscale >= 0 and (event.y + self.y1) / self.imscale >= 0:
             self.polygon_points = np.append(self.polygon_points,
-                                        [(event.x + self.x1)/self.imscale, (event.y + self.y1)/self.imscale])
+                                            [(event.x + self.x1) / self.imscale, (event.y + self.y1) / self.imscale])
 
             print('Scale is {}'.format(self.imscale))
-
             pts = np.array(self.polygon_points).reshape((-1, 1, 2))
-
-            isClosed = True
-            # Blue color in BGR
-            color = (255, 0, 0)
-            # Line thickness of 2 px
+            isClosed = False
             thickness = 2
 
-            image_with_polygon = cv2.polylines(self.opencv_image, [pts.astype(np.int32)], isClosed, color, thickness)
-            # TODO crear mascara a partir del poligono
+            # Creamos una linea para visualizar el area que se va a utilizar
+            image_with_polygon = cv2.polylines(self.opencv_image.copy(), [pts.astype(np.int32)], isClosed=isClosed,
+                                               color=color.red, thickness=thickness)
+            # Creamos la máscara cerrando el poligono
+            self.mask = cv2.fillPoly(np.zeros((self.height, self.width, 3)),
+                                     [pts.astype(np.int32)], color=color.white)
+            plt.imshow(self.mask)
+            plt.show()
             self.image = self.openCVToPIL(image_with_polygon)  # open image
             self.width, self.height = self.image.size
             self.show_image()
+
+    def clean(self):
+        print('Event:clean')
+        self.opencv_image = cv2.imread(self.filename)
+        self.polygon_points = np.array([])
+        self.show_image()
 
     def clicked1(self, event):
         self.move_from(event)
