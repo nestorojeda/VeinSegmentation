@@ -35,6 +35,8 @@ class App(Frame):
         self.opencv_image = cv2.imread(self.filename)
         self.initUiComponents()
         self.polygon_points = np.array([])
+        self.isClosed = False
+        self.thickness = 2
 
     def initUiComponents(self):
         # Vertical and horizontal scrollbars for canvas
@@ -109,12 +111,10 @@ class App(Frame):
 
             print('Scale is {}'.format(self.imscale))
             pts = np.array(self.polygon_points).reshape((-1, 1, 2))
-            isClosed = False
-            thickness = 2
 
             # Creamos una linea para visualizar el area que se va a utilizar
-            image_with_polygon = cv2.polylines(self.opencv_image.copy(), [pts.astype(np.int32)], isClosed=isClosed,
-                                               color=color.red, thickness=thickness)
+            image_with_polygon = cv2.polylines(self.opencv_image.copy(), [pts.astype(np.int32)], isClosed=self.isClosed,
+                                               color=color.red, thickness=self.thickness)
             # Creamos la máscara cerrando el poligono
             self.mask = cv2.fillPoly(np.zeros((self.height, self.width, 3)),
                                      [pts.astype(np.int32)], color=color.white)
@@ -214,7 +214,14 @@ class App(Frame):
             sys.exit()
 
     def enhance(self):
-        mask.extract_roi(self.opencv_image, self.mask)
+        enhanced = mask.apply_enhance_to_roi(self.opencv_image, self.mask)
+        pts = np.array(self.polygon_points).reshape((-1, 1, 2))
+
+        image_with_polygon = cv2.polylines(enhanced.copy(), [pts.astype(np.int32)], isClosed=self.isClosed,
+                                           color=color.red, thickness=self.thickness)
+        self.image = openCVToPIL(image_with_polygon)
+        self.width, self.height = self.image.size
+        self.show_image()
 
 
     def skeletonize(self):
