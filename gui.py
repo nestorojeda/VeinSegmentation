@@ -9,7 +9,7 @@ from PIL import Image
 from PIL import ImageTk
 
 import constants.colors as color
-from VeinSegmentation import enhance
+from VeinSegmentation import enhance, mask
 from components.AutoScrollbar import AutoScrollbar
 from utils.utils import openCVToPIL
 
@@ -78,8 +78,8 @@ class App(Frame):
     def bindCanvasEvents(self):
         """ Bind events to the Canvas """
         self.canvas.bind('<Configure>', self.show_image)  # canvas is resized
-        self.canvas.bind('<ButtonPress-1>', self.clicked1)
-        self.canvas.bind('<ButtonPress-3>', self.clicked2)
+        self.canvas.bind('<ButtonPress-1>', self.click_move)
+        self.canvas.bind('<ButtonPress-3>', self.click_draw_polygon)
         self.canvas.bind('<B1-Motion>', self.move_to)
         self.canvas.bind('<MouseWheel>', self.wheel)  # with Windows and MacOS, but not Linux
         self.canvas.bind('<Button-5>', self.wheel)  # only with Linux, wheel scroll down
@@ -96,7 +96,7 @@ class App(Frame):
         self.canvas.xview(*args, **kwargs)  # scroll horizontally
         self.show_image()  # redraw the image
 
-    def clicked2(self, event):
+    def click_draw_polygon(self, event):
         print('Event::mouse2')
         print('Event click position is x={} y={}'.format(event.x, event.y))
         print('Real click position is x={} y={}'.format((event.x + self.x1) / self.imscale,
@@ -133,7 +133,7 @@ class App(Frame):
         self.width, self.height = self.image.size
         self.show_image()
 
-    def clicked1(self, event):
+    def click_move(self, event):
         self.move_from(event)
 
     def move_from(self, event):
@@ -214,10 +214,8 @@ class App(Frame):
             sys.exit()
 
     def enhance(self):
-        self.opencv_enhanced = enhance.enhance_medical_image(self.opencv_image)
-        self.image = Image.fromarray(self.opencv_enhanced)
-        self.width, self.height = self.image.size
-        self.show_image()
+        mask.extract_roi(self.opencv_image, self.mask)
+
 
     def skeletonize(self):
         print('Skeletonice command')
@@ -230,6 +228,7 @@ class App(Frame):
             self.image = Image.open(self.filename)  # open image
             self.width, self.height = self.image.size
             self.show_image()
+
 
 def main():
     root = Tk()
