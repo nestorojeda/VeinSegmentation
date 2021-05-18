@@ -28,13 +28,13 @@ class App(Frame):
         ''' Initialize the main Frame '''
         ttk.Frame.__init__(self, master=mainframe)
         super().__init__(**kw)
+        self.mask = None
         self.master.title('Segmentación de venas')
         self.master.protocol("WM_DELETE_WINDOW", self.onExit)
         self.filename = path
         self.opencv_image = cv2.imread(self.filename)
         self.initUiComponents()
         self.polygon_points = np.array([])
-        self.bind("<c>", self.clean())
 
     def initUiComponents(self):
         # Vertical and horizontal scrollbars for canvas
@@ -84,6 +84,7 @@ class App(Frame):
         self.canvas.bind('<MouseWheel>', self.wheel)  # with Windows and MacOS, but not Linux
         self.canvas.bind('<Button-5>', self.wheel)  # only with Linux, wheel scroll down
         self.canvas.bind('<Button-4>', self.wheel)  # only with Linux, wheel scroll up
+        self.master.bind('<KeyRelease-c>', self.clean)
 
     def scroll_y(self, *args, **kwargs):
         """ Scroll canvas vertically and redraw the image """
@@ -117,16 +118,19 @@ class App(Frame):
             # Creamos la máscara cerrando el poligono
             self.mask = cv2.fillPoly(np.zeros((self.height, self.width, 3)),
                                      [pts.astype(np.int32)], color=color.white)
-            plt.imshow(self.mask)
-            plt.show()
+            # Uncomment to test
+            # plt.imshow(self.mask)
+            # plt.show()
             self.image = self.openCVToPIL(image_with_polygon)  # open image
             self.width, self.height = self.image.size
             self.show_image()
 
-    def clean(self):
+    def clean(self, event):
         print('Event:clean')
         self.opencv_image = cv2.imread(self.filename)
+        self.image = self.openCVToPIL(self.opencv_image)  # open image
         self.polygon_points = np.array([])
+        self.width, self.height = self.image.size
         self.show_image()
 
     def clicked1(self, event):
