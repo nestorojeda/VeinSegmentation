@@ -1,17 +1,17 @@
-import copy
 import sys
 import tkinter as tk
 from tkinter import Tk, Frame, messagebox, ttk, Menu
 from tkinter import filedialog as fd
-from VeinSegmentation import enhance
+
 import cv2
+import numpy as np
 from PIL import Image
 from PIL import ImageTk
-import numpy as np
-import matplotlib.pyplot as plt
-import constants.colors as color
 
+import constants.colors as color
+from VeinSegmentation import enhance
 from components.AutoScrollbar import AutoScrollbar
+from utils.utils import openCVToPIL
 
 moving = True
 drawing = False
@@ -121,14 +121,14 @@ class App(Frame):
             # Uncomment to test
             # plt.imshow(self.mask)
             # plt.show()
-            self.image = self.openCVToPIL(image_with_polygon)  # open image
+            self.image = openCVToPIL(image_with_polygon)  # open image
             self.width, self.height = self.image.size
             self.show_image()
 
     def clean(self, event):
         print('Event:clean')
         self.opencv_image = cv2.imread(self.filename)
-        self.image = self.openCVToPIL(self.opencv_image)  # open image
+        self.image = openCVToPIL(self.opencv_image)  # open image
         self.polygon_points = np.array([])
         self.width, self.height = self.image.size
         self.show_image()
@@ -230,12 +230,6 @@ class App(Frame):
             self.image = Image.open(self.filename)  # open image
             self.width, self.height = self.image.size
             self.show_image()
-
-    def openCVToPIL(self, img):
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        im_pil = Image.fromarray(img)
-        return im_pil
-
 
 def main():
     root = Tk()

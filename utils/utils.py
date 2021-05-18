@@ -1,7 +1,13 @@
 import cv2
 import numpy as np
-from PIL import Image
 from skimage.feature import hessian_matrix, hessian_matrix_eigvals
+from PIL import Image
+
+
+def openCVToPIL(img):
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    im_pil = Image.fromarray(img)
+    return im_pil
 
 
 def DetectRidges(gray, sigma=3.0):
