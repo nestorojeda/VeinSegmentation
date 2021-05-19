@@ -22,22 +22,26 @@ drawing = False
 # https://www.semicolonworld.com/question/55637/how-to-get-tkinter-canvas-to-dynamically-resize-to-window-width
 
 class App(Frame):
-    ''' Advanced zoom of the image '''
+    """ Advanced zoom of the image """
 
     def __init__(self, mainframe, path="imagenes_orginales/Caso A BN.png", **kw):
-        ''' Initialize the main Frame '''
+        """ Initialize the main Frame """
         ttk.Frame.__init__(self, master=mainframe)
         super().__init__(**kw)
         self.mask = None
         self.master.title('Segmentación de venas')
         self.master.protocol("WM_DELETE_WINDOW", self.onExit)
         # Variables
-        self.filename = path
-        self.opencv_image = cv2.imread(self.filename)
-        self.polygon_points = np.array([])
-        self.isClosed = False
-        self.thickness = 2
-        self.enhanced = False
+        self.image = None # Imagen que se va a mostrar en formato PIL
+        self.width = 0 # Ancho de la imagen
+        self.height = 0 # Alto de la imagen
+        self.filename = path # Ruta de la imagen
+        self.opencv_image = cv2.imread(self.filename) # Imagen que se muestra en formato OpenCV
+        self.polygon_points = np.array([]) # Puntos que forman el poligono
+        self.isClosed = False # Define si el poligono se cierra autmáticamente al poner los puntos
+        self.thickness = 2 # Ancho de la línea
+        self.enhanced = False # Flag para saber si la imagen está mejorada
+        self.skeletonized = False # Flag para saber si la imagen está esqueletonizada
 
         self.initUiComponents()
 
@@ -221,19 +225,24 @@ class App(Frame):
             sys.exit()
 
     def enhance(self):
-        enhanced = mask.apply_enhance_to_roi(self.opencv_image, self.mask)
+        self.opencv_image = mask.apply_enhance_to_roi(self.opencv_image, self.mask)
         pts = np.array(self.polygon_points).reshape((-1, 1, 2))
-
-        image_with_polygon = cv2.polylines(enhanced.copy(), [pts.astype(np.int32)], isClosed=self.isClosed,
+        image_with_polygon = cv2.polylines(self.opencv_image.copy(), [pts.astype(np.int32)], isClosed=self.isClosed,
                                            color=color.red, thickness=self.thickness)
+
         self.image = openCVToPIL(image_with_polygon)
         self.enhanced = True
         self.width, self.height = self.image.size
         self.show_image()
 
-
     def skeletonize(self):
-        print('Skeletonice command')
+        skeletonized = mask.apply_skeletonization_to_roi(self.opencv_image, self.mask)
+        pts = np.array(self.polygon_points).reshape((-1, 1, 2))
+
+        self.image = openCVToPIL(skeletonized)
+        self.skeletonized = True
+        self.width, self.height = self.image.size
+        self.show_image()
 
     def openFileMenu(self):
         file = fd.askopenfilename()
