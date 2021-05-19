@@ -31,12 +31,15 @@ class App(Frame):
         self.mask = None
         self.master.title('Segmentación de venas')
         self.master.protocol("WM_DELETE_WINDOW", self.onExit)
+        # Variables
         self.filename = path
         self.opencv_image = cv2.imread(self.filename)
-        self.initUiComponents()
         self.polygon_points = np.array([])
         self.isClosed = False
         self.thickness = 2
+        self.enhanced = False
+
+        self.initUiComponents()
 
     def initUiComponents(self):
         # Vertical and horizontal scrollbars for canvas
@@ -106,6 +109,10 @@ class App(Frame):
         print('Offset is x1={} y1={} x2={} y2={}'.format(self.x1, self.y1, self.x2, self.y2))
         # We only use positive real points
         if (event.x + self.x1) / self.imscale >= 0 and (event.y + self.y1) / self.imscale >= 0:
+            if self.enhanced:
+                self.polygon_points = np.array([])
+                self.enhanced = False
+
             self.polygon_points = np.append(self.polygon_points,
                                             [(event.x + self.x1) / self.imscale, (event.y + self.y1) / self.imscale])
 
@@ -220,6 +227,7 @@ class App(Frame):
         image_with_polygon = cv2.polylines(enhanced.copy(), [pts.astype(np.int32)], isClosed=self.isClosed,
                                            color=color.red, thickness=self.thickness)
         self.image = openCVToPIL(image_with_polygon)
+        self.enhanced = True
         self.width, self.height = self.image.size
         self.show_image()
 

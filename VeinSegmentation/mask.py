@@ -28,7 +28,7 @@ def apply_enhance_to_roi(image, mask):
         for y in range(0, width):
             if mask[x, y] == white:
                 enhanced[x, y] = enhanced_roi[x, y]
-            if mask[x, y] == black:
+            else:
                 enhanced[x, y] = image[x, y]
 
     elapsed = time() - now
