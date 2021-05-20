@@ -1,17 +1,17 @@
-import copy
 import sys
 import tkinter as tk
 from tkinter import Tk, Frame, messagebox, ttk, Menu
 from tkinter import filedialog as fd
-from VeinSegmentation import enhance
+
 import cv2
+import numpy as np
 from PIL import Image
 from PIL import ImageTk
-import numpy as np
-import matplotlib.pyplot as plt
-import constants.colors as color
 
+import constants.colors as color
 from components.AutoScrollbar import AutoScrollbar
+from utils.utils import openCVToPIL
+from VeinSegmentation import mask
 
 moving = True
 drawing = False
