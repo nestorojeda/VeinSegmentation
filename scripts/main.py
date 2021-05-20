@@ -8,7 +8,7 @@ import numpy as np
 
 from VeinSegmentation.enhance import enhance_medical_image, segmentation, smooth_thresholded_image, skeletonization, \
     color_layer_segmantation_filled
-from plotting import plotArray
+from utils.plotting import plotArray
 
 scaleX = 1
 scaleY = 1
@@ -30,7 +30,7 @@ dissmiss_whites = False
 result_over_enhanced = True
 if __name__ == '__main__':
     this_path = os.path.dirname(os.path.realpath(__file__))
-    img = cv2.imread(os.path.join(this_path, 'imagenes_orginales/Caso A BN.png'))
+    img = cv2.imread(os.path.join(this_path, '../imagenes_orginales/Caso A BN.png'))
     img_gray = (cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)).astype(float)
 
     now = time()

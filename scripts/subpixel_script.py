@@ -17,7 +17,7 @@ w = 600  # tamaño del corte en y
 
 if __name__ == '__main__':
     this_path = os.path.dirname(os.path.realpath(__file__))
-    img = cv2.imread(os.path.join(this_path, 'imagenes_orginales/Caso A BN.png'))
+    img = cv2.imread(os.path.join(this_path, '../imagenes_orginales/Caso A BN.png'))
 
     img_gray = (cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)).astype(float)
     zoom = img_gray[y:y + h, x:x + w]

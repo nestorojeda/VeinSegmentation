@@ -9,7 +9,7 @@ x = 1600  # donde empieza el corte en x
 h = 600  # tamaño del corte en h
 w = 600  # tamaño del corte en y
 
-image = (cv2.imread('imagenes_orginales/Caso A BN.png'))
+image = (cv2.imread('../imagenes_orginales/Caso A BN.png'))
 zoom = image[y:y + h, x:x + w]
 
 enhanced = enhance_medical_image(zoom, clip_limit=8, tile_grid_size=8)

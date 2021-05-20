@@ -22,27 +22,36 @@ drawing = False
 # https://www.semicolonworld.com/question/55637/how-to-get-tkinter-canvas-to-dynamically-resize-to-window-width
 
 class App(Frame):
-    ''' Advanced zoom of the image '''
+    """ Advanced zoom of the image """
 
     def __init__(self, mainframe, **kw):
-        ''' Initialize the main Frame '''
+        """ Initialize the main Frame """
         ttk.Frame.__init__(self, master=mainframe)
         super().__init__(**kw)
         self.mask = None
         self.master.title('Segmentación de venas')
         self.master.protocol("WM_DELETE_WINDOW", self.onExit)
-        self.initWelcomeComponents()
+        # Variables
 
+        self.image = None  # Imagen que se va a mostrar en formato PIL
+        self.width = 0  # Ancho de la imagen
+        self.height = 0  # Alto de la imagen
 
-    def initWelcomeComponents(self):
+        self.polygon_points = np.array([])  # Puntos que forman el poligono
+        self.isClosed = False  # Define si el poligono se cierra autmáticamente al poner los puntos
+        self.thickness = 2  # Ancho de la línea
+        self.enhanced = False  # Flag para saber si la imagen está mejorada
+        self.skeletonized = False  # Flag para saber si la imagen está esqueletonizada
+        self.initWelcomeUI()
+
+    def initWelcomeUI(self):
         file = fd.askopenfilename()
         if file:
             self.filename = file
-            self.opencv_image = cv2.imread(file)
-            self.initUiComponents()
+            self.opencv_image = cv2.imread(self.filename)
             self.image = Image.open(self.filename)  # open image
             self.width, self.height = self.image.size
-            self.polygon_points = np.array([])
+            self.initUiComponents()
             self.show_image()
 
     def initUiComponents(self):
@@ -87,8 +96,8 @@ class App(Frame):
     def bindCanvasEvents(self):
         """ Bind events to the Canvas """
         self.canvas.bind('<Configure>', self.show_image)  # canvas is resized
-        self.canvas.bind('<ButtonPress-1>', self.clicked1)
-        self.canvas.bind('<ButtonPress-3>', self.clicked2)
+        self.canvas.bind('<ButtonPress-1>', self.click_move)
+        self.canvas.bind('<ButtonPress-3>', self.click_draw_polygon)
         self.canvas.bind('<B1-Motion>', self.move_to)
         self.canvas.bind('<MouseWheel>', self.wheel)  # with Windows and MacOS, but not Linux
         self.canvas.bind('<Button-5>', self.wheel)  # only with Linux, wheel scroll down
@@ -105,7 +114,7 @@ class App(Frame):
         self.canvas.xview(*args, **kwargs)  # scroll horizontally
         self.show_image()  # redraw the image
 
-    def clicked2(self, event):
+    def click_draw_polygon(self, event):
         print('Event::mouse2')
         print('Event click position is x={} y={}'.format(event.x, event.y))
         print('Real click position is x={} y={}'.format((event.x + self.x1) / self.imscale,
@@ -113,36 +122,39 @@ class App(Frame):
         print('Offset is x1={} y1={} x2={} y2={}'.format(self.x1, self.y1, self.x2, self.y2))
         # We only use positive real points
         if (event.x + self.x1) / self.imscale >= 0 and (event.y + self.y1) / self.imscale >= 0:
+            if self.enhanced:
+                self.image = openCVToPIL(self.opencv_image)
+                self.polygon_points = np.array([])
+                self.enhanced = False
+
             self.polygon_points = np.append(self.polygon_points,
                                             [(event.x + self.x1) / self.imscale, (event.y + self.y1) / self.imscale])
 
             print('Scale is {}'.format(self.imscale))
             pts = np.array(self.polygon_points).reshape((-1, 1, 2))
-            isClosed = False
-            thickness = 2
 
             # Creamos una linea para visualizar el area que se va a utilizar
-            image_with_polygon = cv2.polylines(self.opencv_image.copy(), [pts.astype(np.int32)], isClosed=isClosed,
-                                               color=color.red, thickness=thickness)
+            image_with_polygon = cv2.polylines(self.opencv_image.copy(), [pts.astype(np.int32)], isClosed=self.isClosed,
+                                               color=color.red, thickness=self.thickness)
             # Creamos la máscara cerrando el poligono
             self.mask = cv2.fillPoly(np.zeros((self.height, self.width, 3)),
                                      [pts.astype(np.int32)], color=color.white)
             # Uncomment to test
             # plt.imshow(self.mask)
             # plt.show()
-            self.image = self.openCVToPIL(image_with_polygon)  # open image
+            self.image = openCVToPIL(image_with_polygon)  # open image
             self.width, self.height = self.image.size
             self.show_image()
 
     def clean(self, event):
         print('Event:clean')
         self.opencv_image = cv2.imread(self.filename)
-        self.image = self.openCVToPIL(self.opencv_image)  # open image
+        self.image = openCVToPIL(self.opencv_image)  # open image
         self.polygon_points = np.array([])
         self.width, self.height = self.image.size
         self.show_image()
 
-    def clicked1(self, event):
+    def click_move(self, event):
         self.move_from(event)
 
     def move_from(self, event):
@@ -223,13 +235,18 @@ class App(Frame):
             sys.exit()
 
     def enhance(self):
-        self.opencv_enhanced = enhance.enhance_medical_image(self.opencv_image)
-        self.image = Image.fromarray(self.opencv_enhanced)
+        self.enhanced = mask.apply_enhance_to_roi(self.opencv_image, self.mask)
+        pts = np.array(self.polygon_points).reshape((-1, 1, 2))
+        image_with_polygon = cv2.polylines(self.enhanced, [pts.astype(np.int32)], isClosed=self.isClosed,
+                                           color=color.red, thickness=self.thickness)
+
+        self.image = openCVToPIL(image_with_polygon)
+        self.enhanced = True
         self.width, self.height = self.image.size
         self.show_image()
 
     def skeletonize(self):
-        print('Skeletonice command')
+        print('Skeletonization')
 
     def openFileMenu(self):
         file = fd.askopenfilename()

@@ -15,7 +15,7 @@ iters = 2
 threshold = 4.5
 order = 2
 
-original = (cv2.imread('imagenes_orginales/Caso A BN.png'))
+original = (cv2.imread('../imagenes_orginales/Caso A BN.png'))
 enhanced_gray = (cv2.cvtColor(original, cv2.COLOR_BGR2GRAY)).astype(float)
 zoom = enhanced_gray[y:y + h, x:x + w]
 
