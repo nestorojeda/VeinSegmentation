@@ -24,7 +24,7 @@ drawing = False
 class App(Frame):
     """ Advanced zoom of the image """
 
-    def __init__(self, mainframe, path="imagenes_orginales/Caso A BN.png", **kw):
+    def __init__(self, mainframe, **kw):
         """ Initialize the main Frame """
         ttk.Frame.__init__(self, master=mainframe)
         super().__init__(**kw)
@@ -32,18 +32,27 @@ class App(Frame):
         self.master.title('Segmentación de venas')
         self.master.protocol("WM_DELETE_WINDOW", self.onExit)
         # Variables
-        self.image = None # Imagen que se va a mostrar en formato PIL
-        self.width = 0 # Ancho de la imagen
-        self.height = 0 # Alto de la imagen
-        self.filename = path # Ruta de la imagen
-        self.opencv_image = cv2.imread(self.filename) # Imagen que se muestra en formato OpenCV
-        self.polygon_points = np.array([]) # Puntos que forman el poligono
-        self.isClosed = False # Define si el poligono se cierra autmáticamente al poner los puntos
-        self.thickness = 2 # Ancho de la línea
-        self.enhanced = False # Flag para saber si la imagen está mejorada
-        self.skeletonized = False # Flag para saber si la imagen está esqueletonizada
 
-        self.initUiComponents()
+        self.image = None  # Imagen que se va a mostrar en formato PIL
+        self.width = 0  # Ancho de la imagen
+        self.height = 0  # Alto de la imagen
+
+        self.polygon_points = np.array([])  # Puntos que forman el poligono
+        self.isClosed = False  # Define si el poligono se cierra autmáticamente al poner los puntos
+        self.thickness = 2  # Ancho de la línea
+        self.enhanced = False  # Flag para saber si la imagen está mejorada
+        self.skeletonized = False  # Flag para saber si la imagen está esqueletonizada
+        self.initWelcomeUI()
+
+    def initWelcomeUI(self):
+        file = fd.askopenfilename()
+        if file:
+            self.filename = file
+            self.opencv_image = cv2.imread(self.filename)
+            self.image = Image.open(self.filename)  # open image
+            self.width, self.height = self.image.size
+            self.initUiComponents()
+            self.show_image()
 
     def initUiComponents(self):
         # Vertical and horizontal scrollbars for canvas
@@ -114,6 +123,7 @@ class App(Frame):
         # We only use positive real points
         if (event.x + self.x1) / self.imscale >= 0 and (event.y + self.y1) / self.imscale >= 0:
             if self.enhanced:
+                self.image = openCVToPIL(self.opencv_image)
                 self.polygon_points = np.array([])
                 self.enhanced = False
 
@@ -225,9 +235,9 @@ class App(Frame):
             sys.exit()
 
     def enhance(self):
-        self.opencv_image = mask.apply_enhance_to_roi(self.opencv_image, self.mask)
+        self.enhanced = mask.apply_enhance_to_roi(self.opencv_image, self.mask)
         pts = np.array(self.polygon_points).reshape((-1, 1, 2))
-        image_with_polygon = cv2.polylines(self.opencv_image.copy(), [pts.astype(np.int32)], isClosed=self.isClosed,
+        image_with_polygon = cv2.polylines(self.enhanced, [pts.astype(np.int32)], isClosed=self.isClosed,
                                            color=color.red, thickness=self.thickness)
 
         self.image = openCVToPIL(image_with_polygon)
@@ -236,13 +246,7 @@ class App(Frame):
         self.show_image()
 
     def skeletonize(self):
-        skeletonized = mask.apply_skeletonization_to_roi(self.opencv_image, self.mask)
-        pts = np.array(self.polygon_points).reshape((-1, 1, 2))
-
-        self.image = openCVToPIL(skeletonized)
-        self.skeletonized = True
-        self.width, self.height = self.image.size
-        self.show_image()
+        print('Skeletonization')
 
     def openFileMenu(self):
         file = fd.askopenfilename()
