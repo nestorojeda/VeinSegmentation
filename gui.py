@@ -24,17 +24,26 @@ drawing = False
 class App(Frame):
     ''' Advanced zoom of the image '''
 
-    def __init__(self, mainframe, path="imagenes_orginales/Caso A BN.png", **kw):
+    def __init__(self, mainframe, **kw):
         ''' Initialize the main Frame '''
         ttk.Frame.__init__(self, master=mainframe)
         super().__init__(**kw)
         self.mask = None
         self.master.title('Segmentación de venas')
         self.master.protocol("WM_DELETE_WINDOW", self.onExit)
-        self.filename = path
-        self.opencv_image = cv2.imread(self.filename)
-        self.initUiComponents()
-        self.polygon_points = np.array([])
+        self.initWelcomeComponents()
+
+
+    def initWelcomeComponents(self):
+        file = fd.askopenfilename()
+        if file:
+            self.filename = file
+            self.opencv_image = cv2.imread(file)
+            self.initUiComponents()
+            self.image = Image.open(self.filename)  # open image
+            self.width, self.height = self.image.size
+            self.polygon_points = np.array([])
+            self.show_image()
 
     def initUiComponents(self):
         # Vertical and horizontal scrollbars for canvas
