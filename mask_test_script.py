@@ -1,21 +1,51 @@
 import cv2
 import matplotlib.pyplot as plt
-from VeinSegmentation import mask as mk
+from VeinSegmentation import enhance as eh
+import numpy as np
 
 image = cv2.imread('imagenes_orginales/Caso A BN.png')
-mask = cv2.imread('./mask.png')
+mask = cv2.imread('./mask2.png', cv2.IMREAD_GRAYSCALE)
 
-enhanced_roi = mk.apply_enhance_to_roi(image, mask)
-plt.imshow(enhanced_roi, cmap='gray')
-plt.title('enhance roi')
-plt.show()
+contours, hierarchy = cv2.findContours(mask, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)[-2:]
+idx = 0
+for cnt in contours:
+    idx += 1
+    x, y, w, h = cv2.boundingRect(cnt)
+    crop = image[y:y + h, x:x + w]
+    enhanced_crop = eh.enhance_medical_image(crop)
 
-subpixel_roi = mk.apply_subpixel_to_roi(enhanced_roi.astype(float), mask)
-plt.imshow(subpixel_roi, cmap='gray')
-plt.title('subpixel roi')
-plt.show()
+    plt.imshow(enhanced_crop, cmap='gray')
+    plt.title('enhanced crop')
+    plt.show()
 
-skeletonized_roi = mk.apply_skeletonization_to_roi(enhanced_roi, mask)
-plt.imshow(skeletonized_roi, cmap='gray')
-plt.title('skeletonized roi')
-plt.show()
+    merged = image.copy()
+    enhanced_crop = cv2.cvtColor(enhanced_crop.astype(np.uint8), cv2.COLOR_GRAY2BGR)
+    merged[y:y + h, x:x + w] = enhanced_crop
+
+    plt.imshow(merged, cmap='gray')
+    plt.title('merged')
+    plt.show()
+
+    # get first masked value (foreground)
+    fg = cv2.bitwise_or(merged, merged, mask=mask)
+    plt.imshow(fg, cmap='gray')
+    plt.title('fg')
+    plt.show()
+    # get second masked value (background) mask must be inverted
+    mask = cv2.bitwise_not(mask)
+
+    # combine foreground+background
+    test = cv2.bitwise_or(fg, image, mask=mask)
+
+    plt.imshow(test, cmap='gray')
+    plt.title('test')
+    plt.show()
+
+    mask = cv2.bitwise_not(mask)
+    final = cv2.bitwise_or(test, fg)
+
+    plt.imshow(final, cmap='gray')
+    plt.title('final')
+    plt.show()
+
+    # TODO PASAR ESTO A UN MODULO

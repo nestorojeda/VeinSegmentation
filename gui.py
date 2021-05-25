@@ -236,6 +236,7 @@ class App(Frame):
 
     def enhance(self):
         self.enhanced = mask.apply_enhance_to_roi(self.opencv_image, self.mask)
+        cv2.imwrite('./mask2.png', self.mask)
         pts = np.array(self.polygon_points).reshape((-1, 1, 2))
         image_with_polygon = cv2.polylines(self.enhanced, [pts.astype(np.int32)], isClosed=self.isClosed,
                                            color=color.red, thickness=self.thickness)
