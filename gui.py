@@ -42,6 +42,7 @@ class App(Frame):
         self.thickness = 2  # Ancho de la línea
         self.is_enhanced = False  # Flag para saber si la imagen está mejorada
         self.is_skeletonized = False  # Flag para saber si la imagen está esqueletonizada
+        self.is_subpixel = False
         self.initWelcomeUI()
 
     def initWelcomeUI(self):
@@ -72,6 +73,7 @@ class App(Frame):
         editMenu = Menu(menubar)
         editMenu.add_command(label="Auto mejorar", command=self.enhance)
         editMenu.add_command(label="Esqueletonizar", command=self.skeletonize)
+        editMenu.add_command(label="Subpixel", command=self.subpixel)
         menubar.add_cascade(label="Edicion", menu=editMenu)
 
         # Create canvas and put image on it
@@ -258,6 +260,17 @@ class App(Frame):
 
         self.image = openCVToPIL(image_with_polygon)
         self.is_skeletonized = True
+        self.width, self.height = self.image.size
+        self.show_image()
+
+    def subpixel(self):
+        self.is_skeletonized = mask.apply_subpixel_to_roi(self.opencv_image, self.mask)
+        pts = np.array(self.polygon_points).reshape((-1, 1, 2))
+        image_with_polygon = cv2.polylines(self.is_skeletonized, [pts.astype(np.int32)], isClosed=self.isClosed,
+                                           color=color.red, thickness=self.thickness)
+
+        self.image = openCVToPIL(image_with_polygon)
+        self.is_subpixel = True
         self.width, self.height = self.image.size
         self.show_image()
 

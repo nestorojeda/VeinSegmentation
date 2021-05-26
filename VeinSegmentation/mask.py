@@ -110,7 +110,8 @@ def apply_subpixel_to_roi(image, mask,
     now = time()
 
     mask = cv2.cvtColor(mask.astype(np.uint8), cv2.COLOR_RGB2GRAY)
-    # image = cv2.cvtColor(image.astype(np.uint8), cv2.COLOR_RGB2GRAY)
+    image = cv2.cvtColor(image.astype(np.uint8), cv2.COLOR_RGB2GRAY)
+
     contours, hierarchy = cv2.findContours(mask, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)[-2:]
     idx = 0
     for cnt in contours:
@@ -119,18 +120,22 @@ def apply_subpixel_to_roi(image, mask,
         crop = image[y:y + h, x:x + w]
         enhanced_crop = eh.enhance_medical_image(crop)
 
-        subpixel_edges_crop = subpixel_edges(enhanced_crop, threshold, iters, order)
+        edges = subpixel_edges(crop.astype(float), threshold, iters, order)
 
-        merged = image.copy()
-        subpixel_edges_crop = cv2.cvtColor(subpixel_edges_crop.astype(np.uint8), cv2.COLOR_GRAY2BGR)
-        merged[y:y + h, x:x + w] = subpixel_edges_crop
+        edged_crop = cv2.cvtColor(enhanced_crop.astype(np.uint8), cv2.COLOR_GRAY2BGR)
+
+        for point in np.array((edges.x, edges.y)).T.astype(np.uint):
+            cv2.circle(edged_crop, tuple(point), 1, (0, 0, 255))
+
+        merged = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
+        merged[y:y + h, x:x + w] = edged_crop
 
         # get first masked value (foreground)
         fg = cv2.bitwise_or(merged, merged, mask=mask)
-
         # get second masked value (background) mask must be inverted
         mask = cv2.bitwise_not(mask)
 
+        image = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
         # combine foreground+background
         test = cv2.bitwise_or(fg, image, mask=mask)
 
