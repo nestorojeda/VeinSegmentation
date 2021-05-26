@@ -9,7 +9,7 @@ iters = 2
 threshold = 1.5
 order = 2
 
-image = cv2.imread('imagenes_orginales/Caso A BN.png')
+image = cv2.imread('imagenes_orginales/Caso A BN.png', cv2.IMREAD_GRAYSCALE)
 mask = cv2.imread('./mask.png', cv2.IMREAD_GRAYSCALE)
 
 contours, hierarchy = cv2.findContours(mask, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)[-2:]
@@ -20,15 +20,19 @@ for cnt in contours:
     crop = image[y:y + h, x:x + w]
     enhanced_crop = eh.enhance_medical_image(crop)
 
-    subpixel_edges_crop = subpixel_edges(enhanced_crop, threshold, iters, order)
+    edges = subpixel_edges(crop.astype(float), threshold, iters, order)
 
-    plt.imshow(subpixel_edges_crop, cmap='gray')
+    edged_crop = cv2.cvtColor(enhanced_crop.astype(np.uint8), cv2.COLOR_GRAY2BGR)
+
+    for point in np.array((edges.x, edges.y)).T.astype(np.uint):
+        cv2.circle(edged_crop, tuple(point), 1, (0, 0, 255))
+
+    plt.imshow(edged_crop)
     plt.title('subpixel_edges crop')
     plt.show()
 
-    merged = image.copy()
-    subpixel_edges_crop = cv2.cvtColor(subpixel_edges_crop.astype(np.uint8), cv2.COLOR_GRAY2BGR)
-    merged[y:y + h, x:x + w] = subpixel_edges_crop
+    merged = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
+    merged[y:y + h, x:x + w] = edged_crop
 
     plt.imshow(merged, cmap='gray')
     plt.title('merged')
@@ -42,6 +46,7 @@ for cnt in contours:
     # get second masked value (background) mask must be inverted
     mask = cv2.bitwise_not(mask)
 
+    image = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
     # combine foreground+background
     test = cv2.bitwise_or(fg, image, mask=mask)
 
@@ -50,9 +55,9 @@ for cnt in contours:
     plt.show()
 
     mask = cv2.bitwise_not(mask)
-    final = cv2.bitwise_or(test, fg)
+    subpixel = cv2.bitwise_or(test, fg)
 
-    plt.imshow(final, cmap='gray')
+    plt.imshow(subpixel, cmap='gray')
     plt.title('final')
     plt.show()
 
