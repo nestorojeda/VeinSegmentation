@@ -49,7 +49,7 @@ def apply_enhance_to_roi(image, mask):
     return enhanced
 
 
-def apply_skeletonization_to_roi(image, mask):
+def apply_skeletonization_to_roi(image, mask, is_enhanced=True):
     """
     Extracción de la región de interés a partir de una máscara
     y aplicación del algoritmo de skeletonización
@@ -59,28 +59,41 @@ def apply_skeletonization_to_roi(image, mask):
     now = time()
 
     mask = cv2.cvtColor(mask.astype(np.uint8), cv2.COLOR_RGB2GRAY)
-    # image = cv2.cvtColor(image.astype(np.uint8), cv2.COLOR_RGB2GRAY)
-    result = cv2.bitwise_and(image, image, mask=mask)
-    skeletonized_roi = eh.skeletonization(result)
+    if not is_enhanced: image = cv2.cvtColor(image.astype(np.uint8), cv2.COLOR_RGB2GRAY)
 
-    plt.imshow(mask, cmap="gray")
-    plt.show()
-    plt.imshow(skeletonized_roi, cmap="gray")
-    plt.show()
-    cv2.imwrite('./mask.png', mask)
+    contours, hierarchy = cv2.findContours(mask, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)[-2:]
+    idx = 0
+    for cnt in contours:
+        idx += 1
+        x, y, w, h = cv2.boundingRect(cnt)
+        crop = image[y:y + h, x:x + w]
+        if not is_enhanced: crop = eh.enhance_medical_image(
+            crop)  # Si la imagen no está mejorada, la mejoramos solo para realizar este proceso
 
-    height, width = mask.shape[:2]
-    enhanced = mask.copy()
-    for x in range(0, height):
-        for y in range(0, width):
-            if mask[x, y] == white:
-                enhanced[x, y] = skeletonized_roi[x, y]
-            else:
-                enhanced[x, y] = image[x, y]
+        skel_crop = eh.skeletonization(crop)
+
+        plt.imshow(skel_crop, cmap='gray')
+        plt.title('skel crop')
+        plt.show()
+
+        merged = image.copy()
+        skel_crop = skel_crop.astype(np.uint8)
+        merged[y:y + h, x:x + w] = skel_crop
+
+        # get first masked value (foreground)
+        fg = cv2.bitwise_or(merged, merged, mask=mask)
+        # get second masked value (background) mask must be inverted
+        mask = cv2.bitwise_not(mask)
+
+        # combine foreground+background
+        test = cv2.bitwise_or(fg, image, mask=mask)
+
+        mask = cv2.bitwise_not(mask)
+        skeleton = cv2.bitwise_or(test, fg)
 
     elapsed = time() - now
     print("Processing time: ", elapsed)
-    return enhanced
+    return skeleton
 
 
 def apply_subpixel_to_roi(image, mask,

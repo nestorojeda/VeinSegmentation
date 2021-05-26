@@ -28,6 +28,12 @@ def segmentation(img, n_clusters=2):
 
 
 def skeletonization(img, niter=100):
+
+    enhanced_segm = segmentation(img, n_clusters=2)
+
+    ret, img = cv2.threshold(enhanced_segm.astype(np.uint8), 127, 255, 0)
+    img = cv2.bitwise_not(img)
+
     img = img.astype(np.uint8)
     size = np.size(img)
     skel = np.zeros(img.shape, np.uint8)

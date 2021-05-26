@@ -40,8 +40,8 @@ class App(Frame):
         self.polygon_points = np.array([])  # Puntos que forman el poligono
         self.isClosed = False  # Define si el poligono se cierra autmáticamente al poner los puntos
         self.thickness = 2  # Ancho de la línea
-        self.enhanced = False  # Flag para saber si la imagen está mejorada
-        self.skeletonized = False  # Flag para saber si la imagen está esqueletonizada
+        self.is_enhanced = False  # Flag para saber si la imagen está mejorada
+        self.is_skeletonized = False  # Flag para saber si la imagen está esqueletonizada
         self.initWelcomeUI()
 
     def initWelcomeUI(self):
@@ -122,10 +122,10 @@ class App(Frame):
         print('Offset is x1={} y1={} x2={} y2={}'.format(self.x1, self.y1, self.x2, self.y2))
         # We only use positive real points
         if (event.x + self.x1) / self.imscale >= 0 and (event.y + self.y1) / self.imscale >= 0:
-            if self.enhanced:
+            if self.is_enhanced:
                 self.image = openCVToPIL(self.opencv_image)
                 self.polygon_points = np.array([])
-                self.enhanced = False
+                self.is_enhanced = False
 
             self.polygon_points = np.append(self.polygon_points,
                                             [(event.x + self.x1) / self.imscale, (event.y + self.y1) / self.imscale])
@@ -236,18 +236,29 @@ class App(Frame):
 
     def enhance(self):
         self.enhanced = mask.apply_enhance_to_roi(self.opencv_image, self.mask)
-        cv2.imwrite('./mask2.png', self.mask)
         pts = np.array(self.polygon_points).reshape((-1, 1, 2))
         image_with_polygon = cv2.polylines(self.enhanced, [pts.astype(np.int32)], isClosed=self.isClosed,
+                                           color=color.red, thickness=self.thickness)
+
+        self.image = openCVToPIL(image_with_polygon)
+        self.is_enhanced = True
+        self.width, self.height = self.image.size
+        self.show_image()
+
+    def skeletonize(self):
+        if self.is_enhanced:
+            self.skeletonized = mask.apply_skeletonization_to_roi(self.enhanced, self.mask, is_enhanced=True)
+        else:
+            self.skeletonized = mask.apply_skeletonization_to_roi(self.opencv_image, self.mask, is_enhanced=False)
+        cv2.imwrite('./mask2.png', self.mask)
+        pts = np.array(self.polygon_points).reshape((-1, 1, 2))
+        image_with_polygon = cv2.polylines(self.skeletonized, [pts.astype(np.int32)], isClosed=self.isClosed,
                                            color=color.red, thickness=self.thickness)
 
         self.image = openCVToPIL(image_with_polygon)
         self.enhanced = True
         self.width, self.height = self.image.size
         self.show_image()
-
-    def skeletonize(self):
-        print('Skeletonization')
 
     def openFileMenu(self):
         file = fd.askopenfilename()
