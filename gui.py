@@ -122,10 +122,11 @@ class App(Frame):
         print('Offset is x1={} y1={} x2={} y2={}'.format(self.x1, self.y1, self.x2, self.y2))
         # We only use positive real points
         if (event.x + self.x1) / self.imscale >= 0 and (event.y + self.y1) / self.imscale >= 0:
-            if self.is_enhanced:
+            if self.is_enhanced or self.is_skeletonized:
                 self.image = openCVToPIL(self.opencv_image)
                 self.polygon_points = np.array([])
                 self.is_enhanced = False
+                self.is_skeletonized = False
 
             self.polygon_points = np.append(self.polygon_points,
                                             [(event.x + self.x1) / self.imscale, (event.y + self.y1) / self.imscale])
@@ -235,9 +236,9 @@ class App(Frame):
             sys.exit()
 
     def enhance(self):
-        self.enhanced = mask.apply_enhance_to_roi(self.opencv_image, self.mask)
+        self.is_skeletonized = mask.apply_enhance_to_roi(self.opencv_image, self.mask)
         pts = np.array(self.polygon_points).reshape((-1, 1, 2))
-        image_with_polygon = cv2.polylines(self.enhanced, [pts.astype(np.int32)], isClosed=self.isClosed,
+        image_with_polygon = cv2.polylines(self.is_skeletonized, [pts.astype(np.int32)], isClosed=self.isClosed,
                                            color=color.red, thickness=self.thickness)
 
         self.image = openCVToPIL(image_with_polygon)
@@ -247,7 +248,7 @@ class App(Frame):
 
     def skeletonize(self):
         if self.is_enhanced:
-            self.skeletonized = mask.apply_skeletonization_to_roi(self.enhanced, self.mask, is_enhanced=True)
+            self.skeletonized = mask.apply_skeletonization_to_roi(self.is_skeletonized, self.mask, is_enhanced=True)
         else:
             self.skeletonized = mask.apply_skeletonization_to_roi(self.opencv_image, self.mask, is_enhanced=False)
         cv2.imwrite('./mask2.png', self.mask)
@@ -256,7 +257,7 @@ class App(Frame):
                                            color=color.red, thickness=self.thickness)
 
         self.image = openCVToPIL(image_with_polygon)
-        self.enhanced = True
+        self.is_skeletonized = True
         self.width, self.height = self.image.size
         self.show_image()
 
