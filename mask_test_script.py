@@ -1,8 +1,13 @@
 import cv2
 import matplotlib.pyplot as plt
-from VeinSegmentation import enhance as eh
-from VeinSegmentation import contour as ct
 import numpy as np
+
+from VeinSegmentation import enhance as eh
+from subpixel_edges import subpixel_edges
+
+iters = 2
+threshold = 1.5
+order = 2
 
 image = cv2.imread('imagenes_orginales/Caso A BN.png')
 mask = cv2.imread('./mask.png', cv2.IMREAD_GRAYSCALE)
@@ -15,15 +20,15 @@ for cnt in contours:
     crop = image[y:y + h, x:x + w]
     enhanced_crop = eh.enhance_medical_image(crop)
 
-    skel_crop = eh.skeletonization(enhanced_crop)
+    subpixel_edges_crop = subpixel_edges(enhanced_crop, threshold, iters, order)
 
-    plt.imshow(skel_crop, cmap='gray')
-    plt.title('skel crop')
+    plt.imshow(subpixel_edges_crop, cmap='gray')
+    plt.title('subpixel_edges crop')
     plt.show()
 
     merged = image.copy()
-    skel_crop = cv2.cvtColor(skel_crop.astype(np.uint8), cv2.COLOR_GRAY2BGR)
-    merged[y:y + h, x:x + w] = skel_crop
+    subpixel_edges_crop = cv2.cvtColor(subpixel_edges_crop.astype(np.uint8), cv2.COLOR_GRAY2BGR)
+    merged[y:y + h, x:x + w] = subpixel_edges_crop
 
     plt.imshow(merged, cmap='gray')
     plt.title('merged')

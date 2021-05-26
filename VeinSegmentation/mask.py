@@ -111,24 +111,32 @@ def apply_subpixel_to_roi(image, mask,
 
     mask = cv2.cvtColor(mask.astype(np.uint8), cv2.COLOR_RGB2GRAY)
     # image = cv2.cvtColor(image.astype(np.uint8), cv2.COLOR_RGB2GRAY)
-    result = cv2.bitwise_and(image, image, mask=mask)
+    contours, hierarchy = cv2.findContours(mask, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)[-2:]
+    idx = 0
+    for cnt in contours:
+        idx += 1
+        x, y, w, h = cv2.boundingRect(cnt)
+        crop = image[y:y + h, x:x + w]
+        enhanced_crop = eh.enhance_medical_image(crop)
 
-    edges = subpixel_edges(result, threshold, iters, order)
-    points = zip(edges.x, edges.y)  # TODO esto no funciona
+        subpixel_edges_crop = subpixel_edges(enhanced_crop, threshold, iters, order)
 
-    for point in points:
-        cv2.circle(image, tuple(point), 1,
-                   (0, 0, 255))  # TODO Aqui peta porque necesitamos un array de tuplas y no el zip
+        merged = image.copy()
+        subpixel_edges_crop = cv2.cvtColor(subpixel_edges_crop.astype(np.uint8), cv2.COLOR_GRAY2BGR)
+        merged[y:y + h, x:x + w] = subpixel_edges_crop
 
-    height, width = mask.shape[:2]
-    enhanced = mask.copy()
-    for x in range(0, height):
-        for y in range(0, width):
-            if mask[x, y] == white:
-                enhanced[x, y] = image[x, y]
-            else:
-                enhanced[x, y] = image[x, y]
+        # get first masked value (foreground)
+        fg = cv2.bitwise_or(merged, merged, mask=mask)
+
+        # get second masked value (background) mask must be inverted
+        mask = cv2.bitwise_not(mask)
+
+        # combine foreground+background
+        test = cv2.bitwise_or(fg, image, mask=mask)
+
+        mask = cv2.bitwise_not(mask)
+        subpixel = cv2.bitwise_or(test, fg)
 
     elapsed = time() - now
     print("Processing time: ", elapsed)
-    return enhanced
+    return subpixel
