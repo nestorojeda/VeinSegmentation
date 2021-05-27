@@ -21,6 +21,12 @@ drawing = False
 # https://solarianprogrammer.com/2018/04/20/python-opencv-show-image-tkinter-window/
 # https://www.semicolonworld.com/question/55637/how-to-get-tkinter-canvas-to-dynamically-resize-to-window-width
 
+def openCVToPIL(img):
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    im_pil = Image.fromarray(img)
+    return im_pil
+
+
 class App(Frame):
     """ Advanced zoom of the image """
 
@@ -281,12 +287,15 @@ class App(Frame):
             self.opencv_image = cv2.imread(self.filename)
             self.image = Image.open(self.filename)  # open image
             self.width, self.height = self.image.size
-            self.show_image()
 
-    def openCVToPIL(self, img):
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        im_pil = Image.fromarray(img)
-        return im_pil
+            self.polygon_points = np.array([])  # Puntos que forman el poligono
+            self.isClosed = False  # Define si el poligono se cierra autmáticamente al poner los puntos
+            self.thickness = 2  # Ancho de la línea
+            self.is_enhanced = False  # Flag para saber si la imagen está mejorada
+            self.is_skeletonized = False  # Flag para saber si la imagen está esqueletonizada
+            self.is_subpixel = False
+
+            self.show_image()
 
 
 def main():
