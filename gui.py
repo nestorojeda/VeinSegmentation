@@ -9,6 +9,7 @@ from PIL import Image
 from PIL import ImageTk
 
 import constants.colors as color
+from components.BrightnessContrastDialog import BrightnessContrastDialog
 from components.AutoScrollbar import AutoScrollbar
 from utils.utils import openCVToPIL
 from VeinSegmentation import mask
@@ -80,6 +81,7 @@ class App(Frame):
         editMenu.add_command(label="Auto mejorar", command=self.enhance)
         editMenu.add_command(label="Esqueletonizar", command=self.skeletonize)
         editMenu.add_command(label="Subpixel", command=self.subpixel)
+        editMenu.add_command(label="Contraste y brillo", command=self.open_contrast_brightness_menu)
         menubar.add_cascade(label="Edicion", menu=editMenu)
 
         # Create canvas and put image on it
@@ -279,6 +281,11 @@ class App(Frame):
         self.is_subpixel = True
         self.width, self.height = self.image.size
         self.show_image()
+
+    def open_contrast_brightness_menu(self):
+        d = BrightnessContrastDialog(self.master)
+        self.master.wait_window(d.top)
+        # self.valor.set(d.ejemplo)
 
     def openFileMenu(self):
         file = fd.askopenfilename()
