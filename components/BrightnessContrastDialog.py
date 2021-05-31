@@ -39,8 +39,6 @@ class BrightnessContrastDialog:
         self.parent.image = openCVToPIL(self.opencv_image)
         self.parent.show_image()
 
-
-
     def bright_and_contrast_controller(self, event=None, reset=False):
         """
             https://www.life2coding.com/change-brightness-and-contrast-of-images-using-opencv-python/
