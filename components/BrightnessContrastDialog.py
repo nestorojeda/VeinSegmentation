@@ -29,13 +29,25 @@ class BrightnessContrastDialog:
         self.c_slider.set(0)
         self.c_slider.pack()
 
-    def bright_and_contrast_controller(self, event=None):
+        self.button = tk.Button(self.top, text="Reiniciar", command=self.reset)
+        self.button.pack()
+
+    def reset(self):
+        self.c_slider.set(0)
+        self.b_slider.set(0)
+
+        self.parent.image = openCVToPIL(self.opencv_image)
+        self.parent.show_image()
+
+
+
+    def bright_and_contrast_controller(self, event=None, reset=False):
         """
             https://www.life2coding.com/change-brightness-and-contrast-of-images-using-opencv-python/
         """
         brightness = self.b_slider.get()
         contrast = self.c_slider.get()
-        img = self.opencv_image
+        img = self.opencv_image.copy()
 
         if brightness != 0:
             if brightness > 0:
