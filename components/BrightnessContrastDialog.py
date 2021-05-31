@@ -1,81 +1,57 @@
 import tkinter as tk
 import cv2
-
-
-def controller(img, brightness=255,
-               contrast=127):
-    brightness = int((brightness - 0) * (255 - (-255)) / (510 - 0) + (-255))
-
-    contrast = int((contrast - 0) * (127 - (-127)) / (254 - 0) + (-127))
-
-    if brightness != 0:
-
-        if brightness > 0:
-
-            shadow = brightness
-
-            max = 255
-
-        else:
-
-            shadow = 0
-            max = 255 + brightness
-
-        al_pha = (max - shadow) / 255
-        ga_mma = shadow
-
-        # The function addWeighted calculates
-        # the weighted sum of two arrays
-        cal = cv2.addWeighted(img, al_pha,
-                              img, 0, ga_mma)
-
-    else:
-        cal = img
-
-    if contrast != 0:
-        Alpha = float(131 * (contrast + 127)) / (127 * (131 - contrast))
-        Gamma = 127 * (1 - Alpha)
-
-        # The function addWeighted calculates
-        # the weighted sum of two arrays
-        cal = cv2.addWeighted(cal, Alpha,
-                              cal, 0, Gamma)
-
-    # putText renders the specified text string in the image.
-    cv2.putText(cal, 'B:{},C:{}'.format(brightness,
-                                        contrast), (10, 30),
-                cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
-
-    return cal
+import matplotlib.pyplot as plt
 
 
 class BrightnessContrastDialog:
-    def __init__(self, parent):
+    def __init__(self, parent, opencv_image):
+        self.opencv_image = opencv_image
         self.top = tk.Toplevel(parent)
         self.top.transient(parent)
-        #self.top.grab_set()
+
         title = "Contraste y brillo"
-        contrast_labeltext = "Seleccione un valor para el contraste"
-        brightness_labeltext = "Seleccione un valor para el brillo"
         self.top.title(title)
 
-        tk.Label(self.top, text=contrast_labeltext).pack()
-        b_slider = tk.Scale(self.top, length=200, from_=-255, to=255, orient=tk.HORIZONTAL)
-        b_slider.set(0)
-        b_slider.pack()
-
+        brightness_labeltext = "Seleccione un valor para el brillo"
         tk.Label(self.top, text=brightness_labeltext).pack()
-        c_slider = tk.Scale(self.top, length=200, from_=-127, to=127, orient=tk.HORIZONTAL)
+        self.b_slider = tk.Scale(self.top, length=200, from_=-255, to=255,
+                                 orient=tk.HORIZONTAL, command=self.bright_and_contrast_controller)
+        self.b_slider.set(0)
+        self.b_slider.pack()
 
-        c_slider.set(0)
-        c_slider.pack()
-        self.top.bind("<Return>", self.ok)
-        b = tk.Button(self.top, text="OK", command=self.ok)
-        b.pack(pady=5)
+        contrast_labeltext = "Seleccione un valor para el contraste"
+        tk.Label(self.top, text=contrast_labeltext).pack()
+        self.c_slider = tk.Scale(self.top, length=200, from_=-127, to=127,
+                                 orient=tk.HORIZONTAL, command=self.bright_and_contrast_controller)
+        self.c_slider.set(0)
+        self.c_slider.pack()
 
-    def ok(self, event=None):
-        print('hola')
-        self.top.destroy()
+    def bright_and_contrast_controller(self, event=None):
+        """
+            https://www.life2coding.com/change-brightness-and-contrast-of-images-using-opencv-python/
+        """
+        brightness = self.b_slider.get()
+        contrast = self.c_slider.get()
+        img = self.opencv_image
 
-    def cancel(self, event=None):
-        self.top.destroy()
+        if brightness != 0:
+            if brightness > 0:
+                shadow = brightness
+                highlight = 255
+            else:
+                shadow = 0
+                highlight = 255 + brightness
+            alpha_b = (highlight - shadow) / 255
+            gamma_b = shadow
+            buf = cv2.addWeighted(img, alpha_b, img, 0, gamma_b)
+        else:
+            buf = img.copy()
+        if contrast != 0:
+            f = float(131 * (contrast + 127)) / (127 * (131 - contrast))
+            alpha_c = f
+            gamma_c = 127 * (1 - f)
+            self.result = cv2.addWeighted(buf, alpha_c, buf, 0, gamma_c)
+
+        # DEBUG PURPOSES
+        # plt.imshow(self.result)
+        # plt.show()
