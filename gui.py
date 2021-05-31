@@ -286,6 +286,9 @@ class App(Frame):
         d = BrightnessContrastDialog(self.master, self.opencv_image)
         self.master.wait_window(d.top)
 
+    def test(self, event=None):
+        print('test')
+
     def openFileMenu(self):
         file = fd.askopenfilename()
         if file:

@@ -2,13 +2,16 @@ import tkinter as tk
 import cv2
 import matplotlib.pyplot as plt
 
+from utils.utils import openCVToPIL
+
 
 class BrightnessContrastDialog:
     def __init__(self, parent, opencv_image):
+        self.parent = parent.children['!app']
         self.opencv_image = opencv_image
         self.top = tk.Toplevel(parent)
         self.top.transient(parent)
-
+        # self.top.grab_set()
         title = "Contraste y brillo"
         self.top.title(title)
 
@@ -50,8 +53,7 @@ class BrightnessContrastDialog:
             f = float(131 * (contrast + 127)) / (127 * (131 - contrast))
             alpha_c = f
             gamma_c = 127 * (1 - f)
-            self.result = cv2.addWeighted(buf, alpha_c, buf, 0, gamma_c)
+            buf = cv2.addWeighted(buf, alpha_c, buf, 0, gamma_c)
 
-        # DEBUG PURPOSES
-        # plt.imshow(self.result)
-        # plt.show()
+        self.parent.image = openCVToPIL(buf)
+        self.parent.show_image()
