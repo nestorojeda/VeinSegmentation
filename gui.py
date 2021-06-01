@@ -22,12 +22,6 @@ drawing = False
 # https://solarianprogrammer.com/2018/04/20/python-opencv-show-image-tkinter-window/
 # https://www.semicolonworld.com/question/55637/how-to-get-tkinter-canvas-to-dynamically-resize-to-window-width
 
-def openCVToPIL(img):
-    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-    im_pil = Image.fromarray(img)
-    return im_pil
-
-
 class App(Frame):
     """ Advanced zoom of the image """
 
@@ -246,41 +240,47 @@ class App(Frame):
             sys.exit()
 
     def enhance(self):
-        self.is_skeletonized = mask.apply_enhance_to_roi(self.opencv_image, self.mask)
-        pts = np.array(self.polygon_points).reshape((-1, 1, 2))
-        image_with_polygon = cv2.polylines(self.is_skeletonized, [pts.astype(np.int32)], isClosed=self.isClosed,
-                                           color=color.red, thickness=self.thickness)
-
-        self.image = openCVToPIL(image_with_polygon)
-        self.is_enhanced = True
-        self.width, self.height = self.image.size
-        self.show_image()
+        if len(self.polygon_points) > 1:
+            self.is_skeletonized = mask.apply_enhance_to_roi(self.opencv_image, self.mask)
+            pts = np.array(self.polygon_points).reshape((-1, 1, 2))
+            image_with_polygon = cv2.polylines(self.is_skeletonized, [pts.astype(np.int32)], isClosed=self.isClosed,
+                                               color=color.red, thickness=self.thickness)
+            self.image = openCVToPIL(image_with_polygon)
+            self.is_enhanced = True
+            self.width, self.height = self.image.size
+            self.show_image()
+        else:
+            messagebox.showerror("Error", "Debes seleleccionar un polígono")
 
     def skeletonize(self):
-        if self.is_enhanced:
-            self.skeletonized = mask.apply_skeletonization_to_roi(self.is_skeletonized, self.mask, is_enhanced=True)
-        else:
-            self.skeletonized = mask.apply_skeletonization_to_roi(self.opencv_image, self.mask, is_enhanced=False)
-        cv2.imwrite('./mask2.png', self.mask)
-        pts = np.array(self.polygon_points).reshape((-1, 1, 2))
-        image_with_polygon = cv2.polylines(self.skeletonized, [pts.astype(np.int32)], isClosed=self.isClosed,
-                                           color=color.red, thickness=self.thickness)
+        if len(self.polygon_points) > 1:
+            if self.is_enhanced:
+                self.skeletonized = mask.apply_skeletonization_to_roi(self.is_skeletonized, self.mask, is_enhanced=True)
+            else:
+                self.skeletonized = mask.apply_skeletonization_to_roi(self.opencv_image, self.mask, is_enhanced=False)
+            pts = np.array(self.polygon_points).reshape((-1, 1, 2))
+            image_with_polygon = cv2.polylines(self.skeletonized, [pts.astype(np.int32)], isClosed=self.isClosed,
+                                               color=color.red, thickness=self.thickness)
 
-        self.image = openCVToPIL(image_with_polygon)
-        self.is_skeletonized = True
-        self.width, self.height = self.image.size
-        self.show_image()
+            self.image = openCVToPIL(image_with_polygon)
+            self.is_skeletonized = True
+            self.width, self.height = self.image.size
+            self.show_image()
+        else:
+            messagebox.showerror("Error", "Debes seleleccionar un polígono")
 
     def subpixel(self):
-        self.is_skeletonized = mask.apply_subpixel_to_roi(self.opencv_image, self.mask)
-        pts = np.array(self.polygon_points).reshape((-1, 1, 2))
-        image_with_polygon = cv2.polylines(self.is_skeletonized, [pts.astype(np.int32)], isClosed=self.isClosed,
-                                           color=color.red, thickness=self.thickness)
-
-        self.image = openCVToPIL(image_with_polygon)
-        self.is_subpixel = True
-        self.width, self.height = self.image.size
-        self.show_image()
+        if len(self.polygon_points) > 1:
+            self.is_skeletonized = mask.apply_subpixel_to_roi(self.opencv_image, self.mask)
+            pts = np.array(self.polygon_points).reshape((-1, 1, 2))
+            image_with_polygon = cv2.polylines(self.is_skeletonized, [pts.astype(np.int32)], isClosed=self.isClosed,
+                                               color=color.red, thickness=self.thickness)
+            self.image = openCVToPIL(image_with_polygon)
+            self.is_subpixel = True
+            self.width, self.height = self.image.size
+            self.show_image()
+        else:
+            messagebox.showerror("Error", "Debes seleleccionar un polígono")
 
     def open_contrast_brightness_menu(self):
         d = BrightnessContrastDialog(self.master, self.opencv_image)
