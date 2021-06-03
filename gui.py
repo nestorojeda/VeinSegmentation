@@ -145,9 +145,6 @@ class App(Frame):
             # Creamos la máscara cerrando el poligono
             self.mask = cv2.fillPoly(np.zeros((self.height, self.width, 3)),
                                      [pts.astype(np.int32)], color=color.white)
-            # Uncomment to test
-            # plt.imshow(self.mask)
-            # plt.show()
             self.image = openCVToPIL(image_with_polygon)  # open image
             self.width, self.height = self.image.size
             self.show_image()
