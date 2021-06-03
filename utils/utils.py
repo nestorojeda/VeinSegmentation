@@ -10,6 +10,10 @@ def openCVToPIL(img):
     return im_pil
 
 
+def PILtoOpenCV(pil_image):
+    return cv2.cvtColor(np.array(pil_image), cv2.COLOR_RGB2BGR)
+
+
 def DetectRidges(gray, sigma=3.0):
     h_elems = hessian_matrix(gray, sigma)
     eigenvalues = hessian_matrix_eigvals(h_elems)

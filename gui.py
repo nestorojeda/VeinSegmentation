@@ -11,7 +11,7 @@ from PIL import ImageTk
 import constants.colors as color
 from components.BrightnessContrastDialog import BrightnessContrastDialog
 from components.AutoScrollbar import AutoScrollbar
-from utils.utils import openCVToPIL
+from utils.utils import openCVToPIL, PILtoOpenCV
 from VeinSegmentation import mask
 
 drawing = False
@@ -68,7 +68,8 @@ class App(Frame):
         menubar = Menu(self.master)
         self.master.config(menu=menubar)
         fileMenu = Menu(menubar)
-        fileMenu.add_command(label="Abrir Archivo", command=self.openFileMenu)
+        fileMenu.add_command(label="Abrir", command=self.openFileMenu)
+        fileMenu.add_command(label="Guardar", command=self.saveFileMenu)
         fileMenu.add_command(label="Salir", command=self.onExit)
         menubar.add_cascade(label="Archivo", menu=fileMenu)
 
@@ -256,8 +257,9 @@ class App(Frame):
                 self.skeletonized = mask.apply_skeletonization_to_roi(self.enhanced,
                                                                       self.mask, is_enhanced=True)
             else:
-                self.skeletonized = mask.apply_skeletonization_to_roi(cv2.cvtColor(self.opencv_image, cv2.COLOR_GRAY2RGB)
-                                                                      , self.mask, is_enhanced=False)
+                self.skeletonized = mask.apply_skeletonization_to_roi(
+                    cv2.cvtColor(self.opencv_image, cv2.COLOR_GRAY2RGB)
+                    , self.mask, is_enhanced=False)
             pts = np.array(self.polygon_points).reshape((-1, 1, 2))
             image_with_polygon = cv2.polylines(self.skeletonized, [pts.astype(np.int32)], isClosed=self.isClosed,
                                                color=color.red, thickness=self.thickness)
@@ -272,7 +274,7 @@ class App(Frame):
     def subpixel(self):
         if len(self.polygon_points) > 1:
             self.subpixel_image = mask.apply_subpixel_to_roi(cv2.cvtColor(self.opencv_image, cv2.COLOR_GRAY2RGB),
-                                                              self.mask)
+                                                             self.mask)
             pts = np.array(self.polygon_points).reshape((-1, 1, 2))
             image_with_polygon = cv2.polylines(self.subpixel_image, [pts.astype(np.int32)], isClosed=self.isClosed,
                                                color=color.red, thickness=self.thickness)
@@ -303,6 +305,14 @@ class App(Frame):
             self.is_subpixel = False
 
             self.show_image()
+
+    def saveFileMenu(self):
+        ftypes = [('Imagen', '.png'),
+                  ('All files', '*')]
+        filename = fd.asksaveasfilename(filetypes=ftypes,
+                                        defaultextension='.png')
+
+        cv2.imwrite(filename, PILtoOpenCV(self.image))
 
 
 def main():
