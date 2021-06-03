@@ -50,7 +50,7 @@ class App(Frame):
         file = fd.askopenfilename()
         if file:
             self.filename = file
-            self.opencv_image = cv2.imread(self.filename)
+            self.opencv_image = cv2.imread(self.filename, cv2.IMREAD_GRAYSCALE)
             self.image = Image.open(self.filename)  # open image
             self.width, self.height = self.image.size
             self.initUiComponents()
@@ -153,7 +153,7 @@ class App(Frame):
 
     def clean(self, event):
         print('Event:clean')
-        self.opencv_image = cv2.imread(self.filename)
+        self.opencv_image = cv2.imread(self.filename, cv2.IMREAD_GRAYSCALE)
         self.image = openCVToPIL(self.opencv_image)  # open image
         self.polygon_points = np.array([])
         self.width, self.height = self.image.size
@@ -286,14 +286,11 @@ class App(Frame):
         d = BrightnessContrastDialog(self.master, self.opencv_image)
         self.master.wait_window(d.top)
 
-    def test(self, event=None):
-        print('test')
-
     def openFileMenu(self):
         file = fd.askopenfilename()
         if file:
             self.filename = file
-            self.opencv_image = cv2.imread(self.filename)
+            self.opencv_image = cv2.imread(self.filename, cv2.IMREAD_GRAYSCALE)
             self.image = Image.open(self.filename)  # open image
             self.width, self.height = self.image.size
 
