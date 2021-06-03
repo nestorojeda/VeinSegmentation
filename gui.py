@@ -14,7 +14,6 @@ from components.AutoScrollbar import AutoScrollbar
 from utils.utils import openCVToPIL
 from VeinSegmentation import mask
 
-moving = True
 drawing = False
 
 
@@ -44,6 +43,8 @@ class App(Frame):
         self.is_enhanced = False  # Flag para saber si la imagen está mejorada
         self.is_skeletonized = False  # Flag para saber si la imagen está esqueletonizada
         self.is_subpixel = False
+        self.filename = ''
+        self.opencv_image = None
         self.initWelcomeUI()
 
     def initWelcomeUI(self):
@@ -110,12 +111,12 @@ class App(Frame):
 
     def scroll_y(self, *args, **kwargs):
         """ Scroll canvas vertically and redraw the image """
-        self.canvas.yview(*args, **kwargs)  # scroll vertically
+        self.canvas.yview(*args)  # scroll vertically
         self.show_image()  # redraw the image
 
     def scroll_x(self, *args, **kwargs):
         """ Scroll canvas horizontally and redraw the image """
-        self.canvas.xview(*args, **kwargs)  # scroll horizontally
+        self.canvas.xview(*args)  # scroll horizontally
         self.show_image()  # redraw the image
 
     def click_draw_polygon(self, event):
@@ -241,9 +242,9 @@ class App(Frame):
 
     def enhance(self):
         if len(self.polygon_points) > 1:
-            self.is_skeletonized = mask.apply_enhance_to_roi(self.opencv_image, self.mask)
+            self.enhanced = mask.apply_enhance_to_roi(cv2.cvtColor(self.opencv_image, cv2.COLOR_GRAY2RGB), self.mask)
             pts = np.array(self.polygon_points).reshape((-1, 1, 2))
-            image_with_polygon = cv2.polylines(self.is_skeletonized, [pts.astype(np.int32)], isClosed=self.isClosed,
+            image_with_polygon = cv2.polylines(self.enhanced, [pts.astype(np.int32)], isClosed=self.isClosed,
                                                color=color.red, thickness=self.thickness)
             self.image = openCVToPIL(image_with_polygon)
             self.is_enhanced = True
@@ -255,9 +256,11 @@ class App(Frame):
     def skeletonize(self):
         if len(self.polygon_points) > 1:
             if self.is_enhanced:
-                self.skeletonized = mask.apply_skeletonization_to_roi(self.is_skeletonized, self.mask, is_enhanced=True)
+                self.skeletonized = mask.apply_skeletonization_to_roi(self.enhanced,
+                                                                      self.mask, is_enhanced=True)
             else:
-                self.skeletonized = mask.apply_skeletonization_to_roi(self.opencv_image, self.mask, is_enhanced=False)
+                self.skeletonized = mask.apply_skeletonization_to_roi(cv2.cvtColor(self.opencv_image, cv2.COLOR_GRAY2RGB)
+                                                                      , self.mask, is_enhanced=False)
             pts = np.array(self.polygon_points).reshape((-1, 1, 2))
             image_with_polygon = cv2.polylines(self.skeletonized, [pts.astype(np.int32)], isClosed=self.isClosed,
                                                color=color.red, thickness=self.thickness)
@@ -271,9 +274,10 @@ class App(Frame):
 
     def subpixel(self):
         if len(self.polygon_points) > 1:
-            self.is_skeletonized = mask.apply_subpixel_to_roi(self.opencv_image, self.mask)
+            self.subpixel_image = mask.apply_subpixel_to_roi(cv2.cvtColor(self.opencv_image, cv2.COLOR_GRAY2RGB),
+                                                              self.mask)
             pts = np.array(self.polygon_points).reshape((-1, 1, 2))
-            image_with_polygon = cv2.polylines(self.is_skeletonized, [pts.astype(np.int32)], isClosed=self.isClosed,
+            image_with_polygon = cv2.polylines(self.subpixel_image, [pts.astype(np.int32)], isClosed=self.isClosed,
                                                color=color.red, thickness=self.thickness)
             self.image = openCVToPIL(image_with_polygon)
             self.is_subpixel = True
