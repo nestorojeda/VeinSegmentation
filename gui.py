@@ -311,8 +311,8 @@ class App(Frame):
                   ('All files', '*')]
         filename = fd.asksaveasfilename(filetypes=ftypes,
                                         defaultextension='.png')
-
-        cv2.imwrite(filename, PILtoOpenCV(self.image))
+        if filename:
+            cv2.imwrite(filename, PILtoOpenCV(self.image))
 
 
 def main():
