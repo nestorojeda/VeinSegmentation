@@ -44,15 +44,14 @@ def skeletonization(img, niter=100):
     i = 0
     while i < niter:
         i = i + 1
-        # Step 2: Open the image
+        # Step 1: Substract open from the original image
         open = cv2.morphologyEx(img, cv2.MORPH_OPEN, element)
-        # Step 3: Substract open from the original image
         temp = cv2.subtract(img, open)
-        # Step 4: Erode the original image and refine the skeleton
+        # Step 2: Erode the original image and refine the skeleton
         eroded = cv2.erode(img, element)
         skel = cv2.bitwise_or(skel, temp)
         img = eroded.copy()
-        # Step 5: If there are no white pixels left ie.. the image has been completely eroded, quit the loop
+        # Step 3: If there are no white pixels left ie.. the image has been completely eroded, quit the loop
         if cv2.countNonZero(img) == 0:
             break
     return skel
