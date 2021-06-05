@@ -184,12 +184,14 @@ class App(Frame):
         # Respond to Linux (event.num) or Windows (event.delta) wheel event
         if event.num == 5 or event.delta == -120:  # scroll down
             i = min(self.width, self.height)
-            if int(i * self.imscale) < 30: return  # image is less than 30 pixels
+            if int(i * self.imscale) < 30:
+                return  # image is less than 30 pixels
             self.imscale /= self.delta
             scale /= self.delta
         if event.num == 4 or event.delta == 120:  # scroll up
             i = min(self.canvas.winfo_width(), self.canvas.winfo_height())
-            if i < self.imscale: return  # 1 pixel is bigger than the visible area
+            if i < self.imscale:
+                return  # 1 pixel is bigger than the visible area
             self.imscale *= self.delta
             scale *= self.delta
         self.canvas.scale('all', x, y, scale, scale)  # rescale all canvas objects

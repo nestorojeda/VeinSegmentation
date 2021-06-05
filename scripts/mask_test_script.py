@@ -9,8 +9,8 @@ iters = 2
 threshold = 1.5
 order = 2
 
-image = cv2.imread('imagenes_orginales/Caso A BN.png', cv2.IMREAD_GRAYSCALE)
-mask = cv2.imread('./mask.png', cv2.IMREAD_GRAYSCALE)
+image = cv2.imread('../imagenes_orginales/Caso A BN.png', cv2.IMREAD_GRAYSCALE)
+mask = cv2.imread('mask.png', cv2.IMREAD_GRAYSCALE)
 
 contours, hierarchy = cv2.findContours(mask, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)[-2:]
 idx = 0

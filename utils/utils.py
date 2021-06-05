@@ -1,6 +1,5 @@
 import cv2
 import numpy as np
-from skimage.feature import hessian_matrix, hessian_matrix_eigvals
 from PIL import Image
 
 
@@ -12,12 +11,6 @@ def openCVToPIL(img):
 
 def PILtoOpenCV(pil_image):
     return cv2.cvtColor(np.array(pil_image), cv2.COLOR_RGB2BGR)
-
-
-def DetectRidges(gray, sigma=3.0):
-    h_elems = hessian_matrix(gray, sigma)
-    eigenvalues = hessian_matrix_eigvals(h_elems)
-    return eigenvalues
 
 
 def AutoCanny(image, sigma=0.33):
@@ -42,17 +35,3 @@ def ResizeWithAspectRatio(image, width=None, height=None, inter=cv2.INTER_AREA):
         dim = (width, int(h * r))
 
     return cv2.resize(image, dim, interpolation=inter)
-
-
-def imadjust(x, a, b, c, d, gamma=1):
-    # Similar to imadjust in MATLAB.
-    # Converts an image range from [a,b] to [c,d].
-    # The Equation of a line can be used for this transformation:
-    #   y=((d-c)/(b-a))*(x-a)+c
-    # However, it is better to use a more generalized equation:
-    #   y=((x-a)/(b-a))^gamma*(d-c)+c
-    # If gamma is equal to 1, then the line equation is used.
-    # When gamma is not equal to 1, then the transformation is not linear.
-
-    y = (((x - a) / (b - a)) ** gamma) * (d - c) + c
-    return y
