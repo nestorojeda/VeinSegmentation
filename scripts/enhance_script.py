@@ -1,7 +1,6 @@
 import cv2
 import numpy as np
 from VeinSegmentation.enhance import enhance_medical_image, km_clust, skeletonization
-from pictures import Picture, show
 
 scaleX = 1
 scaleY = 1

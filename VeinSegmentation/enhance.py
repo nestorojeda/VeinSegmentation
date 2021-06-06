@@ -1,12 +1,10 @@
 import copy
+import math
 import warnings
 
 import cv2
-import math
 import numpy as np
 import scipy.ndimage.filters as flt
-from skimage import exposure
-from sklearn import cluster
 
 white = 255.
 black = 0.
@@ -21,10 +19,19 @@ def gaborFiltering(img):
 
 
 def segmentation(img, n_clusters=2):
-    values, labels = km_clust(img.astype('float32'), n_clusters=n_clusters)
-    enhanced_segm = np.choose(labels, values)
-    enhanced_segm.shape = img.shape
-    return enhanced_segm
+    Z = img.reshape((-1, 1))
+    # convert to np.float32
+    Z = np.float32(Z)
+    # define criteria, number of clusters(K) and apply kmeans()
+    criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 10, 1.0)
+    K = n_clusters
+    ret, label, center = cv2.kmeans(Z, K, None, criteria, 10, cv2.KMEANS_RANDOM_CENTERS)
+    # Now convert back into uint8, and make original image
+    center = np.uint8(center)
+    res = center[label.flatten()]
+    res2 = res.reshape(img.shape)
+
+    return res2
 
 
 def skeletonization(img, niter=100):
@@ -54,20 +61,6 @@ def skeletonization(img, niter=100):
         if cv2.countNonZero(img) == 0:
             break
     return skel
-
-
-def km_clust(array, n_clusters):
-    # Create a line array, the lazy way
-    X = array.reshape((-1, 1))
-    # Define the k-means clustering problem
-    k_m = cluster.KMeans(n_clusters=n_clusters, n_init=4)
-    # Solve the k-means clustering problem
-    k_m.fit(X)
-    # Get the coordinates of the clusters centres as a 1D array
-    values = k_m.cluster_centers_.squeeze()
-    # Get the label of each point
-    labels = k_m.labels_
-    return values, labels
 
 
 def enhance_medical_image(image, clip_limit=5, tile_grid_size=5, use_clahe=True):
@@ -231,20 +224,6 @@ def anisodiff(img, niter=1, kappa=50, gamma=0.1, step=(1., 1.), sigma=0, option=
         # sleep(0.01)
 
     return imgout
-
-
-def smooth_thresholded_image(img):
-    # blur threshold image
-    blur = cv2.GaussianBlur(img, (0, 0), sigmaX=3, sigmaY=3, borderType=cv2.BORDER_DEFAULT)
-
-    # stretch so that 255 -> 255 and 127.5 -> 0
-    # C = A*X+B
-    # 255 = A*255+B
-    # 0 = A*127.5+B
-    # Thus A=2 and B=-127.5
-    # aa = a*2.0-255.0 does not work correctly, so use skimage
-    result = exposure.rescale_intensity(blur, in_range=(127.5, 255), out_range=(0, 255))
-    return result
 
 
 def color_layer_segmentation(img):
