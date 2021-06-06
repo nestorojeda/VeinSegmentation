@@ -6,5 +6,4 @@
 gui.spec
 dist
 build
-hooks
 subpixel_edges

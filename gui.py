@@ -260,8 +260,8 @@ class App(Frame):
                                                                       self.mask, is_enhanced=True)
             else:
                 self.skeletonized = mask.apply_skeletonization_to_roi(
-                    cv2.cvtColor(self.opencv_image, cv2.COLOR_GRAY2RGB)
-                    , self.mask, is_enhanced=False)
+                    cv2.cvtColor(self.opencv_image, cv2.COLOR_GRAY2RGB),
+                        self.mask, is_enhanced=False)
             pts = np.array(self.polygon_points).reshape((-1, 1, 2))
             image_with_polygon = cv2.polylines(self.skeletonized, [pts.astype(np.int32)], isClosed=self.isClosed,
                                                color=color.red, thickness=self.thickness)
