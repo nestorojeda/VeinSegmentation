@@ -3,3 +3,8 @@
 /imagenes_orginales/
 /.vscode/
 /.idea/workspace.xml
+gui.spec
+dist
+build
+hooks
+subpixel_edges
