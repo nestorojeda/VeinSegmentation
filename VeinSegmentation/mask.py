@@ -38,10 +38,10 @@ def apply_enhance_to_roi(image, mask):
 
         mask = cv2.bitwise_not(mask)  # cambiamos la mascara de signo
 
-        hollow_picture = cv2.bitwise_or(fg, image, mask=mask)  # la imagen con un agujero
+        fgbg = cv2.bitwise_or(fg, image, mask=mask)  # la imagen con un agujero
 
         mask = cv2.bitwise_not(mask)
-        enhanced = cv2.bitwise_or(hollow_picture, fg)
+        enhanced = cv2.bitwise_or(fgbg, fg)
 
     elapsed = time() - now
     print("Processing time: ", elapsed)
@@ -81,10 +81,10 @@ def apply_skeletonization_to_roi(image, mask, is_enhanced=True):
         mask = cv2.bitwise_not(mask)
 
         # combine foreground+background
-        test = cv2.bitwise_or(fg, image, mask=mask)
+        fgbg = cv2.bitwise_or(fg, image, mask=mask)
 
         mask = cv2.bitwise_not(mask)
-        skeleton = cv2.bitwise_or(test, fg)
+        skeleton = cv2.bitwise_or(fgbg, fg)
 
     elapsed = time() - now
     print("Processing time: ", elapsed)
@@ -132,10 +132,10 @@ def apply_subpixel_to_roi(image, mask,
 
         image = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
         # combine foreground+background
-        test = cv2.bitwise_or(fg, image, mask=mask)
+        fgbg = cv2.bitwise_or(fg, image, mask=mask)
 
         mask = cv2.bitwise_not(mask)
-        subpixel = cv2.bitwise_or(test, fg)
+        subpixel = cv2.bitwise_or(fgbg, fg)
 
     elapsed = time() - now
     print("Processing time: ", elapsed)
