@@ -58,10 +58,7 @@ def apply_skeletonization_to_roi(image, mask, is_enhanced=True):
     print("Processing apply_skeletonization_to_roi...")
     now = time()
 
-    # image = cv2.cvtColor(image.astype(np.uint8), cv2.COLOR_RGB2GRAY)
     mask = cv2.cvtColor(mask.astype(np.uint8), cv2.COLOR_RGB2GRAY)
-
-    #if not is_enhanced: image = cv2.cvtColor(image.astype(np.uint8), cv2.COLOR_RGB2GRAY)
 
     contours, hierarchy = cv2.findContours(mask, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)[-2:]
     idx = 0
@@ -108,7 +105,6 @@ def apply_subpixel_to_roi(image, mask,
     print("Processing apply_subpixel_to_roi...")
     now = time()
 
-    # image = cv2.cvtColor(image.astype(np.uint8), cv2.COLOR_RGB2GRAY)
     mask = cv2.cvtColor(mask.astype(np.uint8), cv2.COLOR_RGB2GRAY)
 
     contours, hierarchy = cv2.findContours(mask, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)[-2:]
