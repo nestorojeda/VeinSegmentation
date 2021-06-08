@@ -15,6 +15,7 @@ from utils.utils import openCVToPIL, PILtoOpenCV
 from VeinSegmentation import mask
 
 drawing = False
+ftypes = [('Imagen', '.png .jpeg .jpg')]
 
 
 # https://zetcode.com/tkinter/menustoolbars/
@@ -48,7 +49,7 @@ class App(Frame):
         self.initWelcomeUI()
 
     def initWelcomeUI(self):
-        file = fd.askopenfilename()
+        file = fd.askopenfilename(filetypes=ftypes)
         if file:
             self.filename = file
             self.opencv_image = cv2.imread(self.filename, cv2.IMREAD_GRAYSCALE)
@@ -292,7 +293,7 @@ class App(Frame):
         self.master.wait_window(d.top)
 
     def openFileMenu(self):
-        file = fd.askopenfilename()
+        file = fd.askopenfilename(filetypes=ftypes)
         if file:
             self.filename = file
             self.opencv_image = cv2.imread(self.filename, cv2.IMREAD_GRAYSCALE)
@@ -309,8 +310,6 @@ class App(Frame):
             self.show_image()
 
     def saveFileMenu(self):
-        ftypes = [('Imagen', '.png'),
-                  ('All files', '*')]
         filename = fd.asksaveasfilename(filetypes=ftypes,
                                         defaultextension='.png')
         if filename:

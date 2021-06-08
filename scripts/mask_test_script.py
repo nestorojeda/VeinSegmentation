@@ -20,16 +20,7 @@ for cnt in contours:
     crop = image[y:y + h, x:x + w]
     enhanced_crop = eh.enhance_medical_image(crop)
 
-    edges = subpixel_edges(crop.astype(float), threshold, iters, order)
-
     edged_crop = cv2.cvtColor(enhanced_crop.astype(np.uint8), cv2.COLOR_GRAY2BGR)
-
-    for point in np.array((edges.x, edges.y)).T.astype(np.uint):
-        cv2.circle(edged_crop, tuple(point), 1, (0, 0, 255))
-
-    plt.imshow(edged_crop)
-    plt.title('subpixel_edges crop')
-    plt.show()
 
     merged = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
     merged[y:y + h, x:x + w] = edged_crop

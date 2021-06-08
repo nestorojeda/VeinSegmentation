@@ -4,6 +4,7 @@ from subpixel_edges import subpixel_edges
 
 from VeinSegmentation import enhance as eh
 from time import time
+import matplotlib.pyplot as plt
 
 white = 255.
 black = 0.
