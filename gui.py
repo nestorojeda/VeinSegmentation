@@ -9,12 +9,13 @@ from PIL import Image
 from PIL import ImageTk
 
 import constants.colors as color
-from components.BrightnessContrastDialog import BrightnessContrastDialog
-from components.AutoScrollbar import AutoScrollbar
-from utils.utils import openCVToPIL, PILtoOpenCV
-from VeinSegmentation import mask
+from Components.BrightnessContrastDialog import BrightnessContrastDialog
+from Components.AutoScrollbar import AutoScrollbar
+from Utils.Utils import openCVToPIL, PILtoOpenCV
+from VeinSegmentation import Mask
 
 drawing = False
+ftypes = [('Imagen', '.png .jpeg .jpg')]
 
 
 # https://zetcode.com/tkinter/menustoolbars/
@@ -48,7 +49,7 @@ class App(Frame):
         self.initWelcomeUI()
 
     def initWelcomeUI(self):
-        file = fd.askopenfilename()
+        file = fd.askopenfilename(filetypes=ftypes)
         if file:
             self.filename = file
             self.opencv_image = cv2.imread(self.filename, cv2.IMREAD_GRAYSCALE)
@@ -242,7 +243,7 @@ class App(Frame):
 
     def enhance(self):
         if len(self.polygon_points) > 1:
-            self.enhanced = mask.apply_enhance_to_roi(cv2.cvtColor(self.opencv_image, cv2.COLOR_GRAY2RGB), self.mask)
+            self.enhanced = Mask.apply_enhance_to_roi(cv2.cvtColor(self.opencv_image, cv2.COLOR_GRAY2RGB), self.mask)
             pts = np.array(self.polygon_points).reshape((-1, 1, 2))
             image_with_polygon = cv2.polylines(self.enhanced, [pts.astype(np.int32)], isClosed=self.isClosed,
                                                color=color.red, thickness=self.thickness)
@@ -256,12 +257,9 @@ class App(Frame):
     def skeletonize(self):
         if len(self.polygon_points) > 1:
             if self.is_enhanced:
-                self.skeletonized = mask.apply_skeletonization_to_roi(self.enhanced,
-                                                                      self.mask, is_enhanced=True)
+                self.skeletonized = Mask.apply_skeletonization_to_roi(self.enhanced, self.mask, is_enhanced=True)
             else:
-                self.skeletonized = mask.apply_skeletonization_to_roi(
-                    cv2.cvtColor(self.opencv_image, cv2.COLOR_GRAY2RGB)
-                    , self.mask, is_enhanced=False)
+                self.skeletonized = Mask.apply_skeletonization_to_roi(self.opencv_image, self.mask, is_enhanced=False)
             pts = np.array(self.polygon_points).reshape((-1, 1, 2))
             image_with_polygon = cv2.polylines(self.skeletonized, [pts.astype(np.int32)], isClosed=self.isClosed,
                                                color=color.red, thickness=self.thickness)
@@ -275,8 +273,11 @@ class App(Frame):
 
     def subpixel(self):
         if len(self.polygon_points) > 1:
-            self.subpixel_image = mask.apply_subpixel_to_roi(cv2.cvtColor(self.opencv_image, cv2.COLOR_GRAY2RGB),
-                                                             self.mask)
+            if self.is_enhanced:
+                self.subpixel_image = Mask.apply_subpixel_to_roi(self.enhanced, self.mask, is_enhanced=True)
+            else:
+                self.subpixel_image = Mask.apply_subpixel_to_roi(self.opencv_image, self.mask, is_enhanced=False)
+
             pts = np.array(self.polygon_points).reshape((-1, 1, 2))
             image_with_polygon = cv2.polylines(self.subpixel_image, [pts.astype(np.int32)], isClosed=self.isClosed,
                                                color=color.red, thickness=self.thickness)
@@ -292,7 +293,7 @@ class App(Frame):
         self.master.wait_window(d.top)
 
     def openFileMenu(self):
-        file = fd.askopenfilename()
+        file = fd.askopenfilename(filetypes=ftypes)
         if file:
             self.filename = file
             self.opencv_image = cv2.imread(self.filename, cv2.IMREAD_GRAYSCALE)
@@ -309,8 +310,6 @@ class App(Frame):
             self.show_image()
 
     def saveFileMenu(self):
-        ftypes = [('Imagen', '.png'),
-                  ('All files', '*')]
         filename = fd.asksaveasfilename(filetypes=ftypes,
                                         defaultextension='.png')
         if filename:

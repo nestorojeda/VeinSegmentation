@@ -1,8 +1,8 @@
 import cv2
-from VeinSegmentation.contour import contour
+from VeinSegmentation.Contour import contour
 import matplotlib.pyplot as plt
 import numpy as np
-from VeinSegmentation.enhance import enhance_medical_image, segmentation, skeletonization
+from VeinSegmentation.Enhance import enhance_medical_image, segmentation, skeletonization
 
 y = 1300  # donde empieza el corte en y
 x = 1600  # donde empieza el corte en x
