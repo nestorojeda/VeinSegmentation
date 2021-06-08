@@ -2,13 +2,13 @@ import tkinter as tk
 import cv2
 import matplotlib.pyplot as plt
 
-from Utils.Utils import openCVToPIL
+from Utils.Utils import openCVToPIL, PILtoOpenCV
 
 
 class BrightnessContrastDialog:
-    def __init__(self, parent, opencv_image):
+    def __init__(self, parent, pil_image):
         self.parent = parent.children['!app']
-        self.opencv_image = opencv_image
+        self.pil_image = pil_image
         self.top = tk.Toplevel(parent)
         self.top.transient(parent)
         # self.top.grab_set()
@@ -36,7 +36,7 @@ class BrightnessContrastDialog:
         self.c_slider.set(0)
         self.b_slider.set(0)
 
-        self.parent.image = openCVToPIL(self.opencv_image)
+        self.parent.image = self.pil_image
         self.parent.show_image()
 
     def bright_and_contrast_controller(self, event=None, reset=False):
@@ -45,7 +45,7 @@ class BrightnessContrastDialog:
         """
         brightness = self.b_slider.get()
         contrast = self.c_slider.get()
-        img = self.opencv_image.copy()
+        img = PILtoOpenCV(self.pil_image.copy())
 
         if brightness != 0:
             if brightness > 0:

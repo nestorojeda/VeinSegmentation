@@ -289,7 +289,7 @@ class App(Frame):
             messagebox.showerror("Error", "Debes seleleccionar un polígono")
 
     def open_contrast_brightness_menu(self):
-        d = BrightnessContrastDialog(self.master, self.opencv_image)
+        d = BrightnessContrastDialog(self.master, self.image)
         self.master.wait_window(d.top)
 
     def openFileMenu(self):
