@@ -20,8 +20,8 @@ def apply_enhance_to_roi(image, mask):
     print("Processing apply_enhance_to_roi...")
     now = time()
 
-    mask = cv2.cvtColor(mask.astype(np.uint8), cv2.COLOR_RGB2GRAY)
     image = cv2.cvtColor(image.astype(np.uint8), cv2.COLOR_RGB2GRAY)
+    mask = cv2.cvtColor(mask.astype(np.uint8), cv2.COLOR_RGB2GRAY)
 
     contours, hierarchy = cv2.findContours(mask, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)[-2:]
     idx = 0
@@ -58,8 +58,10 @@ def apply_skeletonization_to_roi(image, mask, is_enhanced=True):
     print("Processing apply_skeletonization_to_roi...")
     now = time()
 
+    # image = cv2.cvtColor(image.astype(np.uint8), cv2.COLOR_RGB2GRAY)
     mask = cv2.cvtColor(mask.astype(np.uint8), cv2.COLOR_RGB2GRAY)
-    if not is_enhanced: image = cv2.cvtColor(image.astype(np.uint8), cv2.COLOR_RGB2GRAY)
+
+    #if not is_enhanced: image = cv2.cvtColor(image.astype(np.uint8), cv2.COLOR_RGB2GRAY)
 
     contours, hierarchy = cv2.findContours(mask, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)[-2:]
     idx = 0
@@ -67,8 +69,8 @@ def apply_skeletonization_to_roi(image, mask, is_enhanced=True):
         idx += 1
         x, y, w, h = cv2.boundingRect(cnt)
         crop = image[y:y + h, x:x + w]
-        if not is_enhanced: crop = eh.enhance_medical_image(
-            crop)  # Si la imagen no está mejorada, la mejoramos solo para realizar este proceso
+        if not is_enhanced:
+            crop = eh.enhance_medical_image(crop)  # Si la imagen no está mejorada, la mejoramos solo para realizar este proceso
 
         skel_crop = eh.skeletonization(crop)
 
@@ -95,7 +97,8 @@ def apply_skeletonization_to_roi(image, mask, is_enhanced=True):
 def apply_subpixel_to_roi(image, mask,
                           iters=2,
                           threshold=1.5,
-                          order=2):
+                          order=2,
+                          is_enhanced=True):
     """
     Extracción de la región de interés a partir de una máscara
     y aplicacion del algoritmo de subpixel
@@ -105,8 +108,8 @@ def apply_subpixel_to_roi(image, mask,
     print("Processing apply_subpixel_to_roi...")
     now = time()
 
+    # image = cv2.cvtColor(image.astype(np.uint8), cv2.COLOR_RGB2GRAY)
     mask = cv2.cvtColor(mask.astype(np.uint8), cv2.COLOR_RGB2GRAY)
-    image = cv2.cvtColor(image.astype(np.uint8), cv2.COLOR_RGB2GRAY)
 
     contours, hierarchy = cv2.findContours(mask, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)[-2:]
     idx = 0
@@ -114,11 +117,12 @@ def apply_subpixel_to_roi(image, mask,
         idx += 1
         x, y, w, h = cv2.boundingRect(cnt)
         crop = image[y:y + h, x:x + w]
-        enhanced_crop = eh.enhance_medical_image(crop)
+        if not is_enhanced:
+            crop = eh.enhance_medical_image(crop)  # Si la imagen no está mejorada, la mejoramos solo para realizar este proceso
 
         edges = subpixel_edges(crop.astype(float), threshold, iters, order)
 
-        edged_crop = cv2.cvtColor(enhanced_crop.astype(np.uint8), cv2.COLOR_GRAY2BGR)
+        edged_crop = cv2.cvtColor(crop.astype(np.uint8), cv2.COLOR_GRAY2BGR)
 
         for point in np.array((edges.x, edges.y)).T.astype(np.uint):
             cv2.circle(edged_crop, tuple(point), 1, (0, 0, 255))

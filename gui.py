@@ -257,12 +257,9 @@ class App(Frame):
     def skeletonize(self):
         if len(self.polygon_points) > 1:
             if self.is_enhanced:
-                self.skeletonized = mask.apply_skeletonization_to_roi(self.enhanced,
-                                                                      self.mask, is_enhanced=True)
+                self.skeletonized = mask.apply_skeletonization_to_roi(self.enhanced, self.mask, is_enhanced=True)
             else:
-                self.skeletonized = mask.apply_skeletonization_to_roi(
-                    cv2.cvtColor(self.opencv_image, cv2.COLOR_GRAY2RGB),
-                        self.mask, is_enhanced=False)
+                self.skeletonized = mask.apply_skeletonization_to_roi(self.opencv_image, self.mask, is_enhanced=False)
             pts = np.array(self.polygon_points).reshape((-1, 1, 2))
             image_with_polygon = cv2.polylines(self.skeletonized, [pts.astype(np.int32)], isClosed=self.isClosed,
                                                color=color.red, thickness=self.thickness)
@@ -276,8 +273,11 @@ class App(Frame):
 
     def subpixel(self):
         if len(self.polygon_points) > 1:
-            self.subpixel_image = mask.apply_subpixel_to_roi(cv2.cvtColor(self.opencv_image, cv2.COLOR_GRAY2RGB),
-                                                             self.mask)
+            if self.is_enhanced:
+                self.subpixel_image = mask.apply_subpixel_to_roi(self.enhanced, self.mask, is_enhanced=True)
+            else:
+                self.subpixel_image = mask.apply_subpixel_to_roi(self.opencv_image, self.mask, is_enhanced=False)
+
             pts = np.array(self.polygon_points).reshape((-1, 1, 2))
             image_with_polygon = cv2.polylines(self.subpixel_image, [pts.astype(np.int32)], isClosed=self.isClosed,
                                                color=color.red, thickness=self.thickness)
