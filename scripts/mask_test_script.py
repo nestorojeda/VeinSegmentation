@@ -2,7 +2,7 @@ import cv2
 import matplotlib.pyplot as plt
 import numpy as np
 
-from VeinSegmentation import enhance as eh
+from VeinSegmentation import Enhance as eh
 from subpixel_edges import subpixel_edges
 
 iters = 2

@@ -1,11 +1,11 @@
+from time import time
+
 import cv2
 import numpy as np
 from subpixel_edges import subpixel_edges
 
-from VeinSegmentation import enhance as eh
-from time import time
-import matplotlib.pyplot as plt
-
+from VeinSegmentation import Enhance as eh
+from VeinSegmentation.Skeletonization import skeletonization
 white = 255.
 black = 0.
 
@@ -53,6 +53,7 @@ def apply_skeletonization_to_roi(image, mask, is_enhanced=True):
     """
     Extracción de la región de interés a partir de una máscara
     y aplicación del algoritmo de skeletonización
+    https://www.programmersought.com/article/75844449435/
     """
 
     print("Processing apply_skeletonization_to_roi...")
@@ -69,7 +70,7 @@ def apply_skeletonization_to_roi(image, mask, is_enhanced=True):
         if not is_enhanced:
             crop = eh.enhance_medical_image(crop)  # Si la imagen no está mejorada, la mejoramos solo para realizar este proceso
 
-        skel_crop = eh.skeletonization(crop)
+        skel_crop = skeletonization(crop)
 
         merged = image.copy()
         skel_crop = skel_crop.astype(np.uint8)

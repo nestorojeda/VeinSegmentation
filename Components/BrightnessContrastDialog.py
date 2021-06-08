@@ -2,7 +2,7 @@ import tkinter as tk
 import cv2
 import matplotlib.pyplot as plt
 
-from utils.utils import openCVToPIL
+from Utils.Utils import openCVToPIL
 
 
 class BrightnessContrastDialog:

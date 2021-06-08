@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 
-from VeinSegmentation.enhance import segmentation
+from VeinSegmentation.Enhance import segmentation
 
 scaleX = 1
 scaleY = 1
