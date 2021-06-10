@@ -35,8 +35,12 @@ class App(Frame):
         # Variables
 
         self.image = None  # Imagen que se va a mostrar en formato PIL
+        self.zerobc_image = None
         self.width = 0  # Ancho de la imagen
         self.height = 0  # Alto de la imagen
+
+        self.brightness_value = 0
+        self.contrast_value = 0
 
         self.polygon_points = np.array([])  # Puntos que forman el poligono
         self.isClosed = False  # Define si el poligono se cierra autmáticamente al poner los puntos
@@ -53,7 +57,8 @@ class App(Frame):
         if file:
             self.filename = file
             self.opencv_image = cv2.imread(self.filename, cv2.IMREAD_GRAYSCALE)
-            self.image = Image.open(self.filename)  # open image
+            self.image = Image.open(self.filename)
+            self.zerobc_image = self.image.copy()
             self.width, self.height = self.image.size
             self.initUiComponents()
             self.show_image()
@@ -148,6 +153,7 @@ class App(Frame):
             self.mask = cv2.fillPoly(np.zeros((self.height, self.width, 3)),
                                      [pts.astype(np.int32)], color=color.white)
             self.image = openCVToPIL(image_with_polygon)  # open image
+            self.zerobc_image = self.image.copy()
             self.width, self.height = self.image.size
             self.show_image()
 
@@ -155,6 +161,7 @@ class App(Frame):
         print('Event:clean')
         self.opencv_image = cv2.imread(self.filename, cv2.IMREAD_GRAYSCALE)
         self.image = openCVToPIL(self.opencv_image)  # open image
+        self.zerobc_image = self.image.copy()
         self.polygon_points = np.array([])
         self.width, self.height = self.image.size
         self.show_image()
@@ -248,6 +255,7 @@ class App(Frame):
             image_with_polygon = cv2.polylines(self.enhanced, [pts.astype(np.int32)], isClosed=self.isClosed,
                                                color=color.red, thickness=self.thickness)
             self.image = openCVToPIL(image_with_polygon)
+            self.zerobc_image = self.image.copy()
             self.is_enhanced = True
             self.width, self.height = self.image.size
             self.show_image()
@@ -265,6 +273,7 @@ class App(Frame):
                                                color=color.red, thickness=self.thickness)
 
             self.image = openCVToPIL(image_with_polygon)
+            self.zerobc_image = self.image.copy()
             self.is_skeletonized = True
             self.width, self.height = self.image.size
             self.show_image()
@@ -282,6 +291,7 @@ class App(Frame):
             image_with_polygon = cv2.polylines(self.subpixel_image, [pts.astype(np.int32)], isClosed=self.isClosed,
                                                color=color.red, thickness=self.thickness)
             self.image = openCVToPIL(image_with_polygon)
+            self.zerobc_image = self.image.copy()
             self.is_subpixel = True
             self.width, self.height = self.image.size
             self.show_image()
@@ -289,7 +299,7 @@ class App(Frame):
             messagebox.showerror("Error", "Debes seleleccionar un polígono")
 
     def open_contrast_brightness_menu(self):
-        d = BrightnessContrastDialog(self.master, self.image)
+        d = BrightnessContrastDialog(self.master, self.zerobc_image.copy())
         self.master.wait_window(d.top)
 
     def openFileMenu(self):
@@ -298,6 +308,7 @@ class App(Frame):
             self.filename = file
             self.opencv_image = cv2.imread(self.filename, cv2.IMREAD_GRAYSCALE)
             self.image = Image.open(self.filename)  # open image
+            self.zerobc_image = self.image.copy()
             self.width, self.height = self.image.size
 
             self.polygon_points = np.array([])  # Puntos que forman el poligono
