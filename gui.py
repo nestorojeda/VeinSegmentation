@@ -35,7 +35,7 @@ class App(Frame):
         # Variables
 
         self.image = None  # Imagen que se va a mostrar en formato PIL
-        self.zerobc_image = None
+        self.zerobc_image = None # Imagen sin brillo ni contraste
         self.width = 0  # Ancho de la imagen
         self.height = 0  # Alto de la imagen
 
