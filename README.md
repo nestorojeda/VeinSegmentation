@@ -2,6 +2,10 @@
 
 Repositorio con el código del trabajo de fin de grado titulado 'Segmentación de venas en imagen infrarroja'.
 
+## Requerimientos
+
+- Python 3.8 
+
 ## Montar proyecto
 
 ```
