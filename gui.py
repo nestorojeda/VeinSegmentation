@@ -67,6 +67,11 @@ class App(Frame):
 
         self.initWelcomeUI()
 
+    def onExit(self):
+        if messagebox.askokcancel("Salir", "¿De seguro que quieres salir?"):
+            self.master.destroy()
+            sys.exit()
+
     def initWelcomeUI(self):
         file = fd.askopenfilename(filetypes=ftypes)
         if file:
@@ -77,6 +82,10 @@ class App(Frame):
             self.width, self.height = self.image.size
             self.initUiComponents()
             self.show_image()
+        else:
+            self.master.destroy()
+            sys.exit()
+
 
     def initUiComponents(self):
         # Vertical and horizontal scrollbars for canvas
@@ -380,10 +389,6 @@ class App(Frame):
             self.canvas.lower(imageid)  # set image into background
             self.canvas.imagetk = imagetk  # keep an extra reference to prevent garbage-collection
 
-    def onExit(self):
-        if messagebox.askokcancel("Salir", "¿De seguro que quieres salir?"):
-            self.master.destroy()
-            sys.exit()
 
     def enhance(self):
         if len(self.polygon_points) > 1:
