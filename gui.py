@@ -206,12 +206,14 @@ class App(Frame):
                                            thickness=self.thickness)
 
                 pixel_distance = np.math.sqrt(
-                    (self.measure_points[0][1] - self.measure_points[0][0]) ** 2 +
-                    (self.measure_points[1][1] - self.measure_points[1][0]) ** 2)
+                    (self.measure_points[1][0] - self.measure_points[0][0]) ** 2 +
+                    (self.measure_points[1][1] - self.measure_points[0][1]) ** 2)
+
+                print("Pixel distance betweeen points is: {} pixels".format(pixel_distance))
 
                 distance = pixel_distance * self.one_pixel_size
 
-                print("Distance betweeen points is: {} cm".format(distance))
+                print("Real istance betweeen points is: {} cm".format(distance))
 
                 self.image = openCVToPIL(image_with_line)  # open image
                 self.width, self.height = self.image.size

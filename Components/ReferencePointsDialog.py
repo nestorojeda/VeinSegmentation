@@ -53,8 +53,8 @@ class ReferencePointsDialog:
 
     def saveReference(self):
         print('ReferencePointsDialog::saveReference')
-        pixel_distance = math.sqrt((self.parent.reference_points[0][1] - self.parent.reference_points[0][0]) ** 2 +
-                                   (self.parent.reference_points[1][1] - self.parent.reference_points[1][0]) ** 2)
+        pixel_distance = math.sqrt((self.parent.reference_points[1][0] - self.parent.reference_points[0][0]) ** 2 +
+                                   (self.parent.reference_points[1][1] - self.parent.reference_points[0][1]) ** 2)
         print('Pixel distance {}'.format(pixel_distance))
         self.parent.one_pixel_size = (float(self.entry.get())) / pixel_distance
         print('Real pixel size {}'.format(self.parent.one_pixel_size))
