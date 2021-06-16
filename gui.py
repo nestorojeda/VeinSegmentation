@@ -54,9 +54,10 @@ class App(Frame):
         self.is_subpixel = False
         self.filename = ''
         self.opencv_image = None
-        self.drawing = True
-        self.selectReference = False
-        self.measuring = False
+
+        # MODO PREDETERMINADO
+        self.selectDrawingMode()
+
         self.initWelcomeUI()
 
     def initWelcomeUI(self):
@@ -95,7 +96,7 @@ class App(Frame):
 
         measureMenu = Menu(menubar)
         measureMenu.add_command(label="Seleccionar referencia", command=self.selectReferenceMode)
-        measureMenu.add_command(label="Medir", command=self.skeletonize)
+        measureMenu.add_command(label="Medir", command=self.selectMeasureMode)
         menubar.add_cascade(label="Medidas", menu=measureMenu)
 
         # Create canvas and put image on it
@@ -150,17 +151,29 @@ class App(Frame):
     def selectReferenceMode(self):
         print('Select reference mode')
         if self.one_pixel_size:
-            MsgBox = tk.messagebox.askquestion('Reiniciar referencia', '¿Estás seguro que que deseas rehacer la '
-                                                                       'referencia?',
+            MsgBox = tk.messagebox.askquestion('Aviso', '¿Estás seguro que que deseas rehacer la '
+                                                        'referencia?',
                                                icon='warning')
             if MsgBox == 'yes':
+                self.one_pixel_size = None
                 self.drawing = False
                 self.measuring = False
                 self.selectReference = True
+
         else:
             self.drawing = False
             self.measuring = False
             self.selectReference = True
+
+    def selectMeasureMode(self):
+        self.drawing = False
+        self.measuring = True
+        self.selectReference = False
+
+    def selectDrawingMode(self):
+        self.drawing = True
+        self.measuring = False
+        self.selectReference = False
 
     def click_select_reference(self, event):
         if self.rpd: self.rpd.cancel()
@@ -184,6 +197,7 @@ class App(Frame):
                 self.rpd = ReferencePointsDialog(self.master, self.zerobc_image.copy())
                 self.master.wait_window(self.rpd.top)
                 self.reference_points = []
+                self.selectDrawingMode()
 
     def click_draw_polygon(self, event):
         print('Event::mouse2')
