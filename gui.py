@@ -180,21 +180,27 @@ class App(Frame):
                                 'Debes seleccionar antes una referencia', icon='error')
 
     def selectDrawingMode(self):
-            self.drawing = True
-            self.measuring = False
-            self.selectReference = False
+        self.drawing = True
+        self.measuring = False
+        self.selectReference = False
 
     def click_select_measure(self, event):
         if (event.x + self.x1) / self.imscale >= 0 and (event.y + self.y1) / self.imscale >= 0:
             click_x = int((event.x + self.x1) / self.imscale)
             click_y = int((event.y + self.y1) / self.imscale)
+            self.measure_points.append((click_x, click_y))
 
             if len(self.measure_points) <= 1:
-                self.measure_points.append((click_x, click_y))
+                self.image_with_points = cv2.circle(cv2.cvtColor(self.opencv_image.copy(), cv2.COLOR_GRAY2RGB),
+                                                    (click_x, click_y), radius=0, color=(0, 0, 255), thickness=14)
+                self.image = openCVToPIL(self.image_with_points)  # open image
+                self.width, self.height = self.image.size
+                self.show_image()
 
             if len(self.measure_points) == 2:
-                self.measure_points[1] = (click_x, click_y)
-                image_with_line = cv2.line(cv2.cvtColor(self.opencv_image.copy(), cv2.COLOR_GRAY2RGB),
+                self.image_with_points = cv2.circle(self.image_with_points,
+                                                    (click_x, click_y), radius=0, color=(0, 0, 255), thickness=14)
+                image_with_line = cv2.line(self.image_with_points,
                                            self.measure_points[0], self.measure_points[1],
                                            color=color.red,
                                            thickness=self.thickness)
@@ -217,13 +223,20 @@ class App(Frame):
         if (event.x + self.x1) / self.imscale >= 0 and (event.y + self.y1) / self.imscale >= 0:
             click_x = int((event.x + self.x1) / self.imscale)
             click_y = int((event.y + self.y1) / self.imscale)
+            self.reference_points.append((click_x, click_y))
 
             if len(self.reference_points) <= 1:
-                self.reference_points.append((click_x, click_y))
+                self.image_with_points = cv2.circle(cv2.cvtColor(self.opencv_image.copy(), cv2.COLOR_GRAY2RGB),
+                                                    (click_x, click_y), radius=0, color=(0, 0, 255), thickness=14)
+                self.image = openCVToPIL(self.image_with_points)  # open image
+                self.width, self.height = self.image.size
+                self.show_image()
 
             if len(self.reference_points) == 2:
-                self.reference_points[1] = (click_x, click_y)
-                image_with_line = cv2.line(cv2.cvtColor(self.opencv_image.copy(), cv2.COLOR_GRAY2RGB),
+                self.image_with_points = cv2.circle(self.image_with_points,
+                                                    (click_x, click_y), radius=0, color=(0, 0, 255), thickness=14)
+
+                image_with_line = cv2.line(self.image_with_points,
                                            self.reference_points[0], self.reference_points[1],
                                            color=color.red,
                                            thickness=self.thickness)
