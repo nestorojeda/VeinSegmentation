@@ -17,6 +17,7 @@ from VeinSegmentation import Mask
 
 drawing = False
 ftypes = [('Imagen', '.png .jpeg .jpg')]
+point_thickness = 8
 
 
 # https://zetcode.com/tkinter/menustoolbars/
@@ -59,8 +60,10 @@ class App(Frame):
         self.filename = ''
         self.opencv_image = None
 
-        # MODO PREDETERMINADO
-        self.selectDrawingMode()
+        # MODO PREDETERMINADO: DRAWING
+        self.drawing = True
+        self.measuring = False
+        self.selectReference = False
 
         self.initWelcomeUI()
 
@@ -154,7 +157,8 @@ class App(Frame):
             self.click_select_measure(event)
 
     def selectReferenceMode(self):
-        print('Select reference mode')
+        print('Mode changed to reference mode')
+        self.clean()
         if self.one_pixel_size:
             MsgBox = tk.messagebox.askquestion('Aviso', '¿Estás seguro que que deseas rehacer la '
                                                         'referencia?',
@@ -171,7 +175,9 @@ class App(Frame):
             self.selectReference = True
 
     def selectMeasureMode(self):
+        print('Mode changed to measure mode')
         if self.one_pixel_size:
+            self.clean()
             self.drawing = False
             self.measuring = True
             self.selectReference = False
@@ -180,6 +186,8 @@ class App(Frame):
                                 'Debes seleccionar antes una referencia', icon='error')
 
     def selectDrawingMode(self):
+        print('Mode changed to drawing mode')
+        self.clean()
         self.drawing = True
         self.measuring = False
         self.selectReference = False
@@ -192,14 +200,14 @@ class App(Frame):
 
             if len(self.measure_points) <= 1:
                 self.image_with_points = cv2.circle(cv2.cvtColor(self.opencv_image.copy(), cv2.COLOR_GRAY2RGB),
-                                                    (click_x, click_y), radius=0, color=(0, 0, 255), thickness=14)
+                                                    (click_x, click_y), radius=0, color=(0, 0, 255), thickness=point_thickness)
                 self.image = openCVToPIL(self.image_with_points)  # open image
                 self.width, self.height = self.image.size
                 self.show_image()
 
             if len(self.measure_points) == 2:
                 self.image_with_points = cv2.circle(self.image_with_points,
-                                                    (click_x, click_y), radius=0, color=(0, 0, 255), thickness=14)
+                                                    (click_x, click_y), radius=0, color=(0, 0, 255), thickness=point_thickness)
                 image_with_line = cv2.line(self.image_with_points,
                                            self.measure_points[0], self.measure_points[1],
                                            color=color.red,
@@ -229,14 +237,14 @@ class App(Frame):
 
             if len(self.reference_points) <= 1:
                 self.image_with_points = cv2.circle(cv2.cvtColor(self.opencv_image.copy(), cv2.COLOR_GRAY2RGB),
-                                                    (click_x, click_y), radius=0, color=(0, 0, 255), thickness=14)
+                                                    (click_x, click_y), radius=0, color=(0, 0, 255), thickness=point_thickness)
                 self.image = openCVToPIL(self.image_with_points)  # open image
                 self.width, self.height = self.image.size
                 self.show_image()
 
             if len(self.reference_points) == 2:
                 self.image_with_points = cv2.circle(self.image_with_points,
-                                                    (click_x, click_y), radius=0, color=(0, 0, 255), thickness=14)
+                                                    (click_x, click_y), radius=0, color=(0, 0, 255), thickness=point_thickness)
 
                 image_with_line = cv2.line(self.image_with_points,
                                            self.reference_points[0], self.reference_points[1],
