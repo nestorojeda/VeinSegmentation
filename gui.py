@@ -43,6 +43,7 @@ class App(Frame):
         self.brightness_value = 0
         self.contrast_value = 0
 
+        self.one_pixel_size = None
         self.rpd = None
         self.polygon_points = np.array([])  # Puntos que forman el poligono
         self.reference_points = []
@@ -148,9 +149,18 @@ class App(Frame):
 
     def selectReferenceMode(self):
         print('Select reference mode')
-        self.drawing = False
-        self.measuring = False
-        self.selectReference = True
+        if self.one_pixel_size:
+            MsgBox = tk.messagebox.askquestion('Reiniciar referencia', '¿Estás seguro que que deseas rehacer la '
+                                                                       'referencia?',
+                                               icon='warning')
+            if MsgBox == 'yes':
+                self.drawing = False
+                self.measuring = False
+                self.selectReference = True
+        else:
+            self.drawing = False
+            self.measuring = False
+            self.selectReference = True
 
     def click_select_reference(self, event):
         if self.rpd: self.rpd.cancel()

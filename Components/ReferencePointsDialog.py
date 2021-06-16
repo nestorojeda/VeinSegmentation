@@ -1,5 +1,7 @@
 import math
 import tkinter as tk
+from tkinter import messagebox
+
 import cv2
 import matplotlib.pyplot as plt
 
@@ -54,9 +56,10 @@ class ReferencePointsDialog:
         pixel_distance = math.sqrt((self.parent.reference_points[0][1] - self.parent.reference_points[0][0]) ** 2 +
                                    (self.parent.reference_points[1][1] - self.parent.reference_points[1][0]) ** 2)
         print('Pixel distance {}'.format(pixel_distance))
-        one_pixel_size = (float(self.entry.get())) / pixel_distance
-        print('Real pixel size {}'.format(one_pixel_size))
-
+        self.parent.one_pixel_size = (float(self.entry.get())) / pixel_distance
+        print('Real pixel size {}'.format(self.parent.one_pixel_size))
+        messagebox.showinfo('Aviso', 'Cada pixel de su imagen corresponde a {} cm.'.format(self.parent.one_pixel_size))
+        self.cancel()
 
     def cancel(self, event=None):
         self.parent.focus_set()
