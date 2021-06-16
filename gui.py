@@ -45,8 +45,12 @@ class App(Frame):
 
         self.one_pixel_size = None
         self.rpd = None
+
+        # ARRAYS DE PUNTOS
         self.polygon_points = np.array([])  # Puntos que forman el poligono
-        self.reference_points = []
+        self.reference_points = []  # Puntos de referencia
+        self.measure_points = []  # Puntos para medir
+
         self.isClosed = False  # Define si el poligono se cierra autmáticamente al poner los puntos
         self.thickness = 2  # Ancho de la línea
         self.is_enhanced = False  # Flag para saber si la imagen está mejorada
@@ -146,7 +150,8 @@ class App(Frame):
             self.clean()
             self.click_select_reference(event)
         if self.measuring:
-            print('Measuring mode')
+            self.clean()
+            self.click_select_measure(event)
 
     def selectReferenceMode(self):
         print('Select reference mode')
@@ -166,14 +171,46 @@ class App(Frame):
             self.selectReference = True
 
     def selectMeasureMode(self):
-        self.drawing = False
-        self.measuring = True
-        self.selectReference = False
+        if self.one_pixel_size:
+            self.drawing = False
+            self.measuring = True
+            self.selectReference = False
+        else:
+            messagebox.showinfo('Aviso',
+                                'Debes seleccionar antes una referencia', icon='error')
 
     def selectDrawingMode(self):
-        self.drawing = True
-        self.measuring = False
-        self.selectReference = False
+            self.drawing = True
+            self.measuring = False
+            self.selectReference = False
+
+    def click_select_measure(self, event):
+        if (event.x + self.x1) / self.imscale >= 0 and (event.y + self.y1) / self.imscale >= 0:
+            click_x = int((event.x + self.x1) / self.imscale)
+            click_y = int((event.y + self.y1) / self.imscale)
+
+            if len(self.measure_points) <= 1:
+                self.measure_points.append((click_x, click_y))
+
+            if len(self.measure_points) == 2:
+                self.measure_points[1] = (click_x, click_y)
+                image_with_line = cv2.line(cv2.cvtColor(self.opencv_image.copy(), cv2.COLOR_GRAY2RGB),
+                                           self.measure_points[0], self.measure_points[1],
+                                           color=color.red,
+                                           thickness=self.thickness)
+
+                pixel_distance = np.math.sqrt(
+                    (self.measure_points[0][1] - self.measure_points[0][0]) ** 2 +
+                    (self.measure_points[1][1] - self.measure_points[1][0]) ** 2)
+
+                distance = pixel_distance * self.one_pixel_size
+
+                print("Distance betweeen points is: {} cm".format(distance))
+
+                self.image = openCVToPIL(image_with_line)  # open image
+                self.width, self.height = self.image.size
+                self.show_image()
+                self.measure_points = []
 
     def click_select_reference(self, event):
         if self.rpd: self.rpd.cancel()
@@ -197,7 +234,10 @@ class App(Frame):
                 self.rpd = ReferencePointsDialog(self.master, self.zerobc_image.copy())
                 self.master.wait_window(self.rpd.top)
                 self.reference_points = []
-                self.selectDrawingMode()
+                if self.one_pixel_size:
+                    self.selectMeasureMode()
+                else:
+                    self.selectDrawingMode()
 
     def click_draw_polygon(self, event):
         print('Event::mouse2')
