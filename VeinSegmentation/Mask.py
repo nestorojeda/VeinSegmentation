@@ -30,6 +30,7 @@ def apply_enhance_to_roi(image, mask):
         x, y, w, h = cv2.boundingRect(cnt)
         crop = image[y:y + h, x:x + w]  # Corte que contiene el poligono maximo
         enhanced_crop = eh.enhance_medical_image(crop)  # Corte mejorado
+        black_pixels = cv2.countNonZero(image)
 
         merged = image.copy()
         enhanced_crop = enhanced_crop.astype(np.uint8)
@@ -46,7 +47,7 @@ def apply_enhance_to_roi(image, mask):
 
     elapsed = time() - now
     print("Processing time: ", elapsed)
-    return enhanced
+    return enhanced, black_pixels
 
 
 def apply_skeletonization_to_roi(image, mask, is_enhanced=True):
@@ -71,6 +72,7 @@ def apply_skeletonization_to_roi(image, mask, is_enhanced=True):
             crop = eh.enhance_medical_image(crop)  # Si la imagen no está mejorada, la mejoramos solo para realizar este proceso
 
         skel_crop = skeletonization(crop)
+        white_pixels = np.sum(skel_crop == 255)
 
         merged = image.copy()
         skel_crop = skel_crop.astype(np.uint8)
@@ -89,7 +91,7 @@ def apply_skeletonization_to_roi(image, mask, is_enhanced=True):
 
     elapsed = time() - now
     print("Processing time: ", elapsed)
-    return skeleton
+    return skeleton, white_pixels
 
 
 def apply_subpixel_to_roi(image, mask,
