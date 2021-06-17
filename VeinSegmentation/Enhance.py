@@ -246,7 +246,7 @@ def color_layer_segmantation_filled(img):
     return each_filled_picture
 
 
-def process_brightness_and_contrast(brightness, contrast, img):
+def process_brightness_and_contrast(img, brightness, contrast):
     """
         https://www.life2coding.com/change-brightness-and-contrast-of-images-using-opencv-python/
         https://stackoverflow.com/questions/39308030/how-do-i-increase-the-contrast-of-an-image-in-python-opencv
