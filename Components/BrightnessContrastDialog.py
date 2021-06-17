@@ -3,6 +3,7 @@ import cv2
 import matplotlib.pyplot as plt
 
 from Utils.Utils import openCVToPIL, PILtoOpenCV
+from VeinSegmentation import Enhance
 
 
 class BrightnessContrastDialog:
@@ -50,10 +51,6 @@ class BrightnessContrastDialog:
         self.parent.show_image()
 
     def bright_and_contrast_controller(self, event=None, reset=False):
-        """
-            https://www.life2coding.com/change-brightness-and-contrast-of-images-using-opencv-python/
-            https://stackoverflow.com/questions/39308030/how-do-i-increase-the-contrast-of-an-image-in-python-opencv
-        """
         brightness = self.b_slider.get()
         contrast = self.c_slider.get()
 
@@ -64,25 +61,8 @@ class BrightnessContrastDialog:
         self.parent.brightness_value = brightness
         self.parent.contrast_value = contrast
 
-        if brightness != 0:
-            if brightness > 0:
-                shadow = brightness
-                highlight = 255
-            else:
-                shadow = 0
-                highlight = 255 + brightness
-            alpha_b = (highlight - shadow) / 255
-            gamma_b = shadow
-            print('Brightness values alpha_b={} gamma_b={}'.format(alpha_b, gamma_b))
-            buf = cv2.addWeighted(img, alpha_b, img, 0, gamma_b)
-        else:
-            buf = img.copy()
-        if contrast != 0:
-            f = float(131 * (contrast + 127)) / (127 * (131 - contrast))
-            alpha_c = f
-            gamma_c = 127 * (1 - f)
-            print('Contrast values alpha_c={} gamma_c={}'.format(alpha_c, gamma_c))
-            buf = cv2.addWeighted(buf, alpha_c, buf, 0, gamma_c)
+        buf = Enhance.process_brightness_and_contrast(brightness, contrast, img)
 
         self.parent.image = openCVToPIL(buf)
         self.parent.show_image()
+
