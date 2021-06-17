@@ -3,7 +3,7 @@ import cv2
 import matplotlib.pyplot as plt
 
 from Utils.Utils import openCVToPIL, PILtoOpenCV
-from VeinSegmentation import Enhance
+from VeinSegmentation import Enhance, Mask
 
 
 class BrightnessContrastDialog:
@@ -61,8 +61,11 @@ class BrightnessContrastDialog:
         self.parent.brightness_value = brightness
         self.parent.contrast_value = contrast
 
-        buf = Enhance.process_brightness_and_contrast(brightness, contrast, img)
+        if len(self.parent.polygon_points) > 1:
+            result = Mask.apply_brightness_and_contrast_to_roi(img, self.parent.mask, brightness, contrast)
+        else:
+            result = Enhance.process_brightness_and_contrast(img, brightness, contrast)
 
-        self.parent.image = openCVToPIL(buf)
+        self.parent.image = openCVToPIL(result)
         self.parent.show_image()
 

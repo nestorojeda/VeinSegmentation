@@ -286,7 +286,7 @@ class App(Frame):
         # We only use positive real points
         if (event.x + self.x1) / self.imscale >= 0 and (event.y + self.y1) / self.imscale >= 0:
             if self.is_enhanced or self.is_skeletonized:
-                self.image = openCVToPIL(self.opencv_image)
+                self.clean()
                 self.polygon_points = np.array([])
                 self.is_enhanced = False
                 self.is_skeletonized = False
