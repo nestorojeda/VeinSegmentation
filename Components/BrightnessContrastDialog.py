@@ -12,7 +12,7 @@ class BrightnessContrastDialog:
         self.pil_image = pil_image
         self.top = tk.Toplevel(parent)
         self.top.transient(parent)
-        # self.top.grab_set()
+        self.top.grab_set()
         title = "Contraste y brillo"
         self.top.title(title)
 
@@ -47,9 +47,6 @@ class BrightnessContrastDialog:
 
         self.bright_and_contrast_controller()
 
-        self.parent.image = self.pil_image
-        self.parent.show_image()
-
     def bright_and_contrast_controller(self, event=None, reset=False):
         brightness = self.b_slider.get()
         contrast = self.c_slider.get()
@@ -66,6 +63,7 @@ class BrightnessContrastDialog:
         else:
             result = Enhance.process_brightness_and_contrast(img, brightness, contrast)
 
+        self.parent.opencv_image = cv2.cvtColor(result, cv2.COLOR_RGB2GRAY)
         self.parent.image = openCVToPIL(result)
         self.parent.show_image()
 

@@ -48,7 +48,7 @@ def apply_enhance_to_roi(image, mask):
 
     elapsed = time() - now
     print("Processing time: ", elapsed)
-    return enhanced, black_pixels
+    return cv2.cvtColor(enhanced, cv2.COLOR_GRAY2RGB), black_pixels
 
 
 def apply_skeletonization_to_roi(image, mask, is_enhanced=True):
@@ -159,7 +159,7 @@ def apply_brightness_and_contrast_to_roi(image, mask, brightness, contrast):
     print("Processing apply_enhance_to_roi...")
     now = time()
 
-    image = cv2.cvtColor(image.astype(np.uint8), cv2.COLOR_RGB2GRAY)
+    #image = cv2.cvtColor(image.astype(np.uint8), cv2.COLOR_RGB2GRAY)
     mask = cv2.cvtColor(mask.astype(np.uint8), cv2.COLOR_RGB2GRAY)
 
     contours, hierarchy = cv2.findContours(mask, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)[-2:]
@@ -169,7 +169,6 @@ def apply_brightness_and_contrast_to_roi(image, mask, brightness, contrast):
         x, y, w, h = cv2.boundingRect(cnt)
         crop = image[y:y + h, x:x + w]  # Corte que contiene el poligono maximo
         enhanced_crop = eh.process_brightness_and_contrast(crop, brightness, contrast)  # Corte mejorado
-        black_pixels = cv2.countNonZero(image)
 
         merged = image.copy()
         enhanced_crop = enhanced_crop.astype(np.uint8)
@@ -186,4 +185,4 @@ def apply_brightness_and_contrast_to_roi(image, mask, brightness, contrast):
 
     elapsed = time() - now
     print("Processing time: ", elapsed)
-    return cv2.cvtColor(enhanced, cv2.COLOR_GRAY2RGB)
+    return enhanced
