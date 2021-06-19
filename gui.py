@@ -127,8 +127,6 @@ class App(Frame):
         self.master.rowconfigure(0, weight=1)
         self.master.columnconfigure(0, weight=1)
         self.bindCanvasEvents()
-        self.image = Image.open(self.filename)  # open image
-        self.width, self.height = self.image.size
         self.imscale = 1.0  # scale for the canvaas image
         self.delta = 1.3  # zoom magnitude
         # Put image into container rectangle and use it to set proper coordinates to the image
@@ -278,11 +276,11 @@ class App(Frame):
                                     title="Distancia")
 
     def click_draw_polygon(self, event):
-        print('Event::mouse2')
         print('Event click position is x={} y={}'.format(event.x, event.y))
         print('Real click position is x={} y={}'.format((event.x + self.x1) / self.imscale,
                                                         (event.y + self.y1) / self.imscale))
         print('Offset is x1={} y1={} x2={} y2={}'.format(self.x1, self.y1, self.x2, self.y2))
+        print('Scale is {}'.format(self.imscale))
         # We only use positive real points
         if (event.x + self.x1) / self.imscale >= 0 and (event.y + self.y1) / self.imscale >= 0:
             if self.is_enhanced or self.is_skeletonized:
@@ -294,7 +292,6 @@ class App(Frame):
             self.polygon_points = np.append(self.polygon_points,
                                             [(event.x + self.x1) / self.imscale, (event.y + self.y1) / self.imscale])
 
-            print('Scale is {}'.format(self.imscale))
             pts = np.array(self.polygon_points).reshape((-1, 1, 2))
 
             # Creamos una linea para visualizar el area que se va a utilizar

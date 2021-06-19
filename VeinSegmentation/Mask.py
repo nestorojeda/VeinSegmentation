@@ -174,15 +174,16 @@ def apply_brightness_and_contrast_to_roi(image, mask, brightness, contrast):
         enhanced_crop = enhanced_crop.astype(np.uint8)
         merged[y:y + h, x:x + w] = enhanced_crop  # original con el corte superpuesto
 
-        fg = cv2.bitwise_or(merged, merged, mask=mask)  # la parte que ha sido mejorada
-
-        mask = cv2.bitwise_not(mask)  # cambiamos la mascara de signo
-
-        fgbg = cv2.bitwise_or(fg, image, mask=mask)  # la imagen con un agujero
+        fg = cv2.bitwise_or(merged, merged, mask=mask)
 
         mask = cv2.bitwise_not(mask)
-        enhanced = cv2.bitwise_or(fgbg, fg)
+
+        fgbg = cv2.bitwise_or(fg, image, mask=mask)
+
+        mask = cv2.bitwise_not(mask)
+
+        result = cv2.bitwise_or(fgbg, fg)
 
     elapsed = time() - now
     print("Processing time: ", elapsed)
-    return enhanced
+    return result
