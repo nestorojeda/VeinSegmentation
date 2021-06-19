@@ -34,7 +34,6 @@ def segmentation(img, n_clusters=2):
     return res2
 
 
-
 def enhance_medical_image(image, clip_limit=5, tile_grid_size=5, use_clahe=True):
     """
     # Based in https://ieeexplore.ieee.org/document/6246971
@@ -245,3 +244,28 @@ def color_layer_segmantation_filled(img):
             each_filled_picture.append(filled_color_layer)
 
     return each_filled_picture
+
+
+def process_brightness_and_contrast(img, brightness, contrast):
+    """
+        https://www.life2coding.com/change-brightness-and-contrast-of-images-using-opencv-python/
+        https://stackoverflow.com/questions/39308030/how-do-i-increase-the-contrast-of-an-image-in-python-opencv
+    """
+    if brightness != 0:
+        if brightness > 0:
+            shadow = brightness
+            highlight = 255
+        else:
+            shadow = 0
+            highlight = 255 + brightness
+        alpha_b = (highlight - shadow) / 255
+        gamma_b = shadow
+        buf = cv2.addWeighted(img, alpha_b, img, 0, gamma_b)
+    else:
+        buf = img.copy()
+    if contrast != 0:
+        f = float(131 * (contrast + 127)) / (127 * (131 - contrast))
+        alpha_c = f
+        gamma_c = 127 * (1 - f)
+        buf = cv2.addWeighted(buf, alpha_c, buf, 0, gamma_c)
+    return buf
