@@ -210,7 +210,7 @@ class App(Frame):
             self.reference_points.append((click_x, click_y))
 
             if len(self.reference_points) <= 1:
-                self.image_with_points = cv2.circle(cv2.cvtColor(self.opencv_image.copy(), cv2.COLOR_GRAY2RGB),
+                self.image_with_points = cv2.circle(self.opencv_image.copy(),
                                                     (click_x, click_y), radius=0, color=(0, 0, 255),
                                                     thickness=point_thickness)
                 self.image = openCVToPIL(self.image_with_points)  # open image
@@ -245,7 +245,7 @@ class App(Frame):
             self.measure_points.append((click_x, click_y))
 
             if len(self.measure_points) <= 1:
-                self.image_with_points = cv2.circle(cv2.cvtColor(self.opencv_image.copy(), cv2.COLOR_GRAY2RGB),
+                self.image_with_points = cv2.circle(self.opencv_image.copy(),
                                                     (click_x, click_y), radius=0, color=(0, 0, 255),
                                                     thickness=point_thickness)
                 self.image = openCVToPIL(self.image_with_points)  # open image

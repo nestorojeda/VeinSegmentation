@@ -89,11 +89,11 @@ def apply_skeletonization_to_roi(image, mask, is_enhanced=True):
         fgbg = cv2.bitwise_or(fg, image, mask=mask)
 
         mask = cv2.bitwise_not(mask)
-        skeleton = cv2.bitwise_or(fgbg, fg)
+        result = cv2.bitwise_or(fgbg, fg)
 
     elapsed = time() - now
     print("Processing time: ", elapsed)
-    return skeleton, white_pixels
+    return result, white_pixels
 
 
 def apply_subpixel_to_roi(image, mask,
@@ -142,11 +142,11 @@ def apply_subpixel_to_roi(image, mask,
         fgbg = cv2.bitwise_or(fg, image, mask=mask)
 
         mask = cv2.bitwise_not(mask)
-        subpixel = cv2.bitwise_or(fgbg, fg)
+        result = cv2.bitwise_or(fgbg, fg)
 
     elapsed = time() - now
     print("Processing time: ", elapsed)
-    return subpixel
+    return result
 
 
 def apply_brightness_and_contrast_to_roi(image, mask, brightness, contrast):

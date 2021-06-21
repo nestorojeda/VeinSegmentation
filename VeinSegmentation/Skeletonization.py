@@ -1,6 +1,8 @@
 import cv2
 import numpy as np
 from VeinSegmentation.Enhance import segmentation
+import matplotlib.pyplot as plt
+
 
 def skeletonization(img, niter=100):
     enhanced_segm = segmentation(img, n_clusters=2)
@@ -12,20 +14,19 @@ def skeletonization(img, niter=100):
     size = np.size(img)
     skel = np.zeros(img.shape, np.uint8)
 
-    # Get a Cross Shaped Kernel
+    # Kernel con forma de cruz
     element = cv2.getStructuringElement(cv2.MORPH_CROSS, (3, 3))
-
     i = 0
     while i < niter:
         i = i + 1
-        # Step 1: Substract open from the original image
+        # Substraemos la apertura de la imagen
         open = cv2.morphologyEx(img, cv2.MORPH_OPEN, element)
         temp = cv2.subtract(img, open)
-        # Step 2: Erode the original image and refine the skeleton
+        # Erosionamos y refinamos el esqueleto
         eroded = cv2.erode(img, element)
         skel = cv2.bitwise_or(skel, temp)
         img = eroded.copy()
-        # Step 3: If there are no white pixels left ie.. the image has been completely eroded, quit the loop
+        # Si no quedan píxeles blancos, la imagen ya ha sido esqueletonizada
         if cv2.countNonZero(img) == 0:
             break
     return skel
