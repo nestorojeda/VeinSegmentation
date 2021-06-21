@@ -15,6 +15,9 @@ from Components.ReferencePointsDialog import ReferencePointsDialog
 from Utils.Utils import openCVToPIL, PILtoOpenCV
 from VeinSegmentation import Mask
 
+from shapely.geometry import shape
+
+
 drawing = False
 ftypes = [('Imagen', '.png .jpeg .jpg')]
 point_thickness = 8
@@ -301,6 +304,9 @@ class App(Frame):
             # Creamos la máscara cerrando el poligono
             self.mask = cv2.fillPoly(np.zeros((self.height, self.width, 3)),
                                      [pts.astype(np.int32)], color=color.white)
+
+            print('Mask area is: {}px'.format(Mask.get_mask_area(self.mask)))
+
             self.image = openCVToPIL(image_with_polygon)  # open image
             self.zerobc_image = self.image.copy()
             self.width, self.height = self.image.size

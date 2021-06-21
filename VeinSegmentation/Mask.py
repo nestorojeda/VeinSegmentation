@@ -11,6 +11,18 @@ white = 255.
 black = 0.
 
 
+def get_mask_area(mask):
+    mask = cv2.cvtColor(mask.astype(np.uint8), cv2.COLOR_RGB2GRAY)
+    contours, hierarchy = cv2.findContours(mask, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)[-2:]
+    idx = 0
+    area = 0
+    for cnt in contours:
+        idx += 1
+        area += cv2.contourArea(cnt)
+
+    return area
+
+
 def apply_enhance_to_roi(image, mask):
     """
     Extracción de la región de interés a partir de una máscara
@@ -159,7 +171,7 @@ def apply_brightness_and_contrast_to_roi(image, mask, brightness, contrast):
     print("Processing apply_enhance_to_roi...")
     now = time()
 
-    #image = cv2.cvtColor(image.astype(np.uint8), cv2.COLOR_RGB2GRAY)
+    # image = cv2.cvtColor(image.astype(np.uint8), cv2.COLOR_RGB2GRAY)
     mask = cv2.cvtColor(mask.astype(np.uint8), cv2.COLOR_RGB2GRAY)
 
     contours, hierarchy = cv2.findContours(mask, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)[-2:]
