@@ -287,7 +287,7 @@ class App(Frame):
         print('Scale is {}'.format(self.imscale))
         # We only use positive real points
         if (event.x + self.x1) / self.imscale >= 0 and (event.y + self.y1) / self.imscale >= 0:
-            if self.is_enhanced or self.is_skeletonized:
+            if self.is_enhanced or self.is_skeletonized or self.is_subpixel:
                 self.clean()
                 self.polygon_points = np.array([])
                 self.is_enhanced = False
@@ -421,9 +421,16 @@ class App(Frame):
         if len(self.polygon_points) > 1:
             self.skeletonized, white_pixels = Mask.apply_skeletonization_to_roi(self.original_opencv_image, self.mask)
             pts = np.array(self.polygon_points).reshape((-1, 1, 2))
-            image_with_polygon = cv2.polylines(cv2.cvtColor(self.skeletonized, cv2.COLOR_GRAY2RGB), [pts.astype(np.int32)], isClosed=self.isClosed,
+            self.skeletonized = cv2.cvtColor(self.skeletonized, cv2.COLOR_GRAY2RGB)
+            image_with_polygon = cv2.polylines(self.skeletonized, [pts.astype(np.int32)], isClosed=self.isClosed,
                                                color=color.red, thickness=self.thickness)
+
             print('White pixels: {}'.format(white_pixels))
+            if self.one_pixel_size:
+                messagebox.showinfo(message="La red venosa mide aproximadamente {} cm"
+                                    .format(white_pixels*self.one_pixel_size),
+                                title="Distancia")
+
             self.image = openCVToPIL(image_with_polygon)
             self.zerobc_image = self.image.copy()
             self.opencv_image = self.skeletonized
@@ -439,6 +446,7 @@ class App(Frame):
             pts = np.array(self.polygon_points).reshape((-1, 1, 2))
             image_with_polygon = cv2.polylines(self.subpixel_image, [pts.astype(np.int32)], isClosed=self.isClosed,
                                                color=color.red, thickness=self.thickness)
+
             self.image = openCVToPIL(image_with_polygon)
             self.zerobc_image = self.image.copy()
             self.opencv_image = self.subpixel_image
