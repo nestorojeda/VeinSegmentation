@@ -5,9 +5,9 @@ import matplotlib.pyplot as plt
 
 
 def skeletonization(img, niter=100):
-    enhanced_segm = segmentation(img, n_clusters=2)
+    segm = segmentation(img, n_clusters=2)
 
-    ret, img = cv2.threshold(enhanced_segm.astype(np.uint8), 127, 255, 0)
+    ret, img = cv2.threshold(segm, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
     img = cv2.bitwise_not(img)
 
     img = img.astype(np.uint8)

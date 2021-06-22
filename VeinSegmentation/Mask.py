@@ -63,7 +63,7 @@ def apply_enhance_to_roi(image, mask):
     return cv2.cvtColor(enhanced, cv2.COLOR_GRAY2RGB), black_pixels
 
 
-def apply_skeletonization_to_roi(image, mask, is_enhanced=True):
+def apply_skeletonization_to_roi(image, mask):
     """
     Extracción de la región de interés a partir de una máscara
     y aplicación del algoritmo de skeletonización
@@ -81,9 +81,7 @@ def apply_skeletonization_to_roi(image, mask, is_enhanced=True):
         idx += 1
         x, y, w, h = cv2.boundingRect(cnt)
         crop = image[y:y + h, x:x + w]
-        if not is_enhanced:
-            crop = eh.enhance_medical_image(
-                crop)  # Si la imagen no está mejorada, la mejoramos solo para realizar este proceso
+        crop = eh.enhance_medical_image(crop).astype(np.uint8)
 
         skel_crop = skeletonization(crop)
         white_pixels = np.sum(skel_crop == 255)
@@ -111,8 +109,8 @@ def apply_skeletonization_to_roi(image, mask, is_enhanced=True):
 def apply_subpixel_to_roi(image, mask,
                           iters=2,
                           threshold=1.5,
-                          order=2,
-                          is_enhanced=True):
+                          order=2
+                          ):
     """
     Extracción de la región de interés a partir de una máscara
     y aplicacion del algoritmo de subpixel
@@ -130,9 +128,7 @@ def apply_subpixel_to_roi(image, mask,
         idx += 1
         x, y, w, h = cv2.boundingRect(cnt)
         crop = image[y:y + h, x:x + w]
-        if not is_enhanced:
-            crop = eh.enhance_medical_image(
-                crop)  # Si la imagen no está mejorada, la mejoramos solo para realizar este proceso
+        crop = eh.enhance_medical_image(crop)
 
         edges = subpixel_edges(crop.astype(float), threshold, iters, order)
 
