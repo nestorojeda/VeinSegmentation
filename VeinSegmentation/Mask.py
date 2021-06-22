@@ -137,7 +137,7 @@ def apply_subpixel_to_roi(image, mask,
         for point in np.array((edges.x, edges.y)).T.astype(np.uint):
             cv2.circle(edged_crop, tuple(point), 1, (0, 0, 255))
 
-        merged = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
+        merged = image.copy()
         merged[y:y + h, x:x + w] = edged_crop
 
         # get first masked value (foreground)

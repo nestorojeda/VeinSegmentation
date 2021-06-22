@@ -442,7 +442,7 @@ class App(Frame):
 
     def subpixel(self):
         if len(self.polygon_points) > 1:
-            self.subpixel_image = Mask.apply_subpixel_to_roi(self.original_opencv_image, self.mask)
+            self.subpixel_image = Mask.apply_subpixel_to_roi(self.original_opencv_image.astype(float), self.mask)
             pts = np.array(self.polygon_points).reshape((-1, 1, 2))
             image_with_polygon = cv2.polylines(self.subpixel_image, [pts.astype(np.int32)], isClosed=self.isClosed,
                                                color=color.red, thickness=self.thickness)
