@@ -12,11 +12,11 @@ import constants.colors as color
 from Components.BrightnessContrastDialog import BrightnessContrastDialog
 from Components.AutoScrollbar import AutoScrollbar
 from Components.ReferencePointsDialog import ReferencePointsDialog
+from Components.VeinMetricsModal import VeinMetricsModal
 from Utils.Utils import openCVToPIL, PILtoOpenCV
 from VeinSegmentation import Mask
 
 from shapely.geometry import shape
-
 
 drawing = False
 ftypes = [('Imagen', '.png .jpeg .jpg')]
@@ -57,9 +57,13 @@ class App(Frame):
 
         self.isClosed = False  # Define si el poligono se cierra autmáticamente al poner los puntos
         self.thickness = 2  # Ancho de la línea
+
         self.is_enhanced = False  # Flag para saber si la imagen está mejorada
+        self.black_pixels = None
         self.is_skeletonized = False  # Flag para saber si la imagen está esqueletonizada
+        self.white_pixels = None
         self.is_subpixel = False
+
         self.filename = ''
         self.opencv_image = None
         self.original_opencv_image = None
@@ -119,6 +123,7 @@ class App(Frame):
         measureMenu.add_command(label="Seleccionar referencia", command=self.selectReferenceMode)
         measureMenu.add_checkbutton(label="Medir", variable=self.measuring,
                                     command=self.toggleMeasureMode)
+        measureMenu.add_command(label="Información sobre la selección", command=self.selectionInfo)
         menubar.add_cascade(label="Medidas", menu=measureMenu)
 
         # Create canvas and put image on it
@@ -234,7 +239,7 @@ class App(Frame):
                 self.image = openCVToPIL(image_with_line)  # open image
                 self.width, self.height = self.image.size
                 self.show_image()
-                self.rpd = ReferencePointsDialog(self.master, self.zerobc_image.copy())
+                self.rpd = ReferencePointsDialog(self.master)
                 self.master.wait_window(self.rpd.top)
                 self.reference_points = []
                 if self.one_pixel_size:
@@ -306,8 +311,6 @@ class App(Frame):
             self.mask = cv2.fillPoly(np.zeros((self.height, self.width, 3)),
                                      [pts.astype(np.int32)], color=color.white)
 
-            print('Mask area is: {}px'.format(Mask.get_mask_area(self.mask)))
-
             self.image = openCVToPIL(image_with_polygon)  # open image
             self.zerobc_image = self.image.copy()
             self.width, self.height = self.image.size
@@ -354,6 +357,8 @@ class App(Frame):
 
     def clean(self, event=None):
         print('Clean')
+        self.white_pixels = None
+        self.black_pixels = None
         self.opencv_image = cv2.imread(self.filename, cv2.IMREAD_GRAYSCALE)
         self.original_opencv_image = self.opencv_image.copy()
         self.image = openCVToPIL(self.opencv_image)  # open image
@@ -403,14 +408,14 @@ class App(Frame):
     ## PROCESAMIENTOS ##
     def enhance(self):
         if len(self.polygon_points) > 1:
-            self.enhanced, black_pixels = Mask.apply_enhance_to_roi(cv2.cvtColor(self.original_opencv_image, cv2.COLOR_GRAY2RGB), self.mask)
+            enhanced, self.black_pixels = Mask.apply_enhance_to_roi(
+                cv2.cvtColor(self.original_opencv_image, cv2.COLOR_GRAY2RGB), self.mask)
             pts = np.array(self.polygon_points).reshape((-1, 1, 2))
-            image_with_polygon = cv2.polylines(self.enhanced, [pts.astype(np.int32)], isClosed=self.isClosed,
+            image_with_polygon = cv2.polylines(enhanced, [pts.astype(np.int32)], isClosed=self.isClosed,
                                                color=color.red, thickness=self.thickness)
-            print('Black pixels: {}'.format(black_pixels))
             self.image = openCVToPIL(image_with_polygon)
             self.zerobc_image = self.image.copy()
-            self.opencv_image = self.enhanced
+            self.opencv_image = enhanced
             self.is_enhanced = True
             self.width, self.height = self.image.size
             self.show_image()
@@ -419,17 +424,13 @@ class App(Frame):
 
     def skeletonize(self):
         if len(self.polygon_points) > 1:
-            self.skeletonized, white_pixels = Mask.apply_skeletonization_to_roi(self.original_opencv_image, self.mask)
+            self.skeletonized, self.white_pixels = Mask.apply_skeletonization_to_roi(self.original_opencv_image, self.mask)
             pts = np.array(self.polygon_points).reshape((-1, 1, 2))
             self.skeletonized = cv2.cvtColor(self.skeletonized, cv2.COLOR_GRAY2RGB)
             image_with_polygon = cv2.polylines(self.skeletonized, [pts.astype(np.int32)], isClosed=self.isClosed,
                                                color=color.red, thickness=self.thickness)
 
-            print('White pixels: {}'.format(white_pixels))
-            if self.one_pixel_size:
-                messagebox.showinfo(message="La red venosa mide aproximadamente {} cm"
-                                    .format(white_pixels*self.one_pixel_size),
-                                title="Distancia")
+
 
             self.image = openCVToPIL(image_with_polygon)
             self.zerobc_image = self.image.copy()
@@ -459,6 +460,16 @@ class App(Frame):
     def open_contrast_brightness_menu(self):
         d = BrightnessContrastDialog(self.master, self.zerobc_image.copy())
         self.master.wait_window(d.top)
+
+    def selectionInfo(self):
+        # TODO lanzar el modal
+
+        if len(self.polygon_points) > 1:
+            vein_metrics = VeinMetricsModal(self.master)
+            self.master.wait_window(vein_metrics.top)
+        else:
+            messagebox.showerror("Error", "Debes seleleccionar un polígono")
+
 
     def openFileMenu(self):
         file = fd.askopenfilename(filetypes=ftypes)
