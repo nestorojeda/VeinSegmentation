@@ -86,6 +86,7 @@ class App(Frame):
         if file:
             self.filename = file
             self.opencv_image = cv2.imread(self.filename, cv2.IMREAD_GRAYSCALE)
+            self.opencv_image = cv2.cvtColor(self.opencv_image, cv2.COLOR_GRAY2RGB)
             self.original_opencv_image = self.opencv_image.copy()
             self.image = Image.open(self.filename)
             self.zerobc_image = self.image.copy()
