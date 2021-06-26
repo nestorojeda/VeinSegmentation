@@ -87,7 +87,7 @@ def apply_skeletonization_to_roi(image, mask):
         white_pixels = np.sum(skel_crop == 255)
 
         merged = image.copy()
-        skel_crop = skel_crop.astype(np.uint8)
+        skel_crop = cv2.cvtColor(skel_crop.astype(np.uint8), cv2.COLOR_GRAY2RGB)
         merged[y:y + h, x:x + w] = skel_crop
 
         # get first masked value (foreground)

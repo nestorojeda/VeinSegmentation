@@ -305,7 +305,7 @@ class App(Frame):
             pts = np.array(self.polygon_points).reshape((-1, 1, 2))
 
             # Creamos una linea para visualizar el area que se va a utilizar
-            image_with_polygon = cv2.polylines(cv2.cvtColor(self.opencv_image.copy(), cv2.COLOR_GRAY2RGB),
+            image_with_polygon = cv2.polylines(self.opencv_image.copy(),
                                                [pts.astype(np.int32)], isClosed=self.isClosed,
                                                color=color.red, thickness=self.thickness)
             # Creamos la máscara cerrando el poligono
@@ -361,6 +361,7 @@ class App(Frame):
         self.white_pixels = None
         self.black_pixels = None
         self.opencv_image = cv2.imread(self.filename, cv2.IMREAD_GRAYSCALE)
+        self.opencv_image = cv2.cvtColor(self.opencv_image, cv2.COLOR_GRAY2RGB)
         self.original_opencv_image = self.opencv_image.copy()
         self.image = openCVToPIL(self.opencv_image)  # open image
         self.zerobc_image = self.image.copy()
@@ -409,8 +410,7 @@ class App(Frame):
     ## PROCESAMIENTOS ##
     def enhance(self):
         if len(self.polygon_points) > 1:
-            enhanced, self.black_pixels = Mask.apply_enhance_to_roi(
-                cv2.cvtColor(self.original_opencv_image, cv2.COLOR_GRAY2RGB), self.mask)
+            enhanced, self.black_pixels = Mask.apply_enhance_to_roi(self.original_opencv_image.copy(), self.mask)
             pts = np.array(self.polygon_points).reshape((-1, 1, 2))
             image_with_polygon = cv2.polylines(enhanced, [pts.astype(np.int32)], isClosed=self.isClosed,
                                                color=color.red, thickness=self.thickness)
@@ -425,9 +425,8 @@ class App(Frame):
 
     def skeletonize(self):
         if len(self.polygon_points) > 1:
-            self.skeletonized, self.white_pixels = Mask.apply_skeletonization_to_roi(self.original_opencv_image, self.mask)
+            self.skeletonized, self.white_pixels = Mask.apply_skeletonization_to_roi(self.original_opencv_image.copy(), self.mask)
             pts = np.array(self.polygon_points).reshape((-1, 1, 2))
-            self.skeletonized = cv2.cvtColor(self.skeletonized, cv2.COLOR_GRAY2RGB)
             image_with_polygon = cv2.polylines(self.skeletonized, [pts.astype(np.int32)], isClosed=self.isClosed,
                                                color=color.red, thickness=self.thickness)
 
@@ -444,7 +443,7 @@ class App(Frame):
 
     def subpixel(self):
         if len(self.polygon_points) > 1:
-            self.subpixel_image = Mask.apply_subpixel_to_roi(self.original_opencv_image.astype(float), self.mask)
+            self.subpixel_image = Mask.apply_subpixel_to_roi((self.original_opencv_image.astype(float)).copy(), self.mask)
             pts = np.array(self.polygon_points).reshape((-1, 1, 2))
             image_with_polygon = cv2.polylines(self.subpixel_image, [pts.astype(np.int32)], isClosed=self.isClosed,
                                                color=color.red, thickness=self.thickness)
