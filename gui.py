@@ -9,14 +9,13 @@ from PIL import Image
 from PIL import ImageTk
 
 import constants.colors as color
-from Components.BrightnessContrastDialog import BrightnessContrastDialog
 from Components.AutoScrollbar import AutoScrollbar
+from Components.BrightnessContrastDialog import BrightnessContrastDialog
 from Components.ReferencePointsDialog import ReferencePointsDialog
 from Components.VeinMetricsModal import VeinMetricsModal
 from Utils.Utils import openCVToPIL, PILtoOpenCV
 from VeinSegmentation import Mask
-
-from shapely.geometry import shape
+from copy import deepcopy
 
 drawing = False
 ftypes = [('Imagen', '.png .jpeg .jpg')]
@@ -28,13 +27,13 @@ point_thickness = 8
 # https://www.semicolonworld.com/question/55637/how-to-get-tkinter-canvas-to-dynamically-resize-to-window-width
 # https://www.it-swarm-es.com/es/python/tkinter-canvas-zoom-move-pan/830432124/
 
-class App(Frame):
+class App(tk.Toplevel):
     """ Advanced zoom of the image """
 
-    def __init__(self, mainframe, **kw):
+    def __init__(self, mainframe, file=None, **kw):
         """ Initialize the main Frame """
-        ttk.Frame.__init__(self, master=mainframe)
-        super().__init__(**kw)
+        tk.Toplevel.__init__(self, master=mainframe)
+        self.root = mainframe
         self.mask = None
         self.master.title('Segmentación de venas')
         self.master.protocol("WM_DELETE_WINDOW", self.onExit)
@@ -74,8 +73,18 @@ class App(Frame):
         self.measuring = tk.BooleanVar()
         self.measuring.set(False)
         self.selectReference = False
-
-        self.initWelcomeUI()
+        if file:
+            self.filename = file
+            self.opencv_image = cv2.imread(self.filename, cv2.IMREAD_GRAYSCALE)
+            self.opencv_image = cv2.cvtColor(self.opencv_image, cv2.COLOR_GRAY2RGB)
+            self.original_opencv_image = self.opencv_image.copy()
+            self.image = Image.open(self.filename)
+            self.zerobc_image = self.image.copy()
+            self.width, self.height = self.image.size
+            self.initUiComponents()
+            self.show_image()
+        else:
+            self.initWelcomeUI()
 
     def onExit(self):
         if messagebox.askokcancel("Salir", "¿De seguro que quieres salir?"):
@@ -83,6 +92,7 @@ class App(Frame):
             sys.exit()
 
     def initWelcomeUI(self):
+        print("Starting Welcome UI")
         file = fd.askopenfilename(filetypes=ftypes)
         if file:
             self.filename = file
@@ -99,7 +109,7 @@ class App(Frame):
             sys.exit()
 
     def initUiComponents(self):
-        # Vertical and horizontal scrollbars for canvas
+        print("Starting UI")
         vbar = AutoScrollbar(self.master, orient='vertical')
         hbar = AutoScrollbar(self.master, orient='horizontal')
         vbar.grid(row=0, column=1, sticky='ns')
@@ -406,7 +416,6 @@ class App(Frame):
         self.width, self.height = self.image.size
         self.show_image()
 
-
     ## PROCESAMIENTOS ##
     def enhance(self):
         if len(self.polygon_points) > 1:
@@ -462,8 +471,6 @@ class App(Frame):
         self.master.wait_window(d.top)
 
     def selectionInfo(self):
-        # TODO lanzar el modal
-
         if len(self.polygon_points) > 1:
             vein_metrics = VeinMetricsModal(self.master)
             self.master.wait_window(vein_metrics.top)
@@ -473,20 +480,27 @@ class App(Frame):
     def openFileMenu(self):
         file = fd.askopenfilename(filetypes=ftypes)
         if file:
-            self.filename = file
-            self.opencv_image = cv2.imread(self.filename, cv2.IMREAD_GRAYSCALE)
-            self.image = Image.open(self.filename)  # open image
-            self.zerobc_image = self.image.copy()
-            self.width, self.height = self.image.size
+            MsgBox = tk.messagebox.askquestion('Aviso', '¿Deseas abrir la imagen en una nueva ventana?',
+                                               icon='warning')
+            if MsgBox == 'yes':
+                newInstance = tk.Toplevel()
+                newInstance.title('Segmentación de venas')
+                newInstance.geometry("1000x500")
+                app = App(newInstance, file)
 
-            self.polygon_points = np.array([])  # Puntos que forman el poligono
-            self.isClosed = False  # Define si el poligono se cierra autmáticamente al poner los puntos
-            self.thickness = 2  # Ancho de la línea
-            self.is_enhanced = False  # Flag para saber si la imagen está mejorada
-            self.is_skeletonized = False  # Flag para saber si la imagen está esqueletonizada
-            self.is_subpixel = False
-
-            self.show_image()
+            else:
+                self.filename = file
+                self.opencv_image = cv2.imread(self.filename, cv2.IMREAD_GRAYSCALE)
+                self.image = Image.open(self.filename)  # open image
+                self.zerobc_image = self.image.copy()
+                self.width, self.height = self.image.size
+                self.polygon_points = np.array([])  # Puntos que forman el poligono
+                self.isClosed = False  # Define si el poligono se cierra autmáticamente al poner los puntos
+                self.thickness = 2  # Ancho de la línea
+                self.is_enhanced = False  # Flag para saber si la imagen está mejorada
+                self.is_skeletonized = False  # Flag para saber si la imagen está esqueletonizada
+                self.is_subpixel = False
+                self.show_image()
 
     def saveFileMenu(self):
         filename = fd.asksaveasfilename(filetypes=ftypes,
