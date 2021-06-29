@@ -26,6 +26,7 @@ point_thickness = 8
 # https://zetcode.com/tkinter/menustoolbars/
 # https://solarianprogrammer.com/2018/04/20/python-opencv-show-image-tkinter-window/
 # https://www.semicolonworld.com/question/55637/how-to-get-tkinter-canvas-to-dynamically-resize-to-window-width
+# https://www.it-swarm-es.com/es/python/tkinter-canvas-zoom-move-pan/830432124/
 
 class App(Frame):
     """ Advanced zoom of the image """
@@ -152,8 +153,6 @@ class App(Frame):
         self.canvas.bind('<ButtonPress-3>', self.click_right)
         self.canvas.bind('<B1-Motion>', self.move_to)
         self.canvas.bind('<MouseWheel>', self.wheel)  # with Windows and MacOS, but not Linux
-        self.canvas.bind('<Button-5>', self.wheel)  # only with Linux, wheel scroll down
-        self.canvas.bind('<Button-4>', self.wheel)  # only with Linux, wheel scroll up
         self.master.bind('<KeyRelease-c>', self.clean)
 
     def scroll_y(self, *args, **kwargs):
@@ -186,6 +185,44 @@ class App(Frame):
         self.canvas.scan_dragto(event.x, event.y, gain=1)
         self.show_image()  # redraw the image
 
+    def show_image(self, event=None):
+        """ Show image on the Canvas """
+        bbox1 = self.canvas.bbox(self.container)  # get image area
+        # Remove 1 pixel shift at the sides of the bbox1
+        bbox1 = (bbox1[0] + 1, bbox1[1] + 1, bbox1[2] - 1, bbox1[3] - 1)
+        bbox2 = (self.canvas.canvasx(0),  # get visible area of the canvas
+                 self.canvas.canvasy(0),
+                 self.canvas.canvasx(self.canvas.winfo_width()),
+                 self.canvas.canvasy(self.canvas.winfo_height()))
+        bbox = [min(bbox1[0], bbox2[0]), min(bbox1[1], bbox2[1]),  # get scroll region box
+                max(bbox1[2], bbox2[2]), max(bbox1[3], bbox2[3])]
+        if bbox[0] == bbox2[0] and bbox[2] == bbox2[2]:  # whole image in the visible area
+            bbox[0] = bbox1[0]
+            bbox[2] = bbox1[2]
+        if bbox[1] == bbox2[1] and bbox[3] == bbox2[3]:  # whole image in the visible area
+            bbox[1] = bbox1[1]
+            bbox[3] = bbox1[3]
+        self.canvas.configure(scrollregion=bbox)  # set scroll region
+        x1 = max(bbox2[0] - bbox1[0], 0)  # get coordinates (x1,y1,x2,y2) of the image tile
+        y1 = max(bbox2[1] - bbox1[1], 0)
+        x2 = min(bbox2[2], bbox1[2]) - bbox1[0]
+        y2 = min(bbox2[3], bbox1[3]) - bbox1[1]
+
+        self.x1 = bbox2[0] - bbox1[0]
+        self.y1 = bbox2[1] - bbox1[1]
+        self.x2 = x2
+        self.y2 = y2
+
+        if int(x2 - x1) > 0 and int(y2 - y1) > 0:  # show image if it in the visible area
+            x = min(int(x2 / self.imscale), self.width)  # sometimes it is larger on 1 pixel...
+            y = min(int(y2 / self.imscale), self.height)  # ...and sometimes not
+            image = self.image.crop((int(x1 / self.imscale), int(y1 / self.imscale), x, y))
+            imagetk = ImageTk.PhotoImage(image.resize((int(x2 - x1), int(y2 - y1))))
+            imageid = self.canvas.create_image(max(bbox2[0], bbox1[0]), max(bbox2[1], bbox1[1]),
+                                               anchor='nw', image=imagetk)
+            self.canvas.lower(imageid)  # set image into background
+            self.canvas.imagetk = imagetk  # keep an extra reference to prevent garbage-collection
+
     def wheel(self, event):
         """ Zoom with mouse wheel """
         x = self.canvas.canvasx(event.x)
@@ -197,13 +234,13 @@ class App(Frame):
             return  # zoom only inside image area
         scale = 1.0
         # Respond to Linux (event.num) or Windows (event.delta) wheel event
-        if event.num == 5 or event.delta == -120:  # scroll down
+        if event.delta == -120:  # scroll down
             i = min(self.width, self.height)
             if int(i * self.imscale) < 30:
                 return  # image is less than 30 pixels
             self.imscale /= self.delta
             scale /= self.delta
-        if event.num == 4 or event.delta == 120:  # scroll up
+        if event.delta == 120:  # scroll up
             i = min(self.canvas.winfo_width(), self.canvas.winfo_height())
             if i < self.imscale:
                 return  # 1 pixel is bigger than the visible area
@@ -369,43 +406,6 @@ class App(Frame):
         self.width, self.height = self.image.size
         self.show_image()
 
-    def show_image(self, event=None):
-        """ Show image on the Canvas """
-        bbox1 = self.canvas.bbox(self.container)  # get image area
-        # Remove 1 pixel shift at the sides of the bbox1
-        bbox1 = (bbox1[0] + 1, bbox1[1] + 1, bbox1[2] - 1, bbox1[3] - 1)
-        bbox2 = (self.canvas.canvasx(0),  # get visible area of the canvas
-                 self.canvas.canvasy(0),
-                 self.canvas.canvasx(self.canvas.winfo_width()),
-                 self.canvas.canvasy(self.canvas.winfo_height()))
-        bbox = [min(bbox1[0], bbox2[0]), min(bbox1[1], bbox2[1]),  # get scroll region box
-                max(bbox1[2], bbox2[2]), max(bbox1[3], bbox2[3])]
-        if bbox[0] == bbox2[0] and bbox[2] == bbox2[2]:  # whole image in the visible area
-            bbox[0] = bbox1[0]
-            bbox[2] = bbox1[2]
-        if bbox[1] == bbox2[1] and bbox[3] == bbox2[3]:  # whole image in the visible area
-            bbox[1] = bbox1[1]
-            bbox[3] = bbox1[3]
-        self.canvas.configure(scrollregion=bbox)  # set scroll region
-        x1 = max(bbox2[0] - bbox1[0], 0)  # get coordinates (x1,y1,x2,y2) of the image tile
-        y1 = max(bbox2[1] - bbox1[1], 0)
-        x2 = min(bbox2[2], bbox1[2]) - bbox1[0]
-        y2 = min(bbox2[3], bbox1[3]) - bbox1[1]
-
-        self.x1 = bbox2[0] - bbox1[0]
-        self.y1 = bbox2[1] - bbox1[1]
-        self.x2 = x2
-        self.y2 = y2
-
-        if int(x2 - x1) > 0 and int(y2 - y1) > 0:  # show image if it in the visible area
-            x = min(int(x2 / self.imscale), self.width)  # sometimes it is larger on 1 pixel...
-            y = min(int(y2 / self.imscale), self.height)  # ...and sometimes not
-            image = self.image.crop((int(x1 / self.imscale), int(y1 / self.imscale), x, y))
-            imagetk = ImageTk.PhotoImage(image.resize((int(x2 - x1), int(y2 - y1))))
-            imageid = self.canvas.create_image(max(bbox2[0], bbox1[0]), max(bbox2[1], bbox1[1]),
-                                               anchor='nw', image=imagetk)
-            self.canvas.lower(imageid)  # set image into background
-            self.canvas.imagetk = imagetk  # keep an extra reference to prevent garbage-collection
 
     ## PROCESAMIENTOS ##
     def enhance(self):
@@ -425,12 +425,11 @@ class App(Frame):
 
     def skeletonize(self):
         if len(self.polygon_points) > 1:
-            self.skeletonized, self.white_pixels = Mask.apply_skeletonization_to_roi(self.original_opencv_image.copy(), self.mask)
+            self.skeletonized, self.white_pixels = Mask.apply_skeletonization_to_roi(self.original_opencv_image.copy(),
+                                                                                     self.mask)
             pts = np.array(self.polygon_points).reshape((-1, 1, 2))
             image_with_polygon = cv2.polylines(self.skeletonized, [pts.astype(np.int32)], isClosed=self.isClosed,
                                                color=color.red, thickness=self.thickness)
-
-
 
             self.image = openCVToPIL(image_with_polygon)
             self.zerobc_image = self.image.copy()
@@ -443,7 +442,8 @@ class App(Frame):
 
     def subpixel(self):
         if len(self.polygon_points) > 1:
-            self.subpixel_image = Mask.apply_subpixel_to_roi((self.original_opencv_image.astype(float)).copy(), self.mask)
+            self.subpixel_image = Mask.apply_subpixel_to_roi((self.original_opencv_image.astype(float)).copy(),
+                                                             self.mask)
             pts = np.array(self.polygon_points).reshape((-1, 1, 2))
             image_with_polygon = cv2.polylines(self.subpixel_image, [pts.astype(np.int32)], isClosed=self.isClosed,
                                                color=color.red, thickness=self.thickness)
@@ -469,7 +469,6 @@ class App(Frame):
             self.master.wait_window(vein_metrics.top)
         else:
             messagebox.showerror("Error", "Debes seleleccionar un polígono")
-
 
     def openFileMenu(self):
         file = fd.askopenfilename(filetypes=ftypes)
