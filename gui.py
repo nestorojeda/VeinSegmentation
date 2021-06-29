@@ -34,6 +34,7 @@ class App(tk.Toplevel):
         """ Initialize the main Frame """
         tk.Toplevel.__init__(self, master=mainframe)
         self.root = mainframe
+        self.withdraw()
         self.mask = None
         self.master.title('Segmentación de venas')
         self.master.protocol("WM_DELETE_WINDOW", self.onExit)
