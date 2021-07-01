@@ -34,7 +34,7 @@ class App(tk.Toplevel):
         """ Initialize the main Frame """
         tk.Toplevel.__init__(self, master=mainframe)
         self.root = mainframe
-        self.withdraw()
+        self.iconify()
         self.mask = None
         self.master.title('Segmentación de venas')
         self.master.protocol("WM_DELETE_WINDOW", self.onExit)
@@ -93,18 +93,30 @@ class App(tk.Toplevel):
             sys.exit()
 
     def initWelcomeUI(self):
+        self.master.withdraw()
         print("Starting Welcome UI")
-        file = fd.askopenfilename(filetypes=ftypes)
-        if file:
-            self.filename = file
-            self.opencv_image = cv2.imread(self.filename, cv2.IMREAD_GRAYSCALE)
-            self.opencv_image = cv2.cvtColor(self.opencv_image, cv2.COLOR_GRAY2RGB)
-            self.original_opencv_image = self.opencv_image.copy()
-            self.image = Image.open(self.filename)
-            self.zerobc_image = self.image.copy()
-            self.width, self.height = self.image.size
-            self.initUiComponents()
-            self.show_image()
+        files = fd.askopenfilenames(filetypes=ftypes)
+        if files:
+            if len(files) == 1:
+                self.master.deiconify()
+                self.filename = files[0]
+                self.opencv_image = cv2.imread(self.filename, cv2.IMREAD_GRAYSCALE)
+                self.opencv_image = cv2.cvtColor(self.opencv_image, cv2.COLOR_GRAY2RGB)
+                self.original_opencv_image = self.opencv_image.copy()
+                self.image = Image.open(self.filename)
+                self.zerobc_image = self.image.copy()
+                self.width, self.height = self.image.size
+                self.initUiComponents()
+                self.show_image()
+            else:
+                for file in files:
+                    newInstance = tk.Toplevel()
+                    newInstance.title('Segmentación de venas')
+                    newInstance.geometry("1000x500")
+                    app = App(newInstance, file)
+                    self.master.withdraw()
+
+
         else:
             self.master.destroy()
             sys.exit()
