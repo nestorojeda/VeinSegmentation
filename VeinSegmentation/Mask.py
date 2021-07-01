@@ -11,6 +11,18 @@ white = 255.
 black = 0.
 
 
+def get_mask_area(mask):
+    mask = cv2.cvtColor(mask.astype(np.uint8), cv2.COLOR_RGB2GRAY)
+    contours, hierarchy = cv2.findContours(mask, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)[-2:]
+    idx = 0
+    area = 0
+    for cnt in contours:
+        idx += 1
+        area += cv2.contourArea(cnt)
+
+    return area
+
+
 def apply_enhance_to_roi(image, mask):
     """
     Extracción de la región de interés a partir de una máscara
@@ -51,7 +63,7 @@ def apply_enhance_to_roi(image, mask):
     return cv2.cvtColor(enhanced, cv2.COLOR_GRAY2RGB), black_pixels
 
 
-def apply_skeletonization_to_roi(image, mask, is_enhanced=True):
+def apply_skeletonization_to_roi(image, mask):
     """
     Extracción de la región de interés a partir de una máscara
     y aplicación del algoritmo de skeletonización
@@ -69,15 +81,13 @@ def apply_skeletonization_to_roi(image, mask, is_enhanced=True):
         idx += 1
         x, y, w, h = cv2.boundingRect(cnt)
         crop = image[y:y + h, x:x + w]
-        if not is_enhanced:
-            crop = eh.enhance_medical_image(
-                crop)  # Si la imagen no está mejorada, la mejoramos solo para realizar este proceso
+        crop = eh.enhance_medical_image(crop).astype(np.uint8)
 
         skel_crop = skeletonization(crop)
         white_pixels = np.sum(skel_crop == 255)
 
         merged = image.copy()
-        skel_crop = skel_crop.astype(np.uint8)
+        skel_crop = cv2.cvtColor(skel_crop.astype(np.uint8), cv2.COLOR_GRAY2RGB)
         merged[y:y + h, x:x + w] = skel_crop
 
         # get first masked value (foreground)
@@ -89,18 +99,18 @@ def apply_skeletonization_to_roi(image, mask, is_enhanced=True):
         fgbg = cv2.bitwise_or(fg, image, mask=mask)
 
         mask = cv2.bitwise_not(mask)
-        skeleton = cv2.bitwise_or(fgbg, fg)
+        result = cv2.bitwise_or(fgbg, fg)
 
     elapsed = time() - now
     print("Processing time: ", elapsed)
-    return skeleton, white_pixels
+    return result, white_pixels
 
 
 def apply_subpixel_to_roi(image, mask,
                           iters=2,
                           threshold=1.5,
-                          order=2,
-                          is_enhanced=True):
+                          order=2
+                          ):
     """
     Extracción de la región de interés a partir de una máscara
     y aplicacion del algoritmo de subpixel
@@ -118,9 +128,7 @@ def apply_subpixel_to_roi(image, mask,
         idx += 1
         x, y, w, h = cv2.boundingRect(cnt)
         crop = image[y:y + h, x:x + w]
-        if not is_enhanced:
-            crop = eh.enhance_medical_image(
-                crop)  # Si la imagen no está mejorada, la mejoramos solo para realizar este proceso
+        crop = eh.enhance_medical_image(crop)
 
         edges = subpixel_edges(crop.astype(float), threshold, iters, order)
 
@@ -129,7 +137,7 @@ def apply_subpixel_to_roi(image, mask,
         for point in np.array((edges.x, edges.y)).T.astype(np.uint):
             cv2.circle(edged_crop, tuple(point), 1, (0, 0, 255))
 
-        merged = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
+        merged = image.copy()
         merged[y:y + h, x:x + w] = edged_crop
 
         # get first masked value (foreground)
@@ -142,11 +150,11 @@ def apply_subpixel_to_roi(image, mask,
         fgbg = cv2.bitwise_or(fg, image, mask=mask)
 
         mask = cv2.bitwise_not(mask)
-        subpixel = cv2.bitwise_or(fgbg, fg)
+        result = cv2.bitwise_or(fgbg, fg)
 
     elapsed = time() - now
     print("Processing time: ", elapsed)
-    return subpixel
+    return result
 
 
 def apply_brightness_and_contrast_to_roi(image, mask, brightness, contrast):
@@ -159,7 +167,7 @@ def apply_brightness_and_contrast_to_roi(image, mask, brightness, contrast):
     print("Processing apply_enhance_to_roi...")
     now = time()
 
-    #image = cv2.cvtColor(image.astype(np.uint8), cv2.COLOR_RGB2GRAY)
+    # image = cv2.cvtColor(image.astype(np.uint8), cv2.COLOR_RGB2GRAY)
     mask = cv2.cvtColor(mask.astype(np.uint8), cv2.COLOR_RGB2GRAY)
 
     contours, hierarchy = cv2.findContours(mask, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)[-2:]
@@ -174,15 +182,16 @@ def apply_brightness_and_contrast_to_roi(image, mask, brightness, contrast):
         enhanced_crop = enhanced_crop.astype(np.uint8)
         merged[y:y + h, x:x + w] = enhanced_crop  # original con el corte superpuesto
 
-        fg = cv2.bitwise_or(merged, merged, mask=mask)  # la parte que ha sido mejorada
-
-        mask = cv2.bitwise_not(mask)  # cambiamos la mascara de signo
-
-        fgbg = cv2.bitwise_or(fg, image, mask=mask)  # la imagen con un agujero
+        fg = cv2.bitwise_or(merged, merged, mask=mask)
 
         mask = cv2.bitwise_not(mask)
-        enhanced = cv2.bitwise_or(fgbg, fg)
+
+        fgbg = cv2.bitwise_or(fg, image, mask=mask)
+
+        mask = cv2.bitwise_not(mask)
+
+        result = cv2.bitwise_or(fgbg, fg)
 
     elapsed = time() - now
     print("Processing time: ", elapsed)
-    return enhanced
+    return result

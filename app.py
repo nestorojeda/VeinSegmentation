@@ -9,11 +9,13 @@ from PIL import Image
 from PIL import ImageTk
 
 import constants.colors as color
-from Components.BrightnessContrastDialog import BrightnessContrastDialog
 from Components.AutoScrollbar import AutoScrollbar
+from Components.BrightnessContrastDialog import BrightnessContrastDialog
 from Components.ReferencePointsDialog import ReferencePointsDialog
+from Components.VeinMetricsModal import VeinMetricsModal
 from Utils.Utils import openCVToPIL, PILtoOpenCV
 from VeinSegmentation import Mask
+from copy import deepcopy
 
 drawing = False
 ftypes = [('Imagen', '.png .jpeg .jpg')]
@@ -23,14 +25,16 @@ point_thickness = 8
 # https://zetcode.com/tkinter/menustoolbars/
 # https://solarianprogrammer.com/2018/04/20/python-opencv-show-image-tkinter-window/
 # https://www.semicolonworld.com/question/55637/how-to-get-tkinter-canvas-to-dynamically-resize-to-window-width
+# https://www.it-swarm-es.com/es/python/tkinter-canvas-zoom-move-pan/830432124/
 
-class App(Frame):
+class App(tk.Toplevel):
     """ Advanced zoom of the image """
 
-    def __init__(self, mainframe, **kw):
+    def __init__(self, mainframe, file=None, **kw):
         """ Initialize the main Frame """
-        ttk.Frame.__init__(self, master=mainframe)
-        super().__init__(**kw)
+        tk.Toplevel.__init__(self, master=mainframe)
+        self.root = mainframe
+        self.withdraw()
         self.mask = None
         self.master.title('Segmentación de venas')
         self.master.protocol("WM_DELETE_WINDOW", self.onExit)
@@ -54,19 +58,34 @@ class App(Frame):
 
         self.isClosed = False  # Define si el poligono se cierra autmáticamente al poner los puntos
         self.thickness = 2  # Ancho de la línea
+
         self.is_enhanced = False  # Flag para saber si la imagen está mejorada
+        self.black_pixels = None
         self.is_skeletonized = False  # Flag para saber si la imagen está esqueletonizada
+        self.white_pixels = None
         self.is_subpixel = False
+
         self.filename = ''
         self.opencv_image = None
+        self.original_opencv_image = None
 
         # MODO PREDETERMINADO: DRAWING
         self.drawing = True
         self.measuring = tk.BooleanVar()
         self.measuring.set(False)
         self.selectReference = False
-
-        self.initWelcomeUI()
+        if file:
+            self.filename = file
+            self.opencv_image = cv2.imread(self.filename, cv2.IMREAD_GRAYSCALE)
+            self.opencv_image = cv2.cvtColor(self.opencv_image, cv2.COLOR_GRAY2RGB)
+            self.original_opencv_image = self.opencv_image.copy()
+            self.image = Image.open(self.filename)
+            self.zerobc_image = self.image.copy()
+            self.width, self.height = self.image.size
+            self.initUiComponents()
+            self.show_image()
+        else:
+            self.initWelcomeUI()
 
     def onExit(self):
         if messagebox.askokcancel("Salir", "¿De seguro que quieres salir?"):
@@ -74,21 +93,36 @@ class App(Frame):
             sys.exit()
 
     def initWelcomeUI(self):
-        file = fd.askopenfilename(filetypes=ftypes)
-        if file:
-            self.filename = file
-            self.opencv_image = cv2.imread(self.filename, cv2.IMREAD_GRAYSCALE)
-            self.image = Image.open(self.filename)
-            self.zerobc_image = self.image.copy()
-            self.width, self.height = self.image.size
-            self.initUiComponents()
-            self.show_image()
+        self.master.withdraw()
+        print("Starting Welcome UI")
+        files = fd.askopenfilenames(filetypes=ftypes)
+        if files:
+            if len(files) == 1:
+                self.master.deiconify()
+                self.filename = files[0]
+                self.opencv_image = cv2.imread(self.filename, cv2.IMREAD_GRAYSCALE)
+                self.opencv_image = cv2.cvtColor(self.opencv_image, cv2.COLOR_GRAY2RGB)
+                self.original_opencv_image = self.opencv_image.copy()
+                self.image = Image.open(self.filename)
+                self.zerobc_image = self.image.copy()
+                self.width, self.height = self.image.size
+                self.initUiComponents()
+                self.show_image()
+            else:
+                for file in files:
+                    newInstance = tk.Toplevel()
+                    newInstance.title('Segmentación de venas')
+                    newInstance.geometry("1000x500")
+                    app = App(newInstance, file)
+                    self.master.withdraw()
+
+
         else:
             self.master.destroy()
             sys.exit()
 
     def initUiComponents(self):
-        # Vertical and horizontal scrollbars for canvas
+        print("Starting UI")
         vbar = AutoScrollbar(self.master, orient='vertical')
         hbar = AutoScrollbar(self.master, orient='horizontal')
         vbar.grid(row=0, column=1, sticky='ns')
@@ -114,6 +148,7 @@ class App(Frame):
         measureMenu.add_command(label="Seleccionar referencia", command=self.selectReferenceMode)
         measureMenu.add_checkbutton(label="Medir", variable=self.measuring,
                                     command=self.toggleMeasureMode)
+        measureMenu.add_command(label="Información sobre la selección", command=self.selectionInfo)
         menubar.add_cascade(label="Medidas", menu=measureMenu)
 
         # Create canvas and put image on it
@@ -127,8 +162,6 @@ class App(Frame):
         self.master.rowconfigure(0, weight=1)
         self.master.columnconfigure(0, weight=1)
         self.bindCanvasEvents()
-        self.image = Image.open(self.filename)  # open image
-        self.width, self.height = self.image.size
         self.imscale = 1.0  # scale for the canvaas image
         self.delta = 1.3  # zoom magnitude
         # Put image into container rectangle and use it to set proper coordinates to the image
@@ -143,8 +176,6 @@ class App(Frame):
         self.canvas.bind('<ButtonPress-3>', self.click_right)
         self.canvas.bind('<B1-Motion>', self.move_to)
         self.canvas.bind('<MouseWheel>', self.wheel)  # with Windows and MacOS, but not Linux
-        self.canvas.bind('<Button-5>', self.wheel)  # only with Linux, wheel scroll down
-        self.canvas.bind('<Button-4>', self.wheel)  # only with Linux, wheel scroll up
         self.master.bind('<KeyRelease-c>', self.clean)
 
     def scroll_y(self, *args, **kwargs):
@@ -177,9 +208,46 @@ class App(Frame):
         self.canvas.scan_dragto(event.x, event.y, gain=1)
         self.show_image()  # redraw the image
 
+    def show_image(self, event=None):
+        """ Show image on the Canvas """
+        bbox1 = self.canvas.bbox(self.container)  # get image area
+        # Remove 1 pixel shift at the sides of the bbox1
+        bbox1 = (bbox1[0] + 1, bbox1[1] + 1, bbox1[2] - 1, bbox1[3] - 1)
+        bbox2 = (self.canvas.canvasx(0),  # get visible area of the canvas
+                 self.canvas.canvasy(0),
+                 self.canvas.canvasx(self.canvas.winfo_width()),
+                 self.canvas.canvasy(self.canvas.winfo_height()))
+        bbox = [min(bbox1[0], bbox2[0]), min(bbox1[1], bbox2[1]),  # get scroll region box
+                max(bbox1[2], bbox2[2]), max(bbox1[3], bbox2[3])]
+        if bbox[0] == bbox2[0] and bbox[2] == bbox2[2]:  # whole image in the visible area
+            bbox[0] = bbox1[0]
+            bbox[2] = bbox1[2]
+        if bbox[1] == bbox2[1] and bbox[3] == bbox2[3]:  # whole image in the visible area
+            bbox[1] = bbox1[1]
+            bbox[3] = bbox1[3]
+        self.canvas.configure(scrollregion=bbox)  # set scroll region
+        x1 = max(bbox2[0] - bbox1[0], 0)  # get coordinates (x1,y1,x2,y2) of the image tile
+        y1 = max(bbox2[1] - bbox1[1], 0)
+        x2 = min(bbox2[2], bbox1[2]) - bbox1[0]
+        y2 = min(bbox2[3], bbox1[3]) - bbox1[1]
+
+        self.x1 = bbox2[0] - bbox1[0]
+        self.y1 = bbox2[1] - bbox1[1]
+        self.x2 = x2
+        self.y2 = y2
+
+        if int(x2 - x1) > 0 and int(y2 - y1) > 0:  # show image if it in the visible area
+            x = min(int(x2 / self.imscale), self.width)  # sometimes it is larger on 1 pixel...
+            y = min(int(y2 / self.imscale), self.height)  # ...and sometimes not
+            image = self.image.crop((int(x1 / self.imscale), int(y1 / self.imscale), x, y))
+            imagetk = ImageTk.PhotoImage(image.resize((int(x2 - x1), int(y2 - y1))))
+            imageid = self.canvas.create_image(max(bbox2[0], bbox1[0]), max(bbox2[1], bbox1[1]),
+                                               anchor='nw', image=imagetk)
+            self.canvas.lower(imageid)  # set image into background
+            self.canvas.imagetk = imagetk  # keep an extra reference to prevent garbage-collection
+
     def wheel(self, event):
         """ Zoom with mouse wheel """
-        print('Event::wheel')
         x = self.canvas.canvasx(event.x)
         y = self.canvas.canvasy(event.y)
         bbox = self.canvas.bbox(self.container)  # get image area
@@ -189,13 +257,13 @@ class App(Frame):
             return  # zoom only inside image area
         scale = 1.0
         # Respond to Linux (event.num) or Windows (event.delta) wheel event
-        if event.num == 5 or event.delta == -120:  # scroll down
+        if event.delta == -120:  # scroll down
             i = min(self.width, self.height)
             if int(i * self.imscale) < 30:
                 return  # image is less than 30 pixels
             self.imscale /= self.delta
             scale /= self.delta
-        if event.num == 4 or event.delta == 120:  # scroll up
+        if event.delta == 120:  # scroll up
             i = min(self.canvas.winfo_width(), self.canvas.winfo_height())
             if i < self.imscale:
                 return  # 1 pixel is bigger than the visible area
@@ -212,7 +280,7 @@ class App(Frame):
             self.reference_points.append((click_x, click_y))
 
             if len(self.reference_points) <= 1:
-                self.image_with_points = cv2.circle(cv2.cvtColor(self.opencv_image.copy(), cv2.COLOR_GRAY2RGB),
+                self.image_with_points = cv2.circle(self.opencv_image.copy(),
                                                     (click_x, click_y), radius=0, color=(0, 0, 255),
                                                     thickness=point_thickness)
                 self.image = openCVToPIL(self.image_with_points)  # open image
@@ -232,7 +300,7 @@ class App(Frame):
                 self.image = openCVToPIL(image_with_line)  # open image
                 self.width, self.height = self.image.size
                 self.show_image()
-                self.rpd = ReferencePointsDialog(self.master, self.zerobc_image.copy())
+                self.rpd = ReferencePointsDialog(self.master)
                 self.master.wait_window(self.rpd.top)
                 self.reference_points = []
                 if self.one_pixel_size:
@@ -247,7 +315,7 @@ class App(Frame):
             self.measure_points.append((click_x, click_y))
 
             if len(self.measure_points) <= 1:
-                self.image_with_points = cv2.circle(cv2.cvtColor(self.opencv_image.copy(), cv2.COLOR_GRAY2RGB),
+                self.image_with_points = cv2.circle(self.opencv_image.copy(),
                                                     (click_x, click_y), radius=0, color=(0, 0, 255),
                                                     thickness=point_thickness)
                 self.image = openCVToPIL(self.image_with_points)  # open image
@@ -278,14 +346,14 @@ class App(Frame):
                                     title="Distancia")
 
     def click_draw_polygon(self, event):
-        print('Event::mouse2')
         print('Event click position is x={} y={}'.format(event.x, event.y))
         print('Real click position is x={} y={}'.format((event.x + self.x1) / self.imscale,
                                                         (event.y + self.y1) / self.imscale))
         print('Offset is x1={} y1={} x2={} y2={}'.format(self.x1, self.y1, self.x2, self.y2))
+        print('Scale is {}'.format(self.imscale))
         # We only use positive real points
         if (event.x + self.x1) / self.imscale >= 0 and (event.y + self.y1) / self.imscale >= 0:
-            if self.is_enhanced or self.is_skeletonized:
+            if self.is_enhanced or self.is_skeletonized or self.is_subpixel:
                 self.clean()
                 self.polygon_points = np.array([])
                 self.is_enhanced = False
@@ -294,16 +362,16 @@ class App(Frame):
             self.polygon_points = np.append(self.polygon_points,
                                             [(event.x + self.x1) / self.imscale, (event.y + self.y1) / self.imscale])
 
-            print('Scale is {}'.format(self.imscale))
             pts = np.array(self.polygon_points).reshape((-1, 1, 2))
 
             # Creamos una linea para visualizar el area que se va a utilizar
-            image_with_polygon = cv2.polylines(cv2.cvtColor(self.opencv_image.copy(), cv2.COLOR_GRAY2RGB),
+            image_with_polygon = cv2.polylines(self.opencv_image.copy(),
                                                [pts.astype(np.int32)], isClosed=self.isClosed,
                                                color=color.red, thickness=self.thickness)
             # Creamos la máscara cerrando el poligono
             self.mask = cv2.fillPoly(np.zeros((self.height, self.width, 3)),
                                      [pts.astype(np.int32)], color=color.white)
+
             self.image = openCVToPIL(image_with_polygon)  # open image
             self.zerobc_image = self.image.copy()
             self.width, self.height = self.image.size
@@ -349,62 +417,28 @@ class App(Frame):
         self.clean()
 
     def clean(self, event=None):
-        print('Event:clean')
+        print('Clean')
+        self.white_pixels = None
+        self.black_pixels = None
         self.opencv_image = cv2.imread(self.filename, cv2.IMREAD_GRAYSCALE)
+        self.opencv_image = cv2.cvtColor(self.opencv_image, cv2.COLOR_GRAY2RGB)
+        self.original_opencv_image = self.opencv_image.copy()
         self.image = openCVToPIL(self.opencv_image)  # open image
         self.zerobc_image = self.image.copy()
         self.polygon_points = np.array([])
         self.width, self.height = self.image.size
         self.show_image()
 
-    def show_image(self, event=None):
-        """ Show image on the Canvas """
-        bbox1 = self.canvas.bbox(self.container)  # get image area
-        # Remove 1 pixel shift at the sides of the bbox1
-        bbox1 = (bbox1[0] + 1, bbox1[1] + 1, bbox1[2] - 1, bbox1[3] - 1)
-        bbox2 = (self.canvas.canvasx(0),  # get visible area of the canvas
-                 self.canvas.canvasy(0),
-                 self.canvas.canvasx(self.canvas.winfo_width()),
-                 self.canvas.canvasy(self.canvas.winfo_height()))
-        bbox = [min(bbox1[0], bbox2[0]), min(bbox1[1], bbox2[1]),  # get scroll region box
-                max(bbox1[2], bbox2[2]), max(bbox1[3], bbox2[3])]
-        if bbox[0] == bbox2[0] and bbox[2] == bbox2[2]:  # whole image in the visible area
-            bbox[0] = bbox1[0]
-            bbox[2] = bbox1[2]
-        if bbox[1] == bbox2[1] and bbox[3] == bbox2[3]:  # whole image in the visible area
-            bbox[1] = bbox1[1]
-            bbox[3] = bbox1[3]
-        self.canvas.configure(scrollregion=bbox)  # set scroll region
-        x1 = max(bbox2[0] - bbox1[0], 0)  # get coordinates (x1,y1,x2,y2) of the image tile
-        y1 = max(bbox2[1] - bbox1[1], 0)
-        x2 = min(bbox2[2], bbox1[2]) - bbox1[0]
-        y2 = min(bbox2[3], bbox1[3]) - bbox1[1]
-
-        self.x1 = bbox2[0] - bbox1[0]
-        self.y1 = bbox2[1] - bbox1[1]
-        self.x2 = x2
-        self.y2 = y2
-
-        if int(x2 - x1) > 0 and int(y2 - y1) > 0:  # show image if it in the visible area
-            x = min(int(x2 / self.imscale), self.width)  # sometimes it is larger on 1 pixel...
-            y = min(int(y2 / self.imscale), self.height)  # ...and sometimes not
-            image = self.image.crop((int(x1 / self.imscale), int(y1 / self.imscale), x, y))
-            imagetk = ImageTk.PhotoImage(image.resize((int(x2 - x1), int(y2 - y1))))
-            imageid = self.canvas.create_image(max(bbox2[0], bbox1[0]), max(bbox2[1], bbox1[1]),
-                                               anchor='nw', image=imagetk)
-            self.canvas.lower(imageid)  # set image into background
-            self.canvas.imagetk = imagetk  # keep an extra reference to prevent garbage-collection
-
     ## PROCESAMIENTOS ##
     def enhance(self):
         if len(self.polygon_points) > 1:
-            self.enhanced, black_pixels = Mask.apply_enhance_to_roi(cv2.cvtColor(self.opencv_image, cv2.COLOR_GRAY2RGB), self.mask)
+            enhanced, self.black_pixels = Mask.apply_enhance_to_roi(self.original_opencv_image.copy(), self.mask)
             pts = np.array(self.polygon_points).reshape((-1, 1, 2))
-            image_with_polygon = cv2.polylines(self.enhanced, [pts.astype(np.int32)], isClosed=self.isClosed,
+            image_with_polygon = cv2.polylines(enhanced, [pts.astype(np.int32)], isClosed=self.isClosed,
                                                color=color.red, thickness=self.thickness)
             self.image = openCVToPIL(image_with_polygon)
             self.zerobc_image = self.image.copy()
-            self.opencv_image = self.enhanced
+            self.opencv_image = enhanced
             self.is_enhanced = True
             self.width, self.height = self.image.size
             self.show_image()
@@ -413,10 +447,8 @@ class App(Frame):
 
     def skeletonize(self):
         if len(self.polygon_points) > 1:
-            if self.is_enhanced:
-                self.skeletonized, white_pixels = Mask.apply_skeletonization_to_roi(self.enhanced, self.mask, is_enhanced=True)
-            else:
-                self.skeletonized, white_pixels = Mask.apply_skeletonization_to_roi(self.opencv_image, self.mask, is_enhanced=False)
+            self.skeletonized, self.white_pixels = Mask.apply_skeletonization_to_roi(self.original_opencv_image.copy(),
+                                                                                     self.mask)
             pts = np.array(self.polygon_points).reshape((-1, 1, 2))
             image_with_polygon = cv2.polylines(self.skeletonized, [pts.astype(np.int32)], isClosed=self.isClosed,
                                                color=color.red, thickness=self.thickness)
@@ -432,14 +464,12 @@ class App(Frame):
 
     def subpixel(self):
         if len(self.polygon_points) > 1:
-            if self.is_enhanced:
-                self.subpixel_image = Mask.apply_subpixel_to_roi(self.enhanced, self.mask, is_enhanced=True)
-            else:
-                self.subpixel_image = Mask.apply_subpixel_to_roi(self.opencv_image, self.mask, is_enhanced=False)
-
+            self.subpixel_image = Mask.apply_subpixel_to_roi((self.original_opencv_image.astype(float)).copy(),
+                                                             self.mask)
             pts = np.array(self.polygon_points).reshape((-1, 1, 2))
             image_with_polygon = cv2.polylines(self.subpixel_image, [pts.astype(np.int32)], isClosed=self.isClosed,
                                                color=color.red, thickness=self.thickness)
+
             self.image = openCVToPIL(image_with_polygon)
             self.zerobc_image = self.image.copy()
             self.opencv_image = self.subpixel_image
@@ -453,23 +483,37 @@ class App(Frame):
         d = BrightnessContrastDialog(self.master, self.zerobc_image.copy())
         self.master.wait_window(d.top)
 
+    def selectionInfo(self):
+        if len(self.polygon_points) > 1:
+            vein_metrics = VeinMetricsModal(self.master)
+            self.master.wait_window(vein_metrics.top)
+        else:
+            messagebox.showerror("Error", "Debes seleleccionar un polígono")
+
     def openFileMenu(self):
         file = fd.askopenfilename(filetypes=ftypes)
         if file:
-            self.filename = file
-            self.opencv_image = cv2.imread(self.filename, cv2.IMREAD_GRAYSCALE)
-            self.image = Image.open(self.filename)  # open image
-            self.zerobc_image = self.image.copy()
-            self.width, self.height = self.image.size
+            MsgBox = tk.messagebox.askquestion('Aviso', '¿Deseas abrir la imagen en una nueva ventana?',
+                                               icon='warning')
+            if MsgBox == 'yes':
+                newInstance = tk.Toplevel()
+                newInstance.title('Segmentación de venas')
+                newInstance.geometry("1000x500")
+                app = App(newInstance, file)
 
-            self.polygon_points = np.array([])  # Puntos que forman el poligono
-            self.isClosed = False  # Define si el poligono se cierra autmáticamente al poner los puntos
-            self.thickness = 2  # Ancho de la línea
-            self.is_enhanced = False  # Flag para saber si la imagen está mejorada
-            self.is_skeletonized = False  # Flag para saber si la imagen está esqueletonizada
-            self.is_subpixel = False
-
-            self.show_image()
+            else:
+                self.filename = file
+                self.opencv_image = cv2.imread(self.filename, cv2.IMREAD_GRAYSCALE)
+                self.image = Image.open(self.filename)  # open image
+                self.zerobc_image = self.image.copy()
+                self.width, self.height = self.image.size
+                self.polygon_points = np.array([])  # Puntos que forman el poligono
+                self.isClosed = False  # Define si el poligono se cierra autmáticamente al poner los puntos
+                self.thickness = 2  # Ancho de la línea
+                self.is_enhanced = False  # Flag para saber si la imagen está mejorada
+                self.is_skeletonized = False  # Flag para saber si la imagen está esqueletonizada
+                self.is_subpixel = False
+                self.show_image()
 
     def saveFileMenu(self):
         filename = fd.asksaveasfilename(filetypes=ftypes,

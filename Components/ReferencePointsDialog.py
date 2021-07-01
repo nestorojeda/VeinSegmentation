@@ -9,9 +9,8 @@ from Utils.Utils import openCVToPIL, PILtoOpenCV
 
 
 class ReferencePointsDialog:
-    def __init__(self, parent, pil_image):
+    def __init__(self, parent):
         self.parent = parent.children['!app']
-        self.pil_image = pil_image
         self.top = tk.Toplevel(parent)
         self.top.transient(parent)
         self.top.grab_set()

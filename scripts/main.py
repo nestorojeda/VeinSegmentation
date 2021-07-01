@@ -6,9 +6,9 @@ import cv2
 import matplotlib.pyplot as plt
 import numpy as np
 
-from VeinSegmentation.Enhance import enhance_medical_image, segmentation, smooth_thresholded_image, skeletonization, \
-    color_layer_segmantation_filled
 from Utils.Plotting import plotArray
+from VeinSegmentation.Enhance import enhance_medical_image, segmentation, color_layer_segmantation_filled
+from VeinSegmentation.Skeletonization import skeletonization
 
 scaleX = 1
 scaleY = 1
@@ -69,21 +69,8 @@ if __name__ == '__main__':
     else:
         filled = each_filled_picture
 
-    # SMOOTHING
-    smoothed_images = []
-    for image in filled:
-        smoothed = smooth_thresholded_image(image)
-        smoothed_images.append(smoothed)
-
-    del filled
-
-    if plot_substeps:
-        plotArray(smoothed_images, "Smoothed")
-
-    # TO BINARY
-
     binarized_smoothed = []
-    for image in smoothed_images:
+    for image in filled:
         binary = np.zeros((zoom.shape[0], zoom.shape[1]))
         for y in range(0, h):
             for x in range(0, w):
@@ -98,12 +85,11 @@ if __name__ == '__main__':
 
     # SKELETON
     skeletons = []
-    for image in smoothed_images:
+    for image in filled:
         skel = skeletonization(image)
         skeletons.append(skel)
         del skel
 
-    del smoothed_images
 
     if plot_substeps:
         plotArray(skeletons, "Skeletons")

@@ -7,3 +7,4 @@ gui.spec
 dist
 build
 subpixel_edges
+__pycache__
