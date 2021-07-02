@@ -219,6 +219,8 @@ class App(tk.Toplevel):
                  self.canvas.canvasy(self.canvas.winfo_height()))
         bbox = [min(bbox1[0], bbox2[0]), min(bbox1[1], bbox2[1]),  # get scroll region box
                 max(bbox1[2], bbox2[2]), max(bbox1[3], bbox2[3])]
+        print('bbox1: {}'.format(bbox1))
+        print('bbox2: {}'.format(bbox2))
         if bbox[0] == bbox2[0] and bbox[2] == bbox2[2]:  # whole image in the visible area
             bbox[0] = bbox1[0]
             bbox[2] = bbox1[2]
@@ -237,8 +239,8 @@ class App(tk.Toplevel):
         self.y2 = y2
 
         if int(x2 - x1) > 0 and int(y2 - y1) > 0:  # show image if it in the visible area
-            x = min(int(x2 / self.imscale), self.width)  # sometimes it is larger on 1 pixel...
-            y = min(int(y2 / self.imscale), self.height)  # ...and sometimes not
+            x = min(int(x2 / self.imscale), self.width)
+            y = min(int(y2 / self.imscale), self.height)
             image = self.image.crop((int(x1 / self.imscale), int(y1 / self.imscale), x, y))
             imagetk = ImageTk.PhotoImage(image.resize((int(x2 - x1), int(y2 - y1))))
             imageid = self.canvas.create_image(max(bbox2[0], bbox1[0]), max(bbox2[1], bbox1[1]),
