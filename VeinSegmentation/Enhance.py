@@ -18,7 +18,7 @@ def gaborFiltering(img):
     return filtered
 
 
-def segmentation(img, n_clusters=2):
+def quantification(img, n_clusters=2):
     Z = img.reshape((-1, 1))
     # convert to np.float32
     Z = np.float32(Z)
@@ -34,7 +34,7 @@ def segmentation(img, n_clusters=2):
     return res2
 
 
-def enhance_medical_image(image, clip_limit=5, tile_grid_size=5, use_clahe=True):
+def enhanceMedicalImage(image, clip_limit=5, tile_grid_size=5, use_clahe=True):
     """
     # Based in https://ieeexplore.ieee.org/document/6246971
 
@@ -197,7 +197,7 @@ def anisodiff(img, niter=1, kappa=50, gamma=0.1, step=(1., 1.), sigma=0, option=
     return imgout
 
 
-def color_layer_segmentation(img):
+def colorLayerSegmentation(img):
     colors = np.unique(img)  # De mas oscuro a mas claro
 
     each_color_picture = []  # Con el valor a 1 y el resto a 0
@@ -220,7 +220,7 @@ def color_layer_segmentation(img):
     return each_color_picture
 
 
-def color_layer_segmantation_filled(img):
+def colorLayerSegmentationFilled(img):
     colors = np.unique(img)  # De mas oscuro a mas claro
 
     each_filled_picture = []  # Con el valor y los menores al valor a 1 y el resto a 0
@@ -246,7 +246,7 @@ def color_layer_segmantation_filled(img):
     return each_filled_picture
 
 
-def process_brightness_and_contrast(img, brightness, contrast):
+def processBrightnessAndContrast(img, brightness, contrast):
     """
         https://www.life2coding.com/change-brightness-and-contrast-of-images-using-opencv-python/
         https://stackoverflow.com/questions/39308030/how-do-i-increase-the-contrast-of-an-image-in-python-opencv

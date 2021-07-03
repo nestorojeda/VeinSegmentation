@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from Utils.Plotting import plotArray
-from VeinSegmentation.Enhance import enhance_medical_image, segmentation, color_layer_segmantation_filled
+from VeinSegmentation.Enhance import enhanceMedicalImage, quantification, colorLayerSegmentationFilled
 from VeinSegmentation.Skeletonization import skeletonization
 
 scaleX = 1
@@ -40,7 +40,7 @@ if __name__ == '__main__':
     plt.title("Original")
     plt.show()
 
-    enhanced = enhance_medical_image(zoom, clip_limit=8, tile_grid_size=8, use_clahe=True)
+    enhanced = enhanceMedicalImage(zoom, clip_limit=8, tile_grid_size=8, use_clahe=True)
     plt.imshow(enhanced, cmap='gray')
     plt.title("Enhanced")
     plt.show()
@@ -50,12 +50,12 @@ if __name__ == '__main__':
     plt.title("Thresholded")
     plt.show()
 
-    enhanced_segm = segmentation(enhanced, n_clusters=20)
+    enhanced_segm = quantification(enhanced, n_clusters=20)
     plt.title("Segmented")
     plt.imshow(enhanced_segm, cmap='gray')
     plt.show()
 
-    each_filled_picture = color_layer_segmantation_filled(enhanced_segm)
+    each_filled_picture = colorLayerSegmentationFilled(enhanced_segm)
     if plot_substeps:
         plotArray(each_filled_picture, "Filled color layers")
 

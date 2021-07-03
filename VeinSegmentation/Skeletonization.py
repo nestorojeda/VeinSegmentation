@@ -1,11 +1,11 @@
 import cv2
 import numpy as np
-from VeinSegmentation.Enhance import segmentation
+from VeinSegmentation.Enhance import quantification
 import matplotlib.pyplot as plt
 
 
 def skeletonization(img, niter=100):
-    segm = segmentation(img, n_clusters=2)
+    segm = quantification(img, n_clusters=2)
 
     ret, img = cv2.threshold(segm, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
     img = cv2.bitwise_not(img)

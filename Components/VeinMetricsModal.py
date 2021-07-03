@@ -14,18 +14,18 @@ class VeinMetricsModal:
         title = "Métricas"
         self.top.title(title)
 
-        white_pixels = self.parent.white_pixels
-        black_pixels = self.parent.black_pixels
-        area = Mask.get_mask_area(self.parent.mask)
-        is_skeletonized = self.parent.is_skeletonized
-        is_enhanced = self.parent.is_enhanced
-        pixel_size = self.parent.one_pixel_size
-        square_pixel_size = (1 / pixel_size) ** 2
+        whitePixels = self.parent.whitePixels
+        blackPixels = self.parent.blackPixels
+        area = Mask.getMaskArea(self.parent.mask)
+        isSkeletonized = self.parent.isSkeletonized
+        isEnhanced = self.parent.isEnhanced
+        pixelSize = self.parent.pixelSize
+        squarePixelSize = (1 / pixelSize) ** 2
         print('Area in pixels is {} px'.format(area))
-        if pixel_size:
-            tk.Label(self.top, text="Area de la selección: {} cm2".format(area / square_pixel_size)).pack()
-        if is_skeletonized and pixel_size and white_pixels:
-            tk.Label(self.top, text="Longitud de la red venosa: {} cm".format(pixel_size * white_pixels)).pack()
+        if pixelSize:
+            tk.Label(self.top, text="Area de la selección: {} cm2".format(area / squarePixelSize)).pack()
+        if isSkeletonized and pixelSize and whitePixels:
+            tk.Label(self.top, text="Longitud de la red venosa: {} cm".format(pixelSize * whitePixels)).pack()
 
     def cancel(self, event=None):
         self.parent.focus_set()

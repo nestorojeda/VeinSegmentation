@@ -1,7 +1,7 @@
 import cv2
 import matplotlib.pyplot as plt
 import numpy as np
-from VeinSegmentation.Enhance import enhance_medical_image, segmentation
+from VeinSegmentation.Enhance import enhanceMedicalImage, quantification
 from VeinSegmentation.Skeletonization import skeletonization
 
 scaleX = 1
@@ -22,7 +22,7 @@ plt.imshow(zoom, cmap='gray')
 plt.title('Original')
 plt.show()
 
-enhanced = enhance_medical_image(zoom.copy())
+enhanced = enhanceMedicalImage(zoom.copy())
 
 old = skeletonization(enhanced.copy())
 plt.imshow(old, cmap='gray')

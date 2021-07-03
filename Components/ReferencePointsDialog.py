@@ -20,18 +20,18 @@ class ReferencePointsDialog:
         vcmd = (self.top.register(self.validate),
                 '%d', '%i', '%P', '%s', '%S', '%v', '%V', '%W')
 
-        if len(self.parent.reference_points) >= 1:
-            first_point_label = self.parent.reference_points[0]
+        if len(self.parent.referencePoints) >= 1:
+            firstPointLabel = self.parent.referencePoints[0]
         else:
-            first_point_label = '-'
+            firstPointLabel = '-'
 
-        if len(self.parent.reference_points) >= 2:
-            second_point_label = self.parent.reference_points[1]
+        if len(self.parent.referencePoints) >= 2:
+            secondPointLabel = self.parent.referencePoints[1]
         else:
-            second_point_label = '-'
+            secondPointLabel = '-'
 
-        tk.Label(self.top, text="Posición del primer punto: {}".format(first_point_label)).pack()
-        tk.Label(self.top, text="Posición del segunto punto: {}".format(second_point_label)).pack()
+        tk.Label(self.top, text="Posición del primer punto: {}".format(firstPointLabel)).pack()
+        tk.Label(self.top, text="Posición del segunto punto: {}".format(secondPointLabel)).pack()
         tk.Label(self.top, text="Introduce la medida en centímetros").pack()
         self.entry = tk.Entry(self.top, validate='key', validatecommand=vcmd)
         self.entry.pack()
@@ -52,12 +52,12 @@ class ReferencePointsDialog:
 
     def saveReference(self):
         print('ReferencePointsDialog::saveReference')
-        pixel_distance = math.sqrt((self.parent.reference_points[1][0] - self.parent.reference_points[0][0]) ** 2 +
-                                   (self.parent.reference_points[1][1] - self.parent.reference_points[0][1]) ** 2)
+        pixel_distance = math.sqrt((self.parent.referencePoints[1][0] - self.parent.referencePoints[0][0]) ** 2 +
+                                   (self.parent.referencePoints[1][1] - self.parent.referencePoints[0][1]) ** 2)
         print('Pixel distance {}'.format(pixel_distance))
-        self.parent.one_pixel_size = (float(self.entry.get())) / pixel_distance
-        print('Real pixel size {}'.format(self.parent.one_pixel_size))
-        messagebox.showinfo('Aviso', 'Cada pixel de su imagen corresponde a {} cm.'.format(self.parent.one_pixel_size))
+        self.parent.pixelSize = (float(self.entry.get())) / pixel_distance
+        print('Real pixel size {}'.format(self.parent.pixelSize))
+        messagebox.showinfo('Aviso', 'Cada pixel de su imagen corresponde a {} cm.'.format(self.parent.pixelSize))
         self.cancel()
 
     def cancel(self, event=None):

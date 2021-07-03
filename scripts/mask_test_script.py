@@ -18,7 +18,7 @@ for cnt in contours:
     idx += 1
     x, y, w, h = cv2.boundingRect(cnt)
     crop = image[y:y + h, x:x + w]
-    enhanced_crop = eh.enhance_medical_image(crop)
+    enhanced_crop = eh.enhanceMedicalImage(crop)
 
     edged_crop = cv2.cvtColor(enhanced_crop.astype(np.uint8), cv2.COLOR_GRAY2BGR)
 

@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-from VeinSegmentation.Enhance import enhance_medical_image, km_clust, skeletonization
+from VeinSegmentation.Enhance import enhanceMedicalImage, km_clust, skeletonization
 
 scaleX = 1
 scaleY = 1
@@ -20,7 +20,7 @@ zoom = enhanced_gray[y:y + h, x:x + w]
 
 pictures = []  # dictionary with all generated pictures
 
-enhanced = enhance_medical_image(zoom)
+enhanced = enhanceMedicalImage(zoom)
 
 # Group similar grey levels using 8 clusters
 values, labels = km_clust(enhanced.astype('float32'), n_clusters=20)

@@ -2,7 +2,7 @@ import cv2
 from VeinSegmentation.Contour import contour
 import matplotlib.pyplot as plt
 import numpy as np
-from VeinSegmentation.Enhance import enhance_medical_image, segmentation, skeletonization
+from VeinSegmentation.Enhance import enhanceMedicalImage, quantification, skeletonization
 
 y = 1300  # donde empieza el corte en y
 x = 1600  # donde empieza el corte en x
@@ -12,8 +12,8 @@ w = 600  # tamaño del corte en y
 image = (cv2.imread('../imagenes_orginales/Caso A BN.png'))
 zoom = image[y:y + h, x:x + w]
 
-enhanced = enhance_medical_image(zoom, clip_limit=8, tile_grid_size=8)
-enhanced_segm = segmentation(enhanced, n_clusters=2)
+enhanced = enhanceMedicalImage(zoom, clip_limit=8, tile_grid_size=8)
+enhanced_segm = quantification(enhanced, n_clusters=2)
 
 ret, img = cv2.threshold(enhanced_segm.astype(np.uint8), 127, 255, 0)
 inverted_segm_th = cv2.bitwise_not(img)

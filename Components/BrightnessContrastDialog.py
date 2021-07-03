@@ -16,54 +16,54 @@ class BrightnessContrastDialog:
         title = "Contraste y brillo"
         self.top.title(title)
 
-        brightness_labeltext = "Seleccione un valor para el brillo"
-        tk.Label(self.top, text=brightness_labeltext).pack()
-        self.b_slider = tk.Scale(self.top, length=200, from_=-255, to=255, orient=tk.HORIZONTAL)
-        self.b_slider.set(self.parent.brightness_value)
-        self.b_slider.configure(command=self.bright_and_contrast_controller)
-        self.b_slider.pack()
-        print('Initial brightness value {}'.format(self.parent.brightness_value))
+        brightnessLabelText = "Seleccione un valor para el brillo"
+        tk.Label(self.top, text=brightnessLabelText).pack()
+        self.brightnessSlider = tk.Scale(self.top, length=200, from_=-255, to=255, orient=tk.HORIZONTAL)
+        self.brightnessSlider.set(self.parent.brightnessValue)
+        self.brightnessSlider.configure(command=self.brightAndContrastController)
+        self.brightnessSlider.pack()
+        print('Initial brightness value {}'.format(self.parent.brightnessValue))
 
-        contrast_labeltext = "Seleccione un valor para el contraste"
-        tk.Label(self.top, text=contrast_labeltext).pack()
-        self.c_slider = tk.Scale(self.top, length=200, from_=-127, to=127, orient=tk.HORIZONTAL)
-        self.c_slider.set(self.parent.contrast_value)
-        self.c_slider.configure(command=self.bright_and_contrast_controller)
-        self.c_slider.pack()
-        print('Initial contrast value {}'.format(self.parent.contrast_value))
+        contrastLabelText = "Seleccione un valor para el contraste"
+        tk.Label(self.top, text=contrastLabelText).pack()
+        self.contrastSlider = tk.Scale(self.top, length=200, from_=-127, to=127, orient=tk.HORIZONTAL)
+        self.contrastSlider.set(self.parent.contrastValue)
+        self.contrastSlider.configure(command=self.brightAndContrastController)
+        self.contrastSlider.pack()
+        print('Initial contrast value {}'.format(self.parent.contrastValue))
 
-        self.bright_and_contrast_controller()
+        self.brightAndContrastController()
 
         self.button = tk.Button(self.top, text="Reiniciar", command=self.reset)
         self.button.pack()
 
     def reset(self):
         print('BrightnessContrastDialog::reset')
-        self.c_slider.set(0)
-        self.b_slider.set(0)
+        self.contrastSlider.set(0)
+        self.brightnessSlider.set(0)
 
-        self.parent.brightness_value = 0
-        self.parent.contrast_value = 0
+        self.parent.brightnessValue = 0
+        self.parent.contrastValue = 0
 
-        self.bright_and_contrast_controller()
+        self.brightAndContrastController()
 
-    def bright_and_contrast_controller(self, event=None, reset=False):
-        brightness = self.b_slider.get()
-        contrast = self.c_slider.get()
+    def brightAndContrastController(self, event=None, reset=False):
+        brightness = self.brightnessSlider.get()
+        contrast = self.contrastSlider.get()
 
         print('Controler values b={} c={}'.format(brightness, contrast))
 
         img = PILtoOpenCV(self.pil_image.copy())
 
-        self.parent.brightness_value = brightness
-        self.parent.contrast_value = contrast
+        self.parent.brightnessValue = brightness
+        self.parent.contrastValue = contrast
 
-        if len(self.parent.polygon_points) > 1:
-            result = Mask.apply_brightness_and_contrast_to_roi(img, self.parent.mask, brightness, contrast)
+        if len(self.parent.polygonPoints) > 1:
+            result = Mask.applyBrightnessAndContrastToROI(img, self.parent.mask, brightness, contrast)
         else:
-            result = Enhance.process_brightness_and_contrast(img, brightness, contrast)
+            result = Enhance.processBrightnessAndContrast(img, brightness, contrast)
 
-        self.parent.opencv_image = cv2.cvtColor(result, cv2.COLOR_RGB2GRAY)
+        self.parent.openCVImage = cv2.cvtColor(result, cv2.COLOR_RGB2GRAY)
         self.parent.image = openCVToPIL(result)
-        self.parent.show_image()
+        self.parent.showImage()
 
