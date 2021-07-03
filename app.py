@@ -286,7 +286,6 @@ class App(tk.Toplevel):
                                                     (click_x, click_y), radius=0, color=(0, 0, 255),
                                                     thickness=point_thickness)
                 self.image = openCVToPIL(self.image_with_points)  # open image
-                self.width, self.height = self.image.size
                 self.show_image()
 
             if len(self.reference_points) == 2:
@@ -300,7 +299,6 @@ class App(tk.Toplevel):
                                            thickness=self.thickness)
 
                 self.image = openCVToPIL(image_with_line)  # open image
-                self.width, self.height = self.image.size
                 self.show_image()
                 self.rpd = ReferencePointsDialog(self.master)
                 self.master.wait_window(self.rpd.top)
@@ -321,7 +319,6 @@ class App(tk.Toplevel):
                                                     (click_x, click_y), radius=0, color=(0, 0, 255),
                                                     thickness=point_thickness)
                 self.image = openCVToPIL(self.image_with_points)  # open image
-                self.width, self.height = self.image.size
                 self.show_image()
 
             if len(self.measure_points) == 2:
@@ -341,7 +338,6 @@ class App(tk.Toplevel):
                 print("Real istance betweeen points is: {} cm".format(distance))
 
                 self.image = openCVToPIL(image_with_line)  # open image
-                self.width, self.height = self.image.size
                 self.show_image()
                 self.measure_points = []
                 messagebox.showinfo(message="La distancia entre los dos puntos es de {} cm".format(distance),
@@ -376,7 +372,6 @@ class App(tk.Toplevel):
 
             self.image = openCVToPIL(image_with_polygon)  # open image
             self.zerobc_image = self.image.copy()
-            self.width, self.height = self.image.size
             self.show_image()
 
     ## CAMBIOS DE MODO ##
@@ -428,7 +423,6 @@ class App(tk.Toplevel):
         self.image = openCVToPIL(self.opencv_image)  # open image
         self.zerobc_image = self.image.copy()
         self.polygon_points = np.array([])
-        self.width, self.height = self.image.size
         self.show_image()
 
     ## PROCESAMIENTOS ##
@@ -442,7 +436,6 @@ class App(tk.Toplevel):
             self.zerobc_image = self.image.copy()
             self.opencv_image = enhanced
             self.is_enhanced = True
-            self.width, self.height = self.image.size
             self.show_image()
         else:
             messagebox.showerror("Error", "Debes seleleccionar un polígono")
@@ -459,7 +452,6 @@ class App(tk.Toplevel):
             self.zerobc_image = self.image.copy()
             self.opencv_image = self.skeletonized
             self.is_skeletonized = True
-            self.width, self.height = self.image.size
             self.show_image()
         else:
             messagebox.showerror("Error", "Debes seleleccionar un polígono")
@@ -476,7 +468,6 @@ class App(tk.Toplevel):
             self.zerobc_image = self.image.copy()
             self.opencv_image = self.subpixel_image
             self.is_subpixel = True
-            self.width, self.height = self.image.size
             self.show_image()
         else:
             messagebox.showerror("Error", "Debes seleleccionar un polígono")
@@ -505,16 +496,7 @@ class App(tk.Toplevel):
 
             else:
                 self.filename = file
-                self.opencv_image = cv2.imread(self.filename, cv2.IMREAD_GRAYSCALE)
-                self.image = Image.open(self.filename)  # open image
-                self.zerobc_image = self.image.copy()
-                self.width, self.height = self.image.size
-                self.polygon_points = np.array([])  # Puntos que forman el poligono
-                self.isClosed = False  # Define si el poligono se cierra autmáticamente al poner los puntos
-                self.thickness = 2  # Ancho de la línea
-                self.is_enhanced = False  # Flag para saber si la imagen está mejorada
-                self.is_skeletonized = False  # Flag para saber si la imagen está esqueletonizada
-                self.is_subpixel = False
+                self.clean()
                 self.show_image()
 
     def saveFileMenu(self):
