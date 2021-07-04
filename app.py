@@ -27,10 +27,10 @@ point_thickness = 8
 # https://www.it-swarm-es.com/es/python/tkinter-canvas-zoom-move-pan/830432124/
 
 class App(tk.Toplevel):
-    """ Advanced zoom of the image """
 
     def __init__(self, mainframe, file=None, **kw):
         """ Initialize the main Frame """
+
         tk.Toplevel.__init__(self, master=mainframe)
         self.root = mainframe
         self.withdraw()
@@ -68,10 +68,9 @@ class App(tk.Toplevel):
         self.openCVImage = None
         self.originalOpenCVImage = None
 
-        self.imscale = 1.0  # scale for the canvaas image
-        self.delta = 1.3  # zoom magnitude
+        self.imscale = 1.0  # Escala del canvas
+        self.delta = 1.3  # Magnitud del zoom
 
-        # MODO PREDETERMINADO: DRAWING
         self.drawing = True
         self.measuring = tk.BooleanVar()
         self.measuring.set(False)
@@ -90,11 +89,15 @@ class App(tk.Toplevel):
             self.initWelcomeUI()
 
     def onExit(self):
+        """ Manejo del evento de salir de la página """
+
         if messagebox.askokcancel("Salir", "¿De seguro que quieres salir?"):
             self.master.destroy()
             sys.exit()
 
     def initWelcomeUI(self):
+        """ Inicialización de la vista de selección de ficheros """
+
         self.master.withdraw()
         print("Starting Welcome UI")
         files = fd.askopenfilenames(filetypes=ftypes)
@@ -117,13 +120,13 @@ class App(tk.Toplevel):
                     newInstance.geometry("1000x500")
                     App(newInstance, file)
                     self.master.withdraw()
-
-
         else:
             self.master.destroy()
             sys.exit()
 
     def initUiComponents(self):
+        """ Inicialización de los componentes de la interfaz """
+
         print("Starting UI")
         vbar = AutoScrollbar(self.master, orient='vertical')
         hbar = AutoScrollbar(self.master, orient='horizontal')
@@ -170,25 +173,29 @@ class App(tk.Toplevel):
 
     ## EVENTOS ##
     def bindCanvasEvents(self):
-        """ Bind events to the Canvas """
-        self.canvas.bind('<Configure>', self.showImage)  # canvas is resized
-        self.canvas.bind('<ButtonPress-1>', self.clickMove)
-        self.canvas.bind('<ButtonPress-3>', self.clickRight)
-        self.canvas.bind('<B1-Motion>', self.moveTo)
-        self.canvas.bind('<MouseWheel>', self.wheel)  # with Windows and MacOS, but not Linux
-        self.master.bind('<KeyRelease-c>', self.clean)
+        """ Eventos del Canvas """
+
+        self.canvas.bind('<Configure>', self.showImage)  # Cambio de tamaño del canvas
+        self.canvas.bind('<ButtonPress-1>', self.moveFrom)  # Evento del click antes de mover la image
+        self.canvas.bind('<ButtonPress-3>', self.clickRight)  # Evento del click derecho
+        self.canvas.bind('<B1-Motion>', self.moveTo)  # Movimiento del raton para mover la imagen
+        self.canvas.bind('<MouseWheel>', self.wheel)  # Evento de la rueda del ratón
+        self.master.bind('<KeyRelease-c>', self.clean)  # Evento de limpiar la imagen
 
     def scrollY(self, *args, **kwargs):
-        """ Scroll canvas vertically and redraw the image """
-        self.canvas.yview(*args)  # scroll vertically
-        self.showImage()  # redraw the image
+        """ Scroll vertical """
+
+        self.canvas.yview(*args)
+        self.showImage()
 
     def scrollX(self, *args, **kwargs):
-        """ Scroll canvas horizontally and redraw the image """
-        self.canvas.xview(*args)  # scroll horizontally
-        self.showImage()  # redraw the image
+        """ Scroll horizontal """
+
+        self.canvas.xview(*args)
+        self.showImage()
 
     def clickRight(self, event):
+        """ Manejo del evento del click derecho """
         if self.drawing:
             self.clickDrawPolygon(event)
         if self.selectReference:
@@ -196,20 +203,20 @@ class App(tk.Toplevel):
         if self.measuring.get():
             self.clickSelectMeasure(event)
 
-    def clickMove(self, event):
-        self.moveFrom(event)
-
     def moveFrom(self, event):
-        """ Remember previous coordinates for scrolling with the mouse """
+        """ Guardamos la coordenada desde la que se ha lanzado el evento """
+
         self.canvas.scan_mark(event.x, event.y)
 
     def moveTo(self, event):
-        """ Drag (move) canvas to the new position """
+        """ Guardamos el lugar al que movemos el ratón """
+
         self.canvas.scan_dragto(event.x, event.y, gain=1)
-        self.showImage()  # redraw the image
+        self.showImage()
 
     def showImage(self, event=None):
-        """ Show image on the Canvas """
+        """ Muestra la imagen en el canvas """
+
         bbox1 = self.canvas.bbox(self.container)  # get image area
         # Remove 1 pixel shift at the sides of the bbox1
         bbox1 = (bbox1[0] + 1, bbox1[1] + 1, bbox1[2] - 1, bbox1[3] - 1)
@@ -249,7 +256,8 @@ class App(tk.Toplevel):
             self.canvas.imagetk = imageTk  # keep an extra reference to prevent garbage-collection
 
     def wheel(self, event):
-        """ Zoom with mouse wheel """
+        """ Zoom con la rueda del ratón """
+
         x = self.canvas.canvasx(event.x)
         y = self.canvas.canvasy(event.y)
         bbox = self.canvas.bbox(self.container)  # get image area
@@ -274,6 +282,8 @@ class App(tk.Toplevel):
         self.showImage()
 
     def clickSelectReference(self, event):
+        """ Manejo del evento de selección de la referencia """
+
         if self.rpd:
             self.rpd.cancel()
         if (event.x + self.x1) / self.imscale >= 0 and (event.y + self.y1) / self.imscale >= 0:
@@ -309,6 +319,8 @@ class App(tk.Toplevel):
                     self.selectDrawingMode()
 
     def clickSelectMeasure(self, event):
+        """ Manejo del evento de selección de medida """
+
         if (event.x + self.x1) / self.imscale >= 0 and (event.y + self.y1) / self.imscale >= 0:
             clickX = int((event.x + self.x1) / self.imscale)
             clickY = int((event.y + self.y1) / self.imscale)
@@ -344,6 +356,8 @@ class App(tk.Toplevel):
                                     title="Distancia")
 
     def clickDrawPolygon(self, event):
+        """ Manejo del evento de dibujar el poligono para la mascara """
+
         print('Event click position is x={} y={}'.format(event.x, event.y))
         print('Real click position is x={} y={}'.format((event.x + self.x1) / self.imscale,
                                                         (event.y + self.y1) / self.imscale))
@@ -371,8 +385,9 @@ class App(tk.Toplevel):
             self.zeroBrightnessAndContrastImage = self.image.copy()
             self.showImage()
 
-    ## CAMBIOS DE MODO ##
     def selectReferenceMode(self):
+        """ Cambio de modo a selección de referencia """
+
         print('Mode changed to reference mode')
         if self.pixelSize:
             messageBox = tk.messagebox.askquestion('Aviso', '¿Estás seguro que que deseas rehacer la '
@@ -390,6 +405,8 @@ class App(tk.Toplevel):
             self.selectReference = True
 
     def toggleMeasureMode(self):
+        """ Cambio de modo a medida """
+
         if self.drawing or self.selectReference:
             if self.pixelSize:
                 print('Mode changed to measure mode')
@@ -404,6 +421,7 @@ class App(tk.Toplevel):
             self.selectDrawingMode()
 
     def selectDrawingMode(self):
+        """ Cambio de modo a dibujar """
         print('Mode changed to drawing mode')
         self.drawing = True
         self.measuring.set(False)
@@ -411,6 +429,8 @@ class App(tk.Toplevel):
         self.clean()
 
     def clean(self, event=None):
+        """ Limpieza del canvas y los procesamientos """
+
         print('Clean')
         self.isEnhanced = False
         self.isSkeletonized = False
@@ -426,6 +446,8 @@ class App(tk.Toplevel):
         self.showImage()
 
     def enhance(self):
+        """ Mejora automática de la imagen """
+
         if len(self.polygonPoints) > 1:
             enhanced, self.blackPixels = Mask.applyEnhanceToROI(self.originalOpenCVImage.copy(), self.mask)
             self.drawLines(enhanced)
@@ -435,6 +457,8 @@ class App(tk.Toplevel):
             messagebox.showerror("Error", "Debes seleleccionar un polígono")
 
     def skeletonize(self):
+        """ Esqueletonización de la imagen """
+
         if len(self.polygonPoints) > 1:
             skeletonized, self.whitePixels = Mask.applySkeletonizationToROI(self.originalOpenCVImage.copy(),
                                                                             self.mask)
@@ -445,6 +469,8 @@ class App(tk.Toplevel):
             messagebox.showerror("Error", "Debes seleleccionar un polígono")
 
     def subpixel(self):
+        """ Detección de bordes por subpixel de la imagen """
+
         if len(self.polygonPoints) > 1:
             try:
                 subpixelImage = Mask.applySubpixelToROI((self.originalOpenCVImage.astype(float)).copy(),
@@ -461,6 +487,8 @@ class App(tk.Toplevel):
             messagebox.showerror("Error", "Debes seleleccionar un polígono")
 
     def drawLines(self, image):
+        """ Dibujo del poligono en la imagen"""
+
         pts = np.array(self.polygonPoints).reshape((-1, 1, 2))
         imageWithPolygon = cv2.polylines(image, [pts.astype(np.int32)], isClosed=self.isClosed,
                                          color=color.red, thickness=self.thickness)
@@ -469,10 +497,12 @@ class App(tk.Toplevel):
         self.openCVImage = image
 
     def openContrastBrightnessMenu(self):
+        """ Lanzamiento de la ventana de brillo y contraste """
         d = BrightnessContrastDialog(self.master, self.zeroBrightnessAndContrastImage.copy())
         self.master.wait_window(d.top)
 
     def selectionInfo(self):
+        """ Lanzamiento de la ventana de información sobre la seleccion """
         if len(self.polygonPoints) > 1:
             metrics = VeinMetricsModal(self.master)
             self.master.wait_window(metrics.top)
@@ -480,6 +510,7 @@ class App(tk.Toplevel):
             messagebox.showerror("Error", "Debes seleleccionar un polígono")
 
     def openFileMenu(self):
+        """ Lanzamiento de la ventana de selección de ficheros """
         file = fd.askopenfilename(filetypes=ftypes)
         if file:
             messageBox = tk.messagebox.askquestion('Aviso', '¿Deseas abrir la imagen en una nueva ventana?',
@@ -496,6 +527,7 @@ class App(tk.Toplevel):
                 self.showImage()
 
     def saveFileMenu(self):
+        """ Lanzamiento de la ventana de guadar una imagen """
         filename = fd.asksaveasfilename(filetypes=ftypes,
                                         defaultextension='.png')
         if filename:
