@@ -9,6 +9,7 @@ from VeinSegmentation.Skeletonization import skeletonization
 
 
 def getMaskArea(mask):
+    """ Obtención del numero de pixeles de la imagen"""
     mask = cv2.cvtColor(mask.astype(np.uint8), cv2.COLOR_RGB2GRAY)
     contours, hierarchy = cv2.findContours(mask, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)[-2:]
     area = 0
@@ -152,6 +153,7 @@ def applyBrightnessAndContrastToROI(image, mask, brightness, contrast):
 
 
 def processResult(image, merged, mask):
+    """ Creacion del resultado mediante operaciones lógicas """
     fg = cv2.bitwise_or(merged, merged, mask=mask)
     mask = cv2.bitwise_not(mask)
     fgbg = cv2.bitwise_or(fg, image, mask=mask)
