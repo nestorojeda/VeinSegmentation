@@ -37,8 +37,8 @@ class App(tk.Toplevel):
         self.mask = None
         self.master.title('Segmentación de venas')
         self.master.protocol("WM_DELETE_WINDOW", self.onExit)
-        # Variables
 
+        # Inicialización de variables
         self.image = None  # Imagen que se va a mostrar en formato PIL
         self.zeroBrightnessAndContrastImage = None  # Imagen sin brillo ni contraste
         self.width = 0  # Ancho de la imagen
@@ -115,7 +115,7 @@ class App(tk.Toplevel):
                     newInstance = tk.Toplevel()
                     newInstance.title('Segmentación de venas')
                     newInstance.geometry("1000x500")
-                    app = App(newInstance, file)
+                    App(newInstance, file)
                     self.master.withdraw()
 
 
@@ -258,7 +258,6 @@ class App(tk.Toplevel):
         else:
             return  # zoom only inside image area
         scale = 1.0
-        # Respond to Linux (event.num) or Windows (event.delta) wheel event
         if event.delta == -120:  # scroll down
             i = min(self.width, self.height)
             if int(i * self.imscale) < 30:
@@ -489,7 +488,7 @@ class App(tk.Toplevel):
                 newInstance = tk.Toplevel()
                 newInstance.title('Segmentación de venas')
                 newInstance.geometry("1000x500")
-                app = App(newInstance, file)
+                App(newInstance, file)
 
             else:
                 self.filename = file
