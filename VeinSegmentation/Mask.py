@@ -2,6 +2,7 @@ from time import time
 
 import cv2
 import numpy as np
+import matplotlib.pyplot as plt
 from subpixel_edges import subpixel_edges
 
 from VeinSegmentation import Enhance
@@ -46,12 +47,7 @@ def applyEnhanceToROI(image, mask):
         merged = image.copy()
         enhancedCrop = enhancedCrop.astype(np.uint8)
         merged[y:y + h, x:x + w] = enhancedCrop  # original con el corte superpuesto
-
-        fg = cv2.bitwise_or(merged, merged, mask=mask)  # la parte que ha sido mejorada
-        mask = cv2.bitwise_not(mask)  # cambiamos la mascara de signo
-        fgbg = cv2.bitwise_or(fg, image, mask=mask)  # la imagen con un agujero
-        mask = cv2.bitwise_not(mask)
-        result = cv2.bitwise_or(fgbg, fg)
+        result = processResult(image, merged, mask)
 
     elapsed = time() - now
     print("Processing time: ", elapsed)
@@ -84,12 +80,7 @@ def applySkeletonizationToROI(image, mask):
         merged = image.copy()
         skel_crop = cv2.cvtColor(skel_crop.astype(np.uint8), cv2.COLOR_GRAY2RGB)
         merged[y:y + h, x:x + w] = skel_crop
-
-        fg = cv2.bitwise_or(merged, merged, mask=mask)
-        mask = cv2.bitwise_not(mask)
-        fgbg = cv2.bitwise_or(fg, image, mask=mask)
-        mask = cv2.bitwise_not(mask)
-        result = cv2.bitwise_or(fgbg, fg)
+        result = processResult(image, merged, mask)
 
     elapsed = time() - now
     print("Processing time: ", elapsed)
@@ -128,12 +119,7 @@ def applySubpixelToROI(image, mask,
 
         merged = image.copy()
         merged[y:y + h, x:x + w] = edgedCrop
-
-        fg = cv2.bitwise_or(merged, merged, mask=mask)
-        mask = cv2.bitwise_not(mask)
-        fgbg = cv2.bitwise_or(fg, image, mask=mask)
-        mask = cv2.bitwise_not(mask)
-        result = cv2.bitwise_or(fgbg, fg)
+        result = processResult(image, merged, mask)
 
     elapsed = time() - now
     print("Processing time: ", elapsed)
@@ -164,13 +150,16 @@ def applyBrightnessAndContrastToROI(image, mask, brightness, contrast):
         merged = image.copy()
         enhanced_crop = enhanced_crop.astype(np.uint8)
         merged[y:y + h, x:x + w] = enhanced_crop  # original con el corte superpuesto
-
-        fg = cv2.bitwise_or(merged, merged, mask=mask)
-        mask = cv2.bitwise_not(mask)
-        fgbg = cv2.bitwise_or(fg, image, mask=mask)
-        mask = cv2.bitwise_not(mask)
-        result = cv2.bitwise_or(fgbg, fg)
+        result = processResult(image, merged, mask)
 
     elapsed = time() - now
     print("Processing time: ", elapsed)
+    return result
+
+def processResult(image, merged, mask):
+    fg = cv2.bitwise_or(merged, merged, mask=mask)
+    mask = cv2.bitwise_not(mask)
+    fgbg = cv2.bitwise_or(fg, image, mask=mask)
+    mask = cv2.bitwise_not(mask)
+    result = cv2.bitwise_or(fgbg, fg)
     return result
