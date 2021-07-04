@@ -41,24 +41,21 @@ def applyEnhanceToROI(image, mask):
         x, y, w, h = cv2.boundingRect(cnt)
         crop = image[y:y + h, x:x + w]  # Corte que contiene el poligono maximo
         enhancedCrop = Enhance.enhanceMedicalImage(crop)  # Corte mejorado
-        black_pixels = cv2.countNonZero(image)
+        blackPixels = cv2.countNonZero(image)
 
         merged = image.copy()
         enhancedCrop = enhancedCrop.astype(np.uint8)
         merged[y:y + h, x:x + w] = enhancedCrop  # original con el corte superpuesto
 
         fg = cv2.bitwise_or(merged, merged, mask=mask)  # la parte que ha sido mejorada
-
         mask = cv2.bitwise_not(mask)  # cambiamos la mascara de signo
-
         fgbg = cv2.bitwise_or(fg, image, mask=mask)  # la imagen con un agujero
-
         mask = cv2.bitwise_not(mask)
-        enhanced = cv2.bitwise_or(fgbg, fg)
+        result = cv2.bitwise_or(fgbg, fg)
 
     elapsed = time() - now
     print("Processing time: ", elapsed)
-    return cv2.cvtColor(enhanced, cv2.COLOR_GRAY2RGB), black_pixels
+    return cv2.cvtColor(result, cv2.COLOR_GRAY2RGB), blackPixels
 
 
 def applySkeletonizationToROI(image, mask):
