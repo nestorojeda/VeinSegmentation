@@ -2,7 +2,6 @@ from time import time
 
 import cv2
 import numpy as np
-import matplotlib.pyplot as plt
 from subpixel_edges import subpixel_edges
 
 from VeinSegmentation import Enhance
@@ -156,10 +155,10 @@ def applyBrightnessAndContrastToROI(image, mask, brightness, contrast):
     print("Processing time: ", elapsed)
     return result
 
+
 def processResult(image, merged, mask):
     fg = cv2.bitwise_or(merged, merged, mask=mask)
     mask = cv2.bitwise_not(mask)
     fgbg = cv2.bitwise_or(fg, image, mask=mask)
-    mask = cv2.bitwise_not(mask)
     result = cv2.bitwise_or(fgbg, fg)
     return result
