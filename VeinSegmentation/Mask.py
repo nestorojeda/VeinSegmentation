@@ -7,9 +7,6 @@ from subpixel_edges import subpixel_edges
 from VeinSegmentation import Enhance
 from VeinSegmentation.Skeletonization import skeletonization
 
-white = 255.
-black = 0.
-
 
 def getMaskArea(mask):
     mask = cv2.cvtColor(mask.astype(np.uint8), cv2.COLOR_RGB2GRAY)
@@ -134,8 +131,6 @@ def applyBrightnessAndContrastToROI(image, mask, brightness, contrast):
 
     print("Processing apply_enhance_to_roi...")
     now = time()
-
-    # image = cv2.cvtColor(image.astype(np.uint8), cv2.COLOR_RGB2GRAY)
     mask = cv2.cvtColor(mask.astype(np.uint8), cv2.COLOR_RGB2GRAY)
 
     contours, hierarchy = cv2.findContours(mask, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)[-2:]
