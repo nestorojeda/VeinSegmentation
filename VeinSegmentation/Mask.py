@@ -122,7 +122,6 @@ def applySubpixelToROI(image, mask,
         x, y, w, h = cv2.boundingRect(cnt)
         crop = image[y:y + h, x:x + w]
         crop = Enhance.enhanceMedicalImage(crop)
-
         edges = subpixel_edges(crop.astype(float), threshold, iters, order)
 
         edgedCrop = cv2.cvtColor(crop.astype(np.uint8), cv2.COLOR_GRAY2BGR)
@@ -135,14 +134,13 @@ def applySubpixelToROI(image, mask,
 
         fg = cv2.bitwise_or(merged, merged, mask=mask)
         mask = cv2.bitwise_not(mask)
-        image = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
         fgbg = cv2.bitwise_or(fg, image, mask=mask)
         mask = cv2.bitwise_not(mask)
         result = cv2.bitwise_or(fgbg, fg)
 
     elapsed = time() - now
     print("Processing time: ", elapsed)
-    return result
+    return result.astype(np.uint8)
 
 
 def applyBrightnessAndContrastToROI(image, mask, brightness, contrast):

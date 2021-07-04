@@ -354,9 +354,6 @@ class App(tk.Toplevel):
         if (event.x + self.x1) / self.imscale >= 0 and (event.y + self.y1) / self.imscale >= 0:
             if self.isEnhanced or self.isSkeletonized or self.isSubpixel:
                 self.clean()
-                self.polygonPoints = np.array([])
-                self.isEnhanced = False
-                self.isSkeletonized = False
 
             self.polygonPoints = np.append(self.polygonPoints,
                                            [(event.x + self.x1) / self.imscale, (event.y + self.y1) / self.imscale])
@@ -416,26 +413,23 @@ class App(tk.Toplevel):
 
     def clean(self, event=None):
         print('Clean')
+        self.isEnhanced = False
+        self.isSkeletonized = False
+        self.isSubpixel = False
         self.whitePixels = None
         self.blackPixels = None
         self.openCVImage = cv2.imread(self.filename, cv2.IMREAD_GRAYSCALE)
         self.openCVImage = cv2.cvtColor(self.openCVImage, cv2.COLOR_GRAY2RGB)
         self.originalOpenCVImage = self.openCVImage.copy()
-        self.image = openCVToPIL(self.openCVImage)  # open image
+        self.image = openCVToPIL(self.openCVImage)
         self.zeroBrightnessAndContrastImage = self.image.copy()
         self.polygonPoints = np.array([])
         self.showImage()
 
-    ## PROCESAMIENTOS ##
     def enhance(self):
         if len(self.polygonPoints) > 1:
             enhanced, self.blackPixels = Mask.applyEnhanceToROI(self.originalOpenCVImage.copy(), self.mask)
-            pts = np.array(self.polygonPoints).reshape((-1, 1, 2))
-            image_with_polygon = cv2.polylines(enhanced, [pts.astype(np.int32)], isClosed=self.isClosed,
-                                               color=color.red, thickness=self.thickness)
-            self.image = openCVToPIL(image_with_polygon)
-            self.zeroBrightnessAndContrastImage = self.image.copy()
-            self.openCVImage = enhanced
+            self.drawLines(enhanced)
             self.isEnhanced = True
             self.showImage()
         else:
@@ -443,15 +437,9 @@ class App(tk.Toplevel):
 
     def skeletonize(self):
         if len(self.polygonPoints) > 1:
-            self.skeletonized, self.whitePixels = Mask.applySkeletonizationToROI(self.originalOpenCVImage.copy(),
-                                                                                 self.mask)
-            pts = np.array(self.polygonPoints).reshape((-1, 1, 2))
-            imageWithPolygon = cv2.polylines(self.skeletonized, [pts.astype(np.int32)], isClosed=self.isClosed,
-                                             color=color.red, thickness=self.thickness)
-
-            self.image = openCVToPIL(imageWithPolygon)
-            self.zeroBrightnessAndContrastImage = self.image.copy()
-            self.openCVImage = self.skeletonized
+            skeletonized, self.whitePixels = Mask.applySkeletonizationToROI(self.originalOpenCVImage.copy(),
+                                                                            self.mask)
+            self.drawLines(skeletonized)
             self.isSkeletonized = True
             self.showImage()
         else:
@@ -459,19 +447,27 @@ class App(tk.Toplevel):
 
     def subpixel(self):
         if len(self.polygonPoints) > 1:
-            self.subpixelImage = Mask.applySubpixelToROI((self.originalOpenCVImage.astype(float)).copy(),
-                                                         self.mask)
-            pts = np.array(self.polygonPoints).reshape((-1, 1, 2))
-            imageWithPolygon = cv2.polylines(self.subpixelImage, [pts.astype(np.int32)], isClosed=self.isClosed,
-                                             color=color.red, thickness=self.thickness)
+            try:
+                subpixelImage = Mask.applySubpixelToROI((self.originalOpenCVImage.astype(float)).copy(),
+                                                        self.mask)
+            except UnboundLocalError:
+                messagebox.showerror("Error", "Ha ocurrido un error mientras se realizaba el procesamiento")
+                self.clean()
+                return
 
-            self.image = openCVToPIL(imageWithPolygon)
-            self.zeroBrightnessAndContrastImage = self.image.copy()
-            self.openCVImage = self.subpixelImage
+            self.drawLines(subpixelImage)
             self.isSubpixel = True
             self.showImage()
         else:
             messagebox.showerror("Error", "Debes seleleccionar un polígono")
+
+    def drawLines(self, image):
+        pts = np.array(self.polygonPoints).reshape((-1, 1, 2))
+        imageWithPolygon = cv2.polylines(image, [pts.astype(np.int32)], isClosed=self.isClosed,
+                                         color=color.red, thickness=self.thickness)
+        self.image = openCVToPIL(imageWithPolygon)
+        self.zeroBrightnessAndContrastImage = self.image.copy()
+        self.openCVImage = image
 
     def openContrastBrightnessMenu(self):
         d = BrightnessContrastDialog(self.master, self.zeroBrightnessAndContrastImage.copy())
@@ -488,7 +484,7 @@ class App(tk.Toplevel):
         file = fd.askopenfilename(filetypes=ftypes)
         if file:
             messageBox = tk.messagebox.askquestion('Aviso', '¿Deseas abrir la imagen en una nueva ventana?',
-                                               icon='warning')
+                                                   icon='warning')
             if messageBox == 'yes':
                 newInstance = tk.Toplevel()
                 newInstance.title('Segmentación de venas')
