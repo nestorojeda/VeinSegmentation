@@ -75,6 +75,8 @@ class App(tk.Toplevel):
         self.measuring = tk.BooleanVar()
         self.measuring.set(False)
         self.selectReference = False
+
+        self.imageWithPoints = None  # Imagen con los puntos dibujados
         if file:
             self.filename = file
             self.openCVImage = cv2.imread(self.filename, cv2.IMREAD_GRAYSCALE)
@@ -226,8 +228,6 @@ class App(tk.Toplevel):
                  self.canvas.canvasy(self.canvas.winfo_height()))
         bbox = [min(bbox1[0], bbox2[0]), min(bbox1[1], bbox2[1]),  # get scroll region box
                 max(bbox1[2], bbox2[2]), max(bbox1[3], bbox2[3])]
-        print('bbox1: {}'.format(bbox1))
-        print('bbox2: {}'.format(bbox2))
         if bbox[0] == bbox2[0] and bbox[2] == bbox2[2]:  # whole image in the visible area
             bbox[0] = bbox1[0]
             bbox[2] = bbox1[2]
@@ -252,33 +252,33 @@ class App(tk.Toplevel):
             imageTk = ImageTk.PhotoImage(image.resize((int(x2 - x1), int(y2 - y1))))
             imageId = self.canvas.create_image(max(bbox2[0], bbox1[0]), max(bbox2[1], bbox1[1]),
                                                anchor='nw', image=imageTk)
-            self.canvas.lower(imageId)  # set image into background
-            self.canvas.imagetk = imageTk  # keep an extra reference to prevent garbage-collection
+            self.canvas.lower(imageId)  # Ponemos la imagen de fondo
+            self.canvas.imagetk = imageTk  # Guardamos una referencia extra para el garbage collector
 
     def wheel(self, event):
         """ Zoom con la rueda del ratón """
 
         x = self.canvas.canvasx(event.x)
         y = self.canvas.canvasy(event.y)
-        bbox = self.canvas.bbox(self.container)  # get image area
+        bbox = self.canvas.bbox(self.container)  # Cogemos el area de la imagen
         if bbox[0] < x < bbox[2] and bbox[1] < y < bbox[3]:
             pass  # Ok! Inside the image
         else:
             return  # zoom only inside image area
         scale = 1.0
-        if event.delta == -120:  # scroll down
+        if event.delta == -120:  # Scroll hacia abajo
             i = min(self.width, self.height)
             if int(i * self.imscale) < 30:
-                return  # image is less than 30 pixels
+                return  # la imagen es menor a 30 pixeles
             self.imscale /= self.delta
             scale /= self.delta
-        if event.delta == 120:  # scroll up
+        if event.delta == 120:  # Scroll hacia arrina
             i = min(self.canvas.winfo_width(), self.canvas.winfo_height())
             if i < self.imscale:
-                return  # 1 pixel is bigger than the visible area
+                return  # 1 pixel es mayor al area visible
             self.imscale *= self.delta
             scale *= self.delta
-        self.canvas.scale('all', x, y, scale, scale)  # rescale all canvas objects
+        self.canvas.scale('all', x, y, scale, scale)  # Reescalamos el canvas
         self.showImage()
 
     def clickSelectReference(self, event):
@@ -295,7 +295,7 @@ class App(tk.Toplevel):
                 self.imageWithPoints = cv2.circle(self.openCVImage.copy(),
                                                   (clickX, clickY), radius=0, color=(0, 0, 255),
                                                   thickness=point_thickness)
-                self.image = openCVToPIL(self.imageWithPoints)  # open image
+                self.image = openCVToPIL(self.imageWithPoints)
                 self.showImage()
 
             if len(self.referencePoints) == 2:
@@ -308,7 +308,7 @@ class App(tk.Toplevel):
                                            color=color.red,
                                            thickness=self.thickness)
 
-                self.image = openCVToPIL(image_with_line)  # open image
+                self.image = openCVToPIL(image_with_line)
                 self.showImage()
                 self.rpd = ReferencePointsDialog(self.master)
                 self.master.wait_window(self.rpd.top)
@@ -330,7 +330,7 @@ class App(tk.Toplevel):
                 self.imageWithPoints = cv2.circle(self.openCVImage.copy(),
                                                   (clickX, clickY), radius=0, color=(0, 0, 255),
                                                   thickness=point_thickness)
-                self.image = openCVToPIL(self.imageWithPoints)  # open image
+                self.image = openCVToPIL(self.imageWithPoints)
                 self.showImage()
 
             if len(self.measurePoints) == 2:
@@ -345,11 +345,9 @@ class App(tk.Toplevel):
                 pixel_distance = np.math.sqrt(
                     (self.measurePoints[1][0] - self.measurePoints[0][0]) ** 2 +
                     (self.measurePoints[1][1] - self.measurePoints[0][1]) ** 2)
-                print("Pixel distance betweeen points is: {} pixels".format(pixel_distance))
                 distance = pixel_distance * self.pixelSize
-                print("Real istance betweeen points is: {} cm".format(distance))
 
-                self.image = openCVToPIL(imageWithLine)  # open image
+                self.image = openCVToPIL(imageWithLine)
                 self.showImage()
                 self.measurePoints = []
                 messagebox.showinfo(message="La distancia entre los dos puntos es de {} cm".format(distance),
@@ -381,7 +379,7 @@ class App(tk.Toplevel):
             self.mask = cv2.fillPoly(np.zeros((self.height, self.width, 3)),
                                      [pts.astype(np.int32)], color=color.white)
 
-            self.image = openCVToPIL(imageWithPolygon)  # open image
+            self.image = openCVToPIL(imageWithPolygon)
             self.zeroBrightnessAndContrastImage = self.image.copy()
             self.showImage()
 
