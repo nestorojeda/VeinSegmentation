@@ -5,7 +5,7 @@ import numpy as np
 from subpixel_edges import subpixel_edges
 
 from VeinSegmentation import Enhance
-from VeinSegmentation.Skeletonization import skeletonization
+from VeinSegmentation.Skeletonization import skeletonization, cleanSkeleton
 
 
 def getMaskArea(mask):
@@ -71,12 +71,14 @@ def applySkeletonizationToROI(image, mask):
         crop = image[y:y + h, x:x + w]
         crop = Enhance.enhanceMedicalImage(crop).astype(np.uint8)
 
-        skel_crop = skeletonization(crop)
-        whitePixels = np.sum(skel_crop == 255)
+        skelCrop = skeletonization(crop)
+        # Mejoramos el esqueleto solo para hallar el verdadero trazado de la vena
+        cleanedSkeleton = cleanSkeleton(skelCrop)
+        whitePixels = np.sum(cleanedSkeleton == 255)
 
         merged = image.copy()
-        skel_crop = cv2.cvtColor(skel_crop.astype(np.uint8), cv2.COLOR_GRAY2RGB)
-        merged[y:y + h, x:x + w] = skel_crop
+        skelCrop = cv2.cvtColor(skelCrop.astype(np.uint8), cv2.COLOR_GRAY2RGB)
+        merged[y:y + h, x:x + w] = skelCrop
         result = processResult(image, merged, mask)
 
     elapsed = time() - now

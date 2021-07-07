@@ -1,7 +1,21 @@
 import cv2
 import numpy as np
+
 from VeinSegmentation.Enhance import quantification
-import matplotlib.pyplot as plt
+
+
+def cleanSkeleton(skeleton):
+    h = skeleton.shape[0]
+    w = skeleton.shape[1]
+
+    new = np.zeros((h, w))
+    for i in range(0, h):
+        for j in range(0, w):
+            region = skeleton[j:j + 3, i:i + 3]
+            if sum(sum(region == 255)) == 3:
+                new[j:j + 3, i:i + 3] = region
+
+    return new
 
 
 def skeletonization(img, niter=100):
