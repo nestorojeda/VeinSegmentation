@@ -76,8 +76,21 @@ def applySkeletonizationToROI(image, mask):
         cleanedSkeleton = cleanSkeleton(skelCrop)
         whitePixels = np.sum(cleanedSkeleton == 255)
 
-        merged = image.copy()
+        red = np.zeros((h, w, 3), np.uint8)
+        # Fill image with red color(set each pixel to red)
+        red[:] = (0, 0, 255)
+
         skelCrop = cv2.cvtColor(skelCrop.astype(np.uint8), cv2.COLOR_GRAY2RGB)
+        cleanedSkeleton = cv2.cvtColor(cleanedSkeleton.astype(np.uint8), cv2.COLOR_GRAY2RGB)
+
+        for j in range(0, skelCrop.shape[0]):
+            for i in range(0, skelCrop.shape[1]):
+                if np.array_equal(cleanedSkeleton[j, i], skelCrop[j, i]) \
+                        and np.array_equal(skelCrop[j, i], np.array([255, 255, 255])):
+                    skelCrop[j, i] = (0, 0, 255)
+
+        merged = image.copy()
+
         merged[y:y + h, x:x + w] = skelCrop
         result = processResult(image, merged, mask)
 
