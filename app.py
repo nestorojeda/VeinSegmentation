@@ -19,6 +19,7 @@ from VeinSegmentation import Mask
 drawing = False
 ftypes = [('Imagen', '.png .jpeg .jpg')]
 point_thickness = 8
+windowsOpen = 0  # Indica el número de ventanas que hay abiertas
 
 
 # https://zetcode.com/tkinter/menustoolbars/
@@ -27,10 +28,10 @@ point_thickness = 8
 # https://www.it-swarm-es.com/es/python/tkinter-canvas-zoom-move-pan/830432124/
 
 class App(tk.Toplevel):
+    global windowsOpen
 
     def __init__(self, mainframe, file=None, **kw):
         """ Initialize the main Frame """
-
         tk.Toplevel.__init__(self, master=mainframe)
         self.root = mainframe
         self.withdraw()
@@ -64,10 +65,6 @@ class App(tk.Toplevel):
         self.whitePixels = None
         self.isSubpixel = False
 
-        self.filename = ''
-        self.openCVImage = None
-        self.originalOpenCVImage = None
-
         self.imscale = 1.0  # Escala del canvas
         self.delta = 1.3  # Magnitud del zoom
 
@@ -92,14 +89,19 @@ class App(tk.Toplevel):
 
     def onExit(self):
         """ Manejo del evento de salir de la página """
+        global windowsOpen
 
-        if messagebox.askokcancel("Salir", "¿De seguro que quieres salir?"):
+        if windowsOpen - 1 == 0:
+            if messagebox.askokcancel("Salir", "¿De seguro que quieres salir?"):
+                windowsOpen -= 1
+                self.master.destroy()
+                sys.exit()
+        else:
+            windowsOpen -= 1
             self.master.destroy()
-            sys.exit()
 
     def initWelcomeUI(self):
         """ Inicialización de la vista de selección de ficheros """
-
         self.master.withdraw()
         print("Starting Welcome UI")
         files = fd.askopenfilenames(filetypes=ftypes)
@@ -128,6 +130,8 @@ class App(tk.Toplevel):
 
     def initUiComponents(self):
         """ Inicialización de los componentes de la interfaz """
+        global windowsOpen
+        windowsOpen += 1
 
         print("Starting UI")
         vbar = AutoScrollbar(self.master, orient='vertical')
@@ -509,20 +513,13 @@ class App(tk.Toplevel):
 
     def openFileMenu(self):
         """ Lanzamiento de la ventana de selección de ficheros """
-        file = fd.askopenfilename(filetypes=ftypes)
-        if file:
-            messageBox = tk.messagebox.askquestion('Aviso', '¿Deseas abrir la imagen en una nueva ventana?',
-                                                   icon='warning')
-            if messageBox == 'yes':
+        files = fd.askopenfilenames(filetypes=ftypes)
+        if files:
+            for file in files:
                 newInstance = tk.Toplevel()
                 newInstance.title('Segmentación de venas')
                 newInstance.geometry("1000x500")
                 App(newInstance, file)
-
-            else:
-                self.filename = file
-                self.clean()
-                self.showImage()
 
     def saveFileMenu(self):
         """ Lanzamiento de la ventana de guadar una imagen """
