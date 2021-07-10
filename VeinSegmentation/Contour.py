@@ -10,9 +10,6 @@ def contour(image):
     else:
         gray = image.astype(np.uint8)
 
-    ratio = image.shape[0] / 300.0
-    orig = image.copy()
-
     gray = cv2.bilateralFilter(gray, 11, 17, 17)
     edged = cv2.Canny(gray, 30, 200)
 
@@ -23,13 +20,13 @@ def contour(image):
     contours = sorted(contours, key=cv2.contourArea, reverse=True)
 
     # loop over our contours
-    closed_contours = []
-    open_contours = []
+    closedContours = []
+    openContours = []
 
     for c in contours:
         if cv2.contourArea(c) > cv2.arcLength(c, True):
-            closed_contours.append(c)
+            closedContours.append(c)
         else:
-            open_contours.append(c)
+            openContours.append(c)
 
-    return open_contours, closed_contours
+    return openContours, closedContours
