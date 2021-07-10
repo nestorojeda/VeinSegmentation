@@ -9,7 +9,6 @@ class VeinMetricsModal:
         self.parent = parent.children['!app']
         self.top = tk.Toplevel(parent)
         self.top.transient(parent)
-        self.top.grab_set()
         title = "Métricas"
         self.top.title(title)
 
