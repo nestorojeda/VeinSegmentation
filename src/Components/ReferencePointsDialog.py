@@ -2,11 +2,6 @@ import math
 import tkinter as tk
 from tkinter import messagebox
 
-import cv2
-import matplotlib.pyplot as plt
-
-from Utils.Utils import openCVToPIL, PILtoOpenCV
-
 
 class ReferencePointsDialog:
     def __init__(self, parent):

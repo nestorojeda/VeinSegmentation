@@ -9,12 +9,12 @@ from PIL import Image
 from PIL import ImageTk
 
 import constants.colors as color
-from Components.AutoScrollbar import AutoScrollbar
-from Components.BrightnessContrastDialog import BrightnessContrastDialog
-from Components.ReferencePointsDialog import ReferencePointsDialog
-from Components.VeinMetricsModal import VeinMetricsModal
-from Utils.Utils import openCVToPIL, PILtoOpenCV
-from VeinSegmentation import Mask
+from src.Components.AutoScrollbar import AutoScrollbar
+from src.Components.BrightnessContrastDialog import BrightnessContrastDialog
+from src.Components.ReferencePointsDialog import ReferencePointsDialog
+from src.Components.VeinMetricsModal import VeinMetricsModal
+from src.Utils.Utils import openCVToPIL, PILtoOpenCV
+from src.VeinSegmentation import Mask
 
 drawing = False
 ftypes = [('Imagen', '.png .jpeg .jpg')]
@@ -460,7 +460,7 @@ class App(tk.Toplevel):
 
         if len(self.polygonPoints) > 1:
             skeletonized, self.cleanedSkeleton = Mask.applySkeletonizationToROI(self.originalOpenCVImage.copy(),
-                                                                            self.mask)
+                                                                                self.mask)
             self.drawLines(skeletonized)
             self.isSkeletonized = True
             self.showImage()

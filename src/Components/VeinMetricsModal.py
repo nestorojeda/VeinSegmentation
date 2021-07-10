@@ -1,9 +1,7 @@
-import math
 import tkinter as tk
-from tkinter import messagebox
 
-from VeinSegmentation import Mask
-from VeinSegmentation.Skeletonization import skeletonLenght
+from src.VeinSegmentation import Mask
+from src.VeinSegmentation.Skeletonization import skeletonLenght
 
 
 class VeinMetricsModal:

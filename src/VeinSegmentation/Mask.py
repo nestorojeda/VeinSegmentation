@@ -4,8 +4,8 @@ import cv2
 import numpy as np
 from subpixel_edges import subpixel_edges
 
-from VeinSegmentation import Enhance
-from VeinSegmentation.Skeletonization import skeletonization, cleanSkeleton
+from src.VeinSegmentation import Enhance
+from src.VeinSegmentation.Skeletonization import skeletonization, cleanSkeleton
 
 
 def getMaskArea(mask):

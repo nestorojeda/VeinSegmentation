@@ -6,9 +6,9 @@ import cv2
 import matplotlib.pyplot as plt
 import numpy as np
 
-from Utils.Plotting import plotArray
-from VeinSegmentation.Enhance import enhanceMedicalImage, quantification, colorLayerSegmentationFilled
-from VeinSegmentation.Skeletonization import skeletonization
+from src.Utils.Plotting import plotArray
+from src.VeinSegmentation.Enhance import enhanceMedicalImage, quantification, colorLayerSegmentationFilled
+from src.VeinSegmentation.Skeletonization import skeletonization
 
 scaleX = 1
 scaleY = 1

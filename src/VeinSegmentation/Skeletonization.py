@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 
-from VeinSegmentation.Enhance import quantification
+from src.VeinSegmentation.Enhance import quantification
 
 
 def cleanSkeleton(skeleton):

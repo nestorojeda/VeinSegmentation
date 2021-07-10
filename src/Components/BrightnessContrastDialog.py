@@ -1,9 +1,8 @@
 import tkinter as tk
 import cv2
-import matplotlib.pyplot as plt
 
-from Utils.Utils import openCVToPIL, PILtoOpenCV
-from VeinSegmentation import Enhance, Mask
+from src.Utils.Utils import openCVToPIL, PILtoOpenCV
+from src.VeinSegmentation import Mask, Enhance
 
 
 class BrightnessContrastDialog:
