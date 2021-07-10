@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 
-from VeinSegmentation.Enhance import segmentation
+from src.VeinSegmentation.Enhance import quantification
 
 scaleX = 1
 scaleY = 1
@@ -36,7 +36,7 @@ plt.imshow(res2, cmap='gray')
 plt.title('OpenCV')
 plt.show()
 
-res3 = segmentation(img, n_clusters=3)
+res3 = quantification(img, n_clusters=3)
 plt.imshow(res3, cmap='gray')
 plt.title('Skimage')
 plt.show()
