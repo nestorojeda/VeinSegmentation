@@ -3,7 +3,7 @@
 /imagenes_orginales/
 /.vscode/
 /.idea/workspace.xml
-gui.spec
+*.spec
 dist
 build
 subpixel_edges

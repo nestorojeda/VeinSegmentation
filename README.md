@@ -17,7 +17,7 @@ pip install -r requirements.txt # Instalar dependencias
 
 Comando para montar el ejecutable:
 ```
-pyinstaller .\gui.py --additional-hooks-dir=hooks --hidden-import="skimage.filters.rank.core_cy_3d" --onefile
+pyinstaller .\src\app.py --additional-hooks-dir=hooks --hidden-import="skimage.filters.rank.core_cy_3d" --onefile
 ```
 
 
