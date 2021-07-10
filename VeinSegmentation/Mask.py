@@ -82,7 +82,7 @@ def applySkeletonizationToROI(image, mask):
 
         skelCrop = cv2.cvtColor(skelCrop.astype(np.uint8), cv2.COLOR_GRAY2RGB)
         cleanedSkeleton = cv2.cvtColor(cleanedSkeleton.astype(np.uint8), cv2.COLOR_GRAY2RGB)
-
+        cv2.imwrite("./skeleton.png", skelCrop)
         for j in range(0, skelCrop.shape[0]):
             for i in range(0, skelCrop.shape[1]):
                 if np.array_equal(cleanedSkeleton[j, i], skelCrop[j, i]) \
