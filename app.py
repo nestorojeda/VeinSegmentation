@@ -89,7 +89,6 @@ class App(tk.Toplevel):
     def onExit(self):
         """ Manejo del evento de salir de la página """
         global windowsOpen
-
         if windowsOpen - 1 == 0:
             if messagebox.askokcancel("Salir", "¿De seguro que quieres salir?"):
                 windowsOpen -= 1
@@ -97,7 +96,7 @@ class App(tk.Toplevel):
                 sys.exit()
         else:
             windowsOpen -= 1
-            self.master.destroy()
+            self.master.withdraw()
 
     def initWelcomeUI(self):
         """ Inicialización de la vista de selección de ficheros """
