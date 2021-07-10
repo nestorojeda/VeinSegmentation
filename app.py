@@ -62,7 +62,6 @@ class App(tk.Toplevel):
         self.isEnhanced = False  # Flag para saber si la imagen está mejorada
         self.blackPixels = None
         self.isSkeletonized = False  # Flag para saber si la imagen está esqueletonizada
-        self.whitePixels = None
         self.isSubpixel = False
 
         self.imscale = 1.0  # Escala del canvas
@@ -437,7 +436,6 @@ class App(tk.Toplevel):
         self.isEnhanced = False
         self.isSkeletonized = False
         self.isSubpixel = False
-        self.whitePixels = None
         self.blackPixels = None
         self.openCVImage = cv2.imread(self.filename, cv2.IMREAD_GRAYSCALE)
         self.openCVImage = cv2.cvtColor(self.openCVImage, cv2.COLOR_GRAY2RGB)
@@ -462,7 +460,7 @@ class App(tk.Toplevel):
         """ Esqueletonización de la imagen """
 
         if len(self.polygonPoints) > 1:
-            skeletonized, self.whitePixels = Mask.applySkeletonizationToROI(self.originalOpenCVImage.copy(),
+            skeletonized, self.cleanedSkeleton = Mask.applySkeletonizationToROI(self.originalOpenCVImage.copy(),
                                                                             self.mask)
             self.drawLines(skeletonized)
             self.isSkeletonized = True

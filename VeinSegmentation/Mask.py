@@ -95,7 +95,7 @@ def applySkeletonizationToROI(image, mask):
 
     elapsed = time() - now
     print("Processing time: ", elapsed)
-    return result, whitePixels
+    return result, cleanedSkeleton
 
 
 def applySubpixelToROI(image, mask,
