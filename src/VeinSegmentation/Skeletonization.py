@@ -1,4 +1,5 @@
 import cv2
+import matplotlib.pyplot as plt
 import numpy as np
 
 from src.VeinSegmentation.Enhance import quantification
@@ -44,7 +45,7 @@ def skeletonization(img, niter=100):
     img = cv2.bitwise_not(img)
 
     img = img.astype(np.uint8)
-    size = np.size(img)
+    contours, hierarchy = cv2.findContours(img, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     skel = np.zeros(img.shape, np.uint8)
 
     # Kernel con forma de cruz
@@ -62,7 +63,7 @@ def skeletonization(img, niter=100):
         # Si no quedan píxeles blancos, la imagen ya ha sido esqueletonizada
         if cv2.countNonZero(img) == 0:
             break
-    return skel
+    return skel, contours
 
 
 def skeletonLenght(skeleton, pixelSize):

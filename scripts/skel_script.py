@@ -1,7 +1,11 @@
+import os
+
 import cv2
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
+
+from src.VeinSegmentation import Skeletonization, Enhance
 
 mpl.rcParams['figure.dpi'] = 900
 
@@ -9,8 +13,26 @@ iters = 2
 threshold = 4.5
 order = 2
 
-skeleton = (cv2.imread('../skeleton.png'))
-skeleton = cv2.cvtColor(skeleton, cv2.COLOR_RGB2GRAY)
+scaleX = 1
+scaleY = 1
+
+y = 1300  # donde empieza el corte en y
+x = 1600  # donde empieza el corte en x
+h = 600  # tamaño del corte en h
+w = 600  # tamaño del corte en y
+
+this_path = os.path.dirname(os.path.realpath(__file__))
+img = cv2.imread(os.path.join(this_path, '../imagenes_orginales/Caso A BN.png'))
+
+img_gray = (cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)).astype(float)
+zoom = img_gray[y:y + h, x:x + w]
+
+enhanced = Enhance.enhanceMedicalImage(zoom)
+skeleton = Skeletonization.skeletonization(enhanced)
+
+# img_gray = (cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)).astype(float)
+# skeleton = (cv2.imread('../skeleton.png'))
+# skeleton = cv2.cvtColor(skeleton, cv2.COLOR_RGB2GRAY)
 plt.imshow(skeleton)
 plt.title('original')
 plt.show()

@@ -51,7 +51,7 @@ def applyEnhanceToROI(image, mask):
     return cv2.cvtColor(result, cv2.COLOR_GRAY2RGB), blackPixels
 
 
-def applySkeletonizationToROI(image, mask):
+def applySkeletonizationToROI(image, mask, drawContour=False):
     """
     Extracción de la región de interés a partir de una máscara
     y aplicación del algoritmo de skeletonización
@@ -71,7 +71,7 @@ def applySkeletonizationToROI(image, mask):
         crop = image[y:y + h, x:x + w]
         crop = Enhance.enhanceMedicalImage(crop).astype(np.uint8)
 
-        skelCrop = skeletonization(crop)
+        skelCrop, contours = skeletonization(crop)
         # Mejoramos el esqueleto solo para hallar el verdadero trazado de la vena
         cleanedSkeleton = cleanSkeleton(skelCrop)
         whitePixels = np.sum(cleanedSkeleton == 255)
@@ -82,11 +82,15 @@ def applySkeletonizationToROI(image, mask):
 
         skelCrop = cv2.cvtColor(skelCrop.astype(np.uint8), cv2.COLOR_GRAY2RGB)
         cleanedSkeleton = cv2.cvtColor(cleanedSkeleton.astype(np.uint8), cv2.COLOR_GRAY2RGB)
+
         for j in range(0, skelCrop.shape[0]):
             for i in range(0, skelCrop.shape[1]):
                 if np.array_equal(cleanedSkeleton[j, i], skelCrop[j, i]) \
                         and np.array_equal(skelCrop[j, i], np.array([255, 255, 255])):
                     skelCrop[j, i] = (0, 0, 255)
+
+        if drawContour:
+            skelCrop = cv2.drawContours(skelCrop, contours, -1, (0, 255, 0), 3)
 
         merged = image.copy()
 
