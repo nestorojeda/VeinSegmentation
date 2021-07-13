@@ -30,3 +30,18 @@ def contour(image):
             openContours.append(c)
 
     return openContours, closedContours
+
+
+def sortContours(contours):
+    contours = sorted(contours, key=cv2.contourArea, reverse=True)
+
+    closedContours = []
+    openContours = []
+
+    for c in contours:
+        if cv2.contourArea(c) > cv2.arcLength(c, True):
+            closedContours.append(c)
+        else:
+            openContours.append(c)
+
+    return openContours, closedContours

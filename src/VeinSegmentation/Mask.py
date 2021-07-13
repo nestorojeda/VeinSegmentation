@@ -4,7 +4,7 @@ import cv2
 import numpy as np
 from subpixel_edges import subpixel_edges
 
-from src.VeinSegmentation import Enhance
+from src.VeinSegmentation import Enhance, Contour
 from src.VeinSegmentation.Skeletonization import skeletonization, cleanSkeleton
 
 
@@ -51,7 +51,7 @@ def applyEnhanceToROI(image, mask):
     return cv2.cvtColor(result, cv2.COLOR_GRAY2RGB), blackPixels
 
 
-def applySkeletonizationToROI(image, mask, drawContour=False):
+def applySkeletonizationToROI(image, mask, drawContour=True):
     """
     Extracción de la región de interés a partir de una máscara
     y aplicación del algoritmo de skeletonización
@@ -90,7 +90,8 @@ def applySkeletonizationToROI(image, mask, drawContour=False):
                     skelCrop[j, i] = (0, 0, 255)
 
         if drawContour:
-            skelCrop = cv2.drawContours(skelCrop, contours, -1, (0, 255, 0), 3)
+            openContours, closedContours = Contour.sortContours(contours)
+            skelCrop = cv2.drawContours(skelCrop, closedContours, -1, (0, 255, 0), 1)
 
         merged = image.copy()
 

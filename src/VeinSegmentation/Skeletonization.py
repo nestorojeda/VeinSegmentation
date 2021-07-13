@@ -39,9 +39,7 @@ def cleanSkeleton(skeleton):
 
 
 def skeletonization(img, niter=100):
-    segm = quantification(img, n_clusters=2)
-
-    ret, img = cv2.threshold(segm, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    ret, img = cv2.threshold(img, 220, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
     img = cv2.bitwise_not(img)
 
     img = img.astype(np.uint8)
