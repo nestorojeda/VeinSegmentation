@@ -428,6 +428,8 @@ class App(tk.Toplevel):
         """ Limpieza del canvas y los procesamientos """
 
         print('Clean')
+        if self.skelControl:
+            self.skelControl.top.destroy()
         self.isEnhanced = False
         self.isSkeletonized = False
         self.isSubpixel = False
@@ -444,6 +446,9 @@ class App(tk.Toplevel):
         """ Mejora automática de la imagen """
 
         if len(self.polygonPoints) > 1:
+            if self.skelControl:
+                self.skelControl.top.destroy()
+
             enhanced, self.blackPixels = Mask.applyEnhanceToROI(self.originalOpenCVImage.copy(), self.mask)
             self.drawLines(enhanced)
             self.isEnhanced = True
@@ -455,8 +460,9 @@ class App(tk.Toplevel):
         """ Esqueletonización de la imagen """
 
         if len(self.polygonPoints) > 1:
-            self.skeletonized, self.skeletonizedTransparent, self.skeletonizedContour, self.skeletonizedContourTransparent, self.cleanedSkeleton = Mask.applySkeletonizationToROI(self.originalOpenCVImage.copy(),
-                                                                                self.mask)
+            self.skeletonized, self.skeletonizedTransparent, self.skeletonizedContour, self.skeletonizedContourTransparent, self.cleanedSkeleton = Mask.applySkeletonizationToROI(
+                self.originalOpenCVImage.copy(),
+                self.mask)
             self.drawLines(self.skeletonized)
             self.isSkeletonized = True
             self.showImage()
@@ -470,6 +476,9 @@ class App(tk.Toplevel):
         """ Detección de bordes por subpixel de la imagen """
 
         if len(self.polygonPoints) > 1:
+            if self.skelControl:
+                self.skelControl.top.destroy()
+
             try:
                 subpixelImage = Mask.applySubpixelToROI((self.originalOpenCVImage.astype(float)).copy(),
                                                         self.mask)
