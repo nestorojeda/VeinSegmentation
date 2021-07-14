@@ -51,7 +51,7 @@ def applyEnhanceToROI(image, mask):
     return cv2.cvtColor(result, cv2.COLOR_GRAY2RGB), blackPixels
 
 
-def applySkeletonizationToROI(image, mask, drawContour=True):
+def applySkeletonizationToROI(image, mask):
     """
     Extracción de la región de interés a partir de una máscara
     y aplicación del algoritmo de skeletonización
@@ -69,38 +69,49 @@ def applySkeletonizationToROI(image, mask, drawContour=True):
         idx += 1
         x, y, w, h = cv2.boundingRect(cnt)
         crop = image[y:y + h, x:x + w]
-        crop = Enhance.enhanceMedicalImage(crop).astype(np.uint8)
+        enhancedCrop = Enhance.enhanceMedicalImage(crop).astype(np.uint8)
 
-        skelCrop, contours = skeletonization(crop)
+        skelCrop, contours = skeletonization(enhancedCrop)
         # Mejoramos el esqueleto solo para hallar el verdadero trazado de la vena
         cleanedSkeleton = cleanSkeleton(skelCrop)
-        whitePixels = np.sum(cleanedSkeleton == 255)
-
-        red = np.zeros((h, w, 3), np.uint8)
-        # Fill image with red color(set each pixel to red)
-        red[:] = (0, 0, 255)
 
         skelCrop = cv2.cvtColor(skelCrop.astype(np.uint8), cv2.COLOR_GRAY2RGB)
+        skelCropTransparent = skelCrop.copy()
         cleanedSkeleton = cv2.cvtColor(cleanedSkeleton.astype(np.uint8), cv2.COLOR_GRAY2RGB)
 
         for j in range(0, skelCrop.shape[0]):
             for i in range(0, skelCrop.shape[1]):
-                if np.array_equal(cleanedSkeleton[j, i], skelCrop[j, i]) \
-                        and np.array_equal(skelCrop[j, i], np.array([255, 255, 255])):
+                if np.array_equal(skelCrop[j, i], np.array([255, 255, 255])):
                     skelCrop[j, i] = (0, 0, 255)
+                    skelCropTransparent[j, i] = (0, 0, 255)
+                if np.array_equal(skelCrop[j, i], np.array([0, 0, 0])):
+                    skelCropTransparent[j, i] = crop[j, i]
 
-        if drawContour:
-            openContours, closedContours = Contour.sortContours(contours)
-            skelCrop = cv2.drawContours(skelCrop, closedContours, -1, (0, 255, 0), 1)
+        openContours, closedContours = Contour.sortContours(contours)
+        skelCropWithContours = cv2.drawContours(skelCrop.copy(), closedContours, -1, (0, 255, 0), 1)
+        skelCropWithContoursAndTransparency = cv2.drawContours(skelCropTransparent.copy(), closedContours, -1,
+                                                               (0, 255, 0), 1)
 
         merged = image.copy()
-
         merged[y:y + h, x:x + w] = skelCrop
+
+        mergedWithTransparency = image.copy()
+        mergedWithTransparency[y:y + h, x:x + w] = skelCropTransparent
+
+        mergedWithContours = image.copy()
+        mergedWithContours[y:y + h, x:x + w] = skelCropWithContours
+
+        mergedWithContoursAndTransparency = image.copy()
+        mergedWithContoursAndTransparency[y:y + h, x:x + w] = skelCropWithContoursAndTransparency
+
         result = processResult(image, merged, mask)
+        resultWithContours = processResult(image, mergedWithTransparency, mask)
+        resultWithTransparency = processResult(image, mergedWithContours, mask)
+        resultWithContoursAndTransparency = processResult(image, mergedWithContoursAndTransparency, mask)
 
     elapsed = time() - now
     print("Processing time: ", elapsed)
-    return result, cleanedSkeleton
+    return result, resultWithContours, resultWithTransparency, resultWithContoursAndTransparency, cleanedSkeleton
 
 
 def applySubpixelToROI(image, mask,
@@ -164,7 +175,7 @@ def applyBrightnessAndContrastToROI(image, mask, brightness, contrast):
         merged = image.copy()
         enhanced_crop = enhanced_crop.astype(np.uint8)
         merged[y:y + h, x:x + w] = enhanced_crop  # original con el corte superpuesto
-        result = processResult(image, merged, mask)
+        result = processResult(image, crop, mask)
 
     elapsed = time() - now
     print("Processing time: ", elapsed)

@@ -12,6 +12,7 @@ import constants.colors as color
 from src.Components.AutoScrollbar import AutoScrollbar
 from src.Components.BrightnessContrastDialog import BrightnessContrastDialog
 from src.Components.ReferencePointsDialog import ReferencePointsDialog
+from src.Components.SkeletonizationControl import SkeletonizationControl
 from src.Components.VeinMetricsModal import VeinMetricsModal
 from src.Utils.Utils import openCVToPIL, PILtoOpenCV
 from src.VeinSegmentation import Mask
@@ -358,14 +359,9 @@ class App(tk.Toplevel):
     def clickDrawPolygon(self, event):
         """ Manejo del evento de dibujar el poligono para la mascara """
 
-        print('Event click position is x={} y={}'.format(event.x, event.y))
-        print('Real click position is x={} y={}'.format((event.x + self.x1) / self.imscale,
-                                                        (event.y + self.y1) / self.imscale))
-        print('Offset is x1={} y1={} x2={} y2={}'.format(self.x1, self.y1, self.x2, self.y2))
-        print('Scale is {}'.format(self.imscale))
-        # We only use positive real points
         if (event.x + self.x1) / self.imscale >= 0 and (event.y + self.y1) / self.imscale >= 0:
             if self.isEnhanced or self.isSkeletonized or self.isSubpixel:
+                self.skelControl.top.destroy()
                 self.clean()
 
             self.polygonPoints = np.append(self.polygonPoints,
@@ -459,11 +455,14 @@ class App(tk.Toplevel):
         """ Esqueletonización de la imagen """
 
         if len(self.polygonPoints) > 1:
-            skeletonized, self.cleanedSkeleton = Mask.applySkeletonizationToROI(self.originalOpenCVImage.copy(),
+            self.skeletonized, self.skeletonizedTransparent, self.skeletonizedContour, self.skeletonizedContourTransparent, self.cleanedSkeleton = Mask.applySkeletonizationToROI(self.originalOpenCVImage.copy(),
                                                                                 self.mask)
-            self.drawLines(skeletonized)
+            self.drawLines(self.skeletonized)
             self.isSkeletonized = True
             self.showImage()
+
+            self.skelControl = SkeletonizationControl(self.master)
+            self.master.wait_window(self.skelControl.top)
         else:
             messagebox.showerror("Error", "Debes seleleccionar un polígono")
 
