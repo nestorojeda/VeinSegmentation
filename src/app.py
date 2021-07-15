@@ -72,6 +72,8 @@ class App(tk.Toplevel):
         self.measuring = tk.BooleanVar()
         self.measuring.set(False)
         self.selectReference = False
+        self.metrics = None
+        self.skelControl = None
 
         self.imageWithPoints = None  # Imagen con los puntos dibujados
         if file:
@@ -430,6 +432,8 @@ class App(tk.Toplevel):
         print('Clean')
         if self.skelControl:
             self.skelControl.top.destroy()
+        if self.metrics:
+            self.metrics.top.destroy()
         self.isEnhanced = False
         self.isSkeletonized = False
         self.isSubpixel = False
@@ -511,8 +515,8 @@ class App(tk.Toplevel):
     def selectionInfo(self):
         """ Lanzamiento de la ventana de información sobre la seleccion """
         if len(self.polygonPoints) > 1:
-            metrics = VeinMetricsModal(self.master)
-            self.master.wait_window(metrics.top)
+            self.metrics = VeinMetricsModal(self.master)
+            self.master.wait_window(self.metrics.top)
         else:
             messagebox.showerror("Error", "Debes seleleccionar un polígono")
 

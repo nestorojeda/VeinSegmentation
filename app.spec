@@ -4,7 +4,7 @@
 block_cipher = None
 
 
-a = Analysis(['app.py'],
+a = Analysis(['src\\app.py'],
              pathex=['D:\\TFG\\repo-tfg'],
              binaries=[],
              datas=[],
