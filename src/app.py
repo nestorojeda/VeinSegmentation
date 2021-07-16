@@ -459,7 +459,7 @@ class App(tk.Toplevel):
             if self.skelControl:
                 self.skelControl.top.destroy()
 
-            enhanced, self.blackPixels = Mask.applyEnhanceToROI(self.originalOpenCVImage.copy(), self.mask)
+            enhanced = self.processing.enhance()
             self.drawLines(enhanced)
             self.isEnhanced = True
             self.showImage()

@@ -72,6 +72,14 @@ class Processing:
     def getCleanedSkeleton(self):
         return cleanSkeleton(self.whiteSkeleton)
 
+    def enhance(self):
+        crop = self.getROICrop()
+        enhancedCrop = Enhance.enhanceMedicalImage(crop)  # Corte mejorado
+        enhancedCrop = cv2.cvtColor(enhancedCrop.astype(np.uint8), cv2.COLOR_GRAY2RGB)
+        self.enhanced = enhancedCrop
+
+        return self.mergeCropAndOriginal(enhancedCrop)
+
     def mergeCropAndOriginal(self, processedCrop):
         merged = self.image.copy()
         x, y, w, h = self.getCropCoordinates()
@@ -81,3 +89,12 @@ class Processing:
         fgbg = cv2.bitwise_or(fg, self.image, mask=invertedMask)
         result = cv2.bitwise_or(fgbg, fg)
         return result
+
+    def getMaskArea(self):
+        """ Obtención del numero de pixeles de la imagen"""
+        contours, hierarchy = cv2.findContours(self.mask, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)[-2:]
+        area = 0
+        for cnt in contours:
+            area += cv2.contourArea(cnt)
+
+        return area

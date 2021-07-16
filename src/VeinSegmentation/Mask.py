@@ -4,51 +4,7 @@ import cv2
 import numpy as np
 from subpixel_edges import subpixel_edges
 
-from src.VeinSegmentation import Enhance, Contour
-from src.VeinSegmentation.Skeletonization import skeletonization, cleanSkeleton
-
-
-def getMaskArea(mask):
-    """ Obtención del numero de pixeles de la imagen"""
-    mask = cv2.cvtColor(mask.astype(np.uint8), cv2.COLOR_RGB2GRAY)
-    contours, hierarchy = cv2.findContours(mask, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)[-2:]
-    area = 0
-    for cnt in contours:
-        area += cv2.contourArea(cnt)
-
-    return area
-
-
-def applyEnhanceToROI(image, mask):
-    """
-    Extracción de la región de interés a partir de una máscara
-    y aplicacion de la mejora para imagenes médicas
-    https://www.programmersought.com/article/75844449435/
-    """
-
-    print("Processing apply_enhance_to_roi...")
-    now = time()
-
-    image = cv2.cvtColor(image.astype(np.uint8), cv2.COLOR_RGB2GRAY)
-    mask = cv2.cvtColor(mask.astype(np.uint8), cv2.COLOR_RGB2GRAY)
-
-    contours, hierarchy = cv2.findContours(mask, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)[-2:]
-    idx = 0
-    for cnt in contours:
-        idx += 1
-        x, y, w, h = cv2.boundingRect(cnt)
-        crop = image[y:y + h, x:x + w]  # Corte que contiene el poligono maximo
-        enhancedCrop = Enhance.enhanceMedicalImage(crop)  # Corte mejorado
-        blackPixels = cv2.countNonZero(image)
-
-        merged = image.copy()
-        enhancedCrop = enhancedCrop.astype(np.uint8)
-        merged[y:y + h, x:x + w] = enhancedCrop  # original con el corte superpuesto
-        result = processResult(image, merged, mask)
-
-    elapsed = time() - now
-    print("Processing time: ", elapsed)
-    return cv2.cvtColor(result, cv2.COLOR_GRAY2RGB), blackPixels
+from src.VeinSegmentation import Enhance
 
 
 def applySubpixelToROI(image, mask,
