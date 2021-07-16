@@ -16,6 +16,7 @@ from src.Components.SkeletonizationControl import SkeletonizationControl
 from src.Components.VeinMetricsModal import VeinMetricsModal
 from src.Utils.Utils import openCVToPIL, PILtoOpenCV
 from src.VeinSegmentation import Mask
+from src.VeinSegmentation.Processing import Processing
 
 drawing = False
 ftypes = [('Imagen', '.png .jpeg .jpg')]
@@ -76,6 +77,9 @@ class App(tk.Toplevel):
         self.skelControl = None
 
         self.imageWithPoints = None  # Imagen con los puntos dibujados
+
+        self.processing = None
+
         if file:
             self.filename = file
             self.openCVImage = cv2.imread(self.filename, cv2.IMREAD_GRAYSCALE)
@@ -379,6 +383,8 @@ class App(tk.Toplevel):
             self.mask = cv2.fillPoly(np.zeros((self.height, self.width, 3)),
                                      [pts.astype(np.int32)], color=color.white)
 
+            self.processing = Processing(self.originalOpenCVImage, self.mask)
+
             self.image = openCVToPIL(imageWithPolygon)
             self.zeroBrightnessAndContrastImage = self.image.copy()
             self.showImage()
@@ -464,9 +470,7 @@ class App(tk.Toplevel):
         """ Esqueletonización de la imagen """
 
         if len(self.polygonPoints) > 1:
-            self.skeletonized, self.skeletonizedTransparent, self.skeletonizedContour, self.skeletonizedContourTransparent, self.cleanedSkeleton = Mask.applySkeletonizationToROI(
-                self.originalOpenCVImage.copy(),
-                self.mask)
+            self.skeletonized = self.processing.skeletonization()
             self.drawLines(self.skeletonized)
             self.isSkeletonized = True
             self.showImage()

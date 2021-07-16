@@ -25,16 +25,7 @@ class SkeletonizationControl:
         self.top.destroy()
 
     def checkBoxClicked(self):
-
-        if self.applyContour.get() and self.applyTrasparency.get():
-            self.parent.drawLines(self.parent.skeletonizedContourTransparent)
-        if not self.applyContour.get() and self.applyTrasparency.get():
-            self.parent.drawLines(self.parent.skeletonizedTransparent)
-        if self.applyContour.get() and not self.applyTrasparency.get():
-            self.parent.drawLines(self.parent.skeletonizedContour)
-        if not self.applyContour.get() and not self.applyTrasparency.get():
-            self.parent.drawLines(self.parent.skeletonized)
-
+        self.parent.drawLines(self.parent.processing.skeletonSettings(self.applyContour.get(), self.applyTrasparency.get()))
         self.parent.isSkeletonized = True
         self.parent.showImage()
 

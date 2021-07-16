@@ -62,7 +62,6 @@ def skeletonization(img, niter=100):
 
 
 def skeletonLenght(skeleton, pixelSize):
-    skeleton = cv2.cvtColor(skeleton, cv2.COLOR_RGB2GRAY)
     h = skeleton.shape[0]
     w = skeleton.shape[1]
     measure = 0

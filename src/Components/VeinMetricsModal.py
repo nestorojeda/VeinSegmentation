@@ -12,7 +12,6 @@ class VeinMetricsModal:
         title = "Métricas"
         self.top.title(title)
 
-        skeleton = self.parent.cleanedSkeleton
         area = Mask.getMaskArea(self.parent.mask)
         isSkeletonized = self.parent.isSkeletonized
         pixelSize = self.parent.pixelSize
@@ -21,7 +20,7 @@ class VeinMetricsModal:
         if pixelSize:
             tk.Label(self.top, text="Area de la selección: {} cm2".format(area / squarePixelSize)).pack()
         if isSkeletonized and pixelSize:
-            measure = skeletonLenght(skeleton, pixelSize)
+            measure = skeletonLenght(self.parent.processing.getCleanedSkeleton(), pixelSize)
             tk.Label(self.top, text="Longitud de la red venosa: {} cm".format(measure)).pack()
 
     def cancel(self, event=None):
