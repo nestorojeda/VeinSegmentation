@@ -8,22 +8,12 @@ from src.VeinSegmentation.Skeletonization import skeletonization, cleanSkeleton
 
 class Processing:
 
-    def __int__(self, image):
-        self.image = image
-
     def __init__(self, image, mask):
         self.image = image
         self.mask = cv2.cvtColor(mask.astype(np.uint8), cv2.COLOR_RGB2GRAY)
         self.crops = []
-
         self.enhanced = None
-
-        self.getROICrop()
-
-    def setMask(self, mask):
-        self.mask = cv2.cvtColor(mask.astype(np.uint8), cv2.COLOR_RGB2GRAY)
-        self.crops = []
-
+        self.transparentSkeleton = None
         self.getROICrop()
 
     def getROICrop(self):
@@ -46,9 +36,9 @@ class Processing:
         crop = self.getROICrop()
         if self.enhanced is None:
             crop = Enhance.enhanceMedicalImage(crop).astype(np.uint8)
-            self.enhanced = crop
+            self.enhanced = crop.copy()
         else:
-            crop = self.enhanced
+            crop = self.enhanced.copy()
 
         skelCrop, self.skeletonContours = skeletonization(crop)
         self.whiteSkeleton = cleanSkeleton(skelCrop)
@@ -66,10 +56,15 @@ class Processing:
         crop = self.getROICrop()
         result = self.skeleton.copy()
         if transparency:
-            for j in range(0, self.skeleton.shape[0]):
-                for i in range(0, self.skeleton.shape[1]):
-                    if np.array_equal(self.skeleton[j, i], np.array([0, 0, 0])):
-                        result[j, i] = crop[j, i]
+            if self.transparentSkeleton is None:
+                for j in range(0, self.skeleton.shape[0]):
+                    for i in range(0, self.skeleton.shape[1]):
+                        if np.array_equal(self.skeleton[j, i], np.array([0, 0, 0])):
+                            result[j, i] = crop[j, i]
+                self.transparentSkeleton = result.copy()
+            else:
+                result = self.transparentSkeleton.copy()
+
         if contour:
             openContours, closedContours = Contour.sortContours(self.skeletonContours)
             result = cv2.drawContours(result, closedContours, -1, (0, 255, 0), pixelWidth)
