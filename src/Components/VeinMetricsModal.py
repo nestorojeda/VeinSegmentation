@@ -15,16 +15,19 @@ class VeinMetricsModal:
         y = self.parent.winfo_y()
         self.top.geometry("+%d+%d" % (x + 300, y + 200))
 
-        area = self.parent.processing.getMaskArea(self.parent.mask)
+        area = self.parent.processing.getMaskArea()
         isSkeletonized = self.parent.isSkeletonized
         pixelSize = self.parent.pixelSize
-        squarePixelSize = (1 / pixelSize) ** 2
         print('Area in pixels is {} px'.format(area))
         if pixelSize:
+            squarePixelSize = (1 / pixelSize) ** 2
             tk.Label(self.top, text="Area de la selección: {} cm2".format(area / squarePixelSize)).pack()
         if isSkeletonized and pixelSize:
             measure = skeletonLenght(self.parent.processing.getCleanedSkeleton(), pixelSize)
             tk.Label(self.top, text="Longitud de la red venosa: {} cm".format(measure)).pack()
+        if not pixelSize and not isSkeletonized:
+            tk.Label(self.top, text="Debes seleccionar una referencia para poder obtener información").pack()
+
 
     def cancel(self, event=None):
         self.parent.focus_set()
