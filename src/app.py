@@ -61,13 +61,12 @@ class App(tk.Toplevel):
         self.thickness = 2  # Ancho de la línea
 
         self.isEnhanced = False  # Flag para saber si la imagen está mejorada
-        self.blackPixels = None
         self.isSkeletonized = False  # Flag para saber si la imagen está esqueletonizada
         self.isSubpixel = False
 
         self.imscale = 1.0  # Escala del canvas
         self.delta = 1.3  # Magnitud del zoom
-
+        self.lineWidth = 1
         self.drawing = True
         self.measuring = tk.BooleanVar()
         self.measuring.set(False)
@@ -287,6 +286,17 @@ class App(tk.Toplevel):
             self.imscale *= self.delta
             scale *= self.delta
         self.canvas.scale('all', x, y, scale, scale)  # Reescalamos el canvas
+        if self.isSkeletonized and self.skelControl:
+            if self.skelControl.applyContour.get():
+                if self.imscale < 1:
+                    newLineWidth = 3
+                else:
+                    newLineWidth = 1
+                if newLineWidth != self.lineWidth:
+                    self.lineWidth = newLineWidth
+                    self.drawLines(self.processing.skeletonSettings(self.skelControl.applyContour.get(),
+                                                                self.skelControl.applyTrasparency.get(),
+                                                                self.lineWidth))
         self.showImage()
 
     def clickSelectReference(self, event):
@@ -442,7 +452,6 @@ class App(tk.Toplevel):
         self.isEnhanced = False
         self.isSkeletonized = False
         self.isSubpixel = False
-        self.blackPixels = None
         self.openCVImage = cv2.imread(self.filename, cv2.IMREAD_GRAYSCALE)
         self.openCVImage = cv2.cvtColor(self.openCVImage, cv2.COLOR_GRAY2RGB)
         self.originalOpenCVImage = self.openCVImage.copy()
@@ -469,8 +478,8 @@ class App(tk.Toplevel):
         """ Esqueletonización de la imagen """
 
         if len(self.polygonPoints) > 1:
-            self.skeletonized = self.processing.skeletonization()
-            self.drawLines(self.skeletonized)
+            skeletonized = self.processing.skeletonization()
+            self.drawLines(skeletonized)
             self.isSkeletonized = True
             self.showImage()
 
