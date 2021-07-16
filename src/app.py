@@ -10,9 +10,9 @@ from PIL import ImageTk
 
 import constants.colors as color
 from src.Components.AutoScrollbar import AutoScrollbar
-from src.Components.BrightnessContrastDialog import BrightnessContrastDialog
-from src.Components.ReferencePointsDialog import ReferencePointsDialog
-from src.Components.SkeletonizationControl import SkeletonizationControl
+from src.Components.Modals.BrightnessContrastModal import BrightnessContrastDialog
+from src.Components.Modals.ReferencePointsModal import ReferencePointsDialog
+from src.Components.Modals.SkeletonizationControlModal import SkeletonizationControl
 from src.Components.VeinMetricsModal import VeinMetricsModal
 from src.Utils.Utils import openCVToPIL, PILtoOpenCV
 from src.VeinSegmentation.Processing import Processing
