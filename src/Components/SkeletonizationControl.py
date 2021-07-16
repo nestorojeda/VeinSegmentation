@@ -13,12 +13,12 @@ class SkeletonizationControl:
         self.applyTrasparency = BooleanVar(self.top)
         self.applyContour = BooleanVar(self.top)
 
-        checkboxContour = Checkbutton(self.top, text="Contornos",
-                                      variable=self.applyContour,
-                                      command=self.checkBoxClicked).pack()
-        checkboxTransparency = Checkbutton(self.top, text="Transparencia",
-                                           variable=self.applyTrasparency,
-                                           command=self.checkBoxClicked).pack()
+        Checkbutton(self.top, text="Contornos",
+                    variable=self.applyContour,
+                    command=self.checkBoxClicked).pack()
+        Checkbutton(self.top, text="Transparencia",
+                    variable=self.applyTrasparency,
+                    command=self.checkBoxClicked).pack()
 
     def cancel(self, event=None):
         self.parent.focus_set()
