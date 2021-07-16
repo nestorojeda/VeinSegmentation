@@ -15,7 +15,6 @@ from src.Components.ReferencePointsDialog import ReferencePointsDialog
 from src.Components.SkeletonizationControl import SkeletonizationControl
 from src.Components.VeinMetricsModal import VeinMetricsModal
 from src.Utils.Utils import openCVToPIL, PILtoOpenCV
-from src.VeinSegmentation import Mask
 from src.VeinSegmentation.Processing import Processing
 
 drawing = False

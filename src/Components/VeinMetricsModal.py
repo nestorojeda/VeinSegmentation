@@ -1,6 +1,5 @@
 import tkinter as tk
 
-from src.VeinSegmentation import Mask
 from src.VeinSegmentation.Skeletonization import skeletonLenght
 
 
@@ -12,7 +11,7 @@ class VeinMetricsModal:
         title = "Métricas"
         self.top.title(title)
 
-        area = Mask.getMaskArea(self.parent.mask)
+        area = self.parent.processing.getMaskArea(self.parent.mask)
         isSkeletonized = self.parent.isSkeletonized
         pixelSize = self.parent.pixelSize
         squarePixelSize = (1 / pixelSize) ** 2

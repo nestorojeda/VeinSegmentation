@@ -1,8 +1,10 @@
 import tkinter as tk
+
 import cv2
 
 from src.Utils.Utils import openCVToPIL, PILtoOpenCV
-from src.VeinSegmentation import Mask, Enhance
+from src.VeinSegmentation import Enhance
+from src.VeinSegmentation.Processing import Processing
 
 
 class BrightnessContrastDialog:
@@ -58,7 +60,8 @@ class BrightnessContrastDialog:
         self.parent.contrastValue = contrast
 
         if len(self.parent.polygonPoints) > 1:
-            result = Mask.applyBrightnessAndContrastToROI(img, self.parent.mask, brightness, contrast)
+            processing = Processing(img, self.parent.mask)
+            result = processing.brightnessAndContrast(brightness, contrast)
         else:
             result = Enhance.processBrightnessAndContrast(img, brightness, contrast)
 

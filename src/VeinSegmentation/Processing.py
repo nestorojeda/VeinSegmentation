@@ -104,6 +104,11 @@ class Processing:
             cv2.circle(edgedCrop, tuple(point), 1, (0, 0, 255))
         return self.mergeCropAndOriginal(edgedCrop)
 
+    def brightnessAndContrast(self, brightness, contrast):
+        crop = self.getROICrop()
+        modifiedCrop = Enhance.processBrightnessAndContrast(crop, brightness, contrast)
+        return self.mergeCropAndOriginal(modifiedCrop)
+
     def mergeCropAndOriginal(self, processedCrop):
         merged = self.image.copy()
         x, y, w, h = self.getCropCoordinates()
