@@ -10,6 +10,10 @@ class SkeletonizationControl:
         self.top.title(title)
         self.top.protocol("WM_DELETE_WINDOW", self.disableExit)
 
+        x = self.parent.winfo_x()
+        y = self.parent.winfo_y()
+        self.top.geometry("+%d+%d" % (x + 300, y + 200))
+
         self.applyTrasparency = BooleanVar(self.top)
         self.applyContour = BooleanVar(self.top)
 

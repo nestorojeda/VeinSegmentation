@@ -11,6 +11,10 @@ class VeinMetricsModal:
         title = "Métricas"
         self.top.title(title)
 
+        x = self.parent.winfo_x()
+        y = self.parent.winfo_y()
+        self.top.geometry("+%d+%d" % (x + 300, y + 200))
+
         area = self.parent.processing.getMaskArea(self.parent.mask)
         isSkeletonized = self.parent.isSkeletonized
         pixelSize = self.parent.pixelSize

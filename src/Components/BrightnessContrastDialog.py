@@ -17,6 +17,10 @@ class BrightnessContrastDialog:
         title = "Contraste y brillo"
         self.top.title(title)
 
+        x = self.parent.winfo_x()
+        y = self.parent.winfo_y()
+        self.top.geometry("+%d+%d" % (x + 300, y + 200))
+
         brightnessLabelText = "Seleccione un valor para el brillo"
         tk.Label(self.top, text=brightnessLabelText).pack()
         self.brightnessSlider = tk.Scale(self.top, length=200, from_=-255, to=255, orient=tk.HORIZONTAL)

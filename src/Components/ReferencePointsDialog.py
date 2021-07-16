@@ -12,6 +12,10 @@ class ReferencePointsDialog:
         title = "Referencia de la medida"
         self.top.title(title)
 
+        x = self.parent.winfo_x()
+        y = self.parent.winfo_y()
+        self.top.geometry("+%d+%d" % (x + 300, y + 200))
+
         vcmd = (self.top.register(self.validate),
                 '%d', '%i', '%P', '%s', '%S', '%v', '%V', '%W')
 
