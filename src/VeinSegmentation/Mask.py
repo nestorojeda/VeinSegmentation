@@ -7,45 +7,6 @@ from subpixel_edges import subpixel_edges
 from src.VeinSegmentation import Enhance
 
 
-def applySubpixelToROI(image, mask,
-                       iters=2,
-                       threshold=1.5,
-                       order=2
-                       ):
-    """
-    Extracción de la región de interés a partir de una máscara
-    y aplicacion del algoritmo de subpixel
-    https://www.programmersought.com/article/75844449435/
-    """
-
-    print("Processing apply_subpixel_to_roi...")
-    now = time()
-
-    mask = cv2.cvtColor(mask.astype(np.uint8), cv2.COLOR_RGB2GRAY)
-
-    contours, hierarchy = cv2.findContours(mask, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)[-2:]
-    idx = 0
-    for cnt in contours:
-        idx += 1
-        x, y, w, h = cv2.boundingRect(cnt)
-        crop = image[y:y + h, x:x + w]
-        crop = Enhance.enhanceMedicalImage(crop)
-        edges = subpixel_edges(crop.astype(float), threshold, iters, order)
-
-        edgedCrop = cv2.cvtColor(crop.astype(np.uint8), cv2.COLOR_GRAY2BGR)
-
-        for point in np.array((edges.x, edges.y)).T.astype(np.uint):
-            cv2.circle(edgedCrop, tuple(point), 1, (0, 0, 255))
-
-        merged = image.copy()
-        merged[y:y + h, x:x + w] = edgedCrop
-        result = processResult(image, merged, mask)
-
-    elapsed = time() - now
-    print("Processing time: ", elapsed)
-    return result.astype(np.uint8)
-
-
 def applyBrightnessAndContrastToROI(image, mask, brightness, contrast):
     """
     Extracción de la región de interés a partir de una máscara

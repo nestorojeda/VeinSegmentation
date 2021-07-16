@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+from subpixel_edges import subpixel_edges
 
 from src.VeinSegmentation import Enhance, Contour
 from src.VeinSegmentation.Skeletonization import skeletonization, cleanSkeleton
@@ -14,6 +15,8 @@ class Processing:
         self.image = image
         self.mask = cv2.cvtColor(mask.astype(np.uint8), cv2.COLOR_RGB2GRAY)
         self.crops = []
+
+        self.enhanced = None
 
         self.getROICrop()
 
@@ -41,9 +44,13 @@ class Processing:
 
     def skeletonization(self):
         crop = self.getROICrop()
-        enhancedCrop = Enhance.enhanceMedicalImage(crop).astype(np.uint8)
+        if self.enhanced is None:
+            crop = Enhance.enhanceMedicalImage(crop).astype(np.uint8)
+            self.enhanced = crop
+        else:
+            crop = self.enhanced
 
-        skelCrop, self.skeletonContours = skeletonization(enhancedCrop)
+        skelCrop, self.skeletonContours = skeletonization(crop)
         self.whiteSkeleton = cleanSkeleton(skelCrop)
         skelCrop = cv2.cvtColor(skelCrop.astype(np.uint8), cv2.COLOR_GRAY2RGB)
 
@@ -75,10 +82,27 @@ class Processing:
     def enhance(self):
         crop = self.getROICrop()
         enhancedCrop = Enhance.enhanceMedicalImage(crop)  # Corte mejorado
-        enhancedCrop = cv2.cvtColor(enhancedCrop.astype(np.uint8), cv2.COLOR_GRAY2RGB)
-        self.enhanced = enhancedCrop
+        self.enhanced = enhancedCrop.astype(np.uint8)
+        enhancedCrop = cv2.cvtColor(enhancedCrop.astype(np.uint8).copy(), cv2.COLOR_GRAY2RGB)
 
         return self.mergeCropAndOriginal(enhancedCrop)
+
+    def subpixel(self, iters=2, threshold=1.5, order=2):
+        crop = self.getROICrop()
+
+        if self.enhanced is None:
+            crop = Enhance.enhanceMedicalImage(crop).astype(np.uint8)
+            self.enhanced = crop
+        else:
+            crop = self.enhanced
+
+        edges = subpixel_edges(crop.astype(float), threshold, iters, order)
+
+        edgedCrop = cv2.cvtColor(crop.astype(np.uint8), cv2.COLOR_GRAY2BGR)
+
+        for point in np.array((edges.x, edges.y)).T.astype(np.uint):
+            cv2.circle(edgedCrop, tuple(point), 1, (0, 0, 255))
+        return self.mergeCropAndOriginal(edgedCrop)
 
     def mergeCropAndOriginal(self, processedCrop):
         merged = self.image.copy()

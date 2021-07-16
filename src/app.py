@@ -488,8 +488,7 @@ class App(tk.Toplevel):
                 self.skelControl.top.destroy()
 
             try:
-                subpixelImage = Mask.applySubpixelToROI((self.originalOpenCVImage.astype(float)).copy(),
-                                                        self.mask)
+                subpixelImage = self.processing.subpixel()
             except UnboundLocalError:
                 messagebox.showerror("Error", "Ha ocurrido un error mientras se realizaba el procesamiento")
                 self.clean()
