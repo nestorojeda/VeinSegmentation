@@ -99,7 +99,6 @@ class Processing:
             crop = self.enhanced
             crop = cv2.cvtColor(crop, cv2.COLOR_RGB2GRAY)
 
-
         edges = subpixel_edges(crop.astype(float), threshold, iters, order)
 
         edgedCrop = cv2.cvtColor(crop.astype(np.uint8), cv2.COLOR_GRAY2BGR)
