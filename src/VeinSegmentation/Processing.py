@@ -13,6 +13,8 @@ class Processing:
         self.mask = cv2.cvtColor(mask.astype(np.uint8), cv2.COLOR_RGB2GRAY)
         self.crops = []
         self.enhanced = None
+        self.skeleton = None
+        self.subpixel = None
         self.transparentSkeleton = None
 
     def getROICrop(self):
@@ -32,12 +34,15 @@ class Processing:
             return x, y, w, h
 
     def skeletonization(self):
+        if self.skeleton is not None:
+            return self.mergeCropAndOriginal(self.skeleton.copy())
         crop = self.getROICrop()
+
         if self.enhanced is None:
             crop = Enhance.enhanceMedicalImage(crop).astype(np.uint8)
             self.enhanced = crop.copy()
         else:
-            crop = self.enhanced.copy()
+            crop = cv2.cvtColor(self.enhanced.copy().astype(np.uint8), cv2.COLOR_RGB2GRAY)
 
         skelCrop, self.skeletonContours = skeletonization(crop)
         self.whiteSkeleton = cleanSkeleton(skelCrop)
@@ -74,16 +79,19 @@ class Processing:
         return cleanSkeleton(self.whiteSkeleton)
 
     def enhance(self):
+        if self.enhanced is not None:
+            return self.mergeCropAndOriginal(self.enhanced.copy())
         crop = self.getROICrop()
         enhancedCrop = Enhance.enhanceMedicalImage(crop)  # Corte mejorado
-        self.enhanced = enhancedCrop.astype(np.uint8)
         enhancedCrop = cv2.cvtColor(enhancedCrop.astype(np.uint8).copy(), cv2.COLOR_GRAY2RGB)
+        self.enhanced = enhancedCrop.astype(np.uint8)
 
         return self.mergeCropAndOriginal(enhancedCrop)
 
     def subpixel(self, iters=2, threshold=1.5, order=2):
+        if self.subpixel is not None:
+            return self.mergeCropAndOriginal(self.subpixel.copy())
         crop = self.getROICrop()
-
         if self.enhanced is None:
             crop = Enhance.enhanceMedicalImage(crop).astype(np.uint8)
             self.enhanced = crop
