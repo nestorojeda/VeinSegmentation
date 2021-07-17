@@ -471,6 +471,8 @@ class App(tk.Toplevel):
             self.drawLines(enhanced)
             self.isEnhanced = True
             self.showImage()
+            self.brightnessValue = 0
+            self.contrastValue = 0
         else:
             messagebox.showerror("Error", "Debes seleleccionar un polígono")
 
@@ -482,7 +484,8 @@ class App(tk.Toplevel):
             self.drawLines(skeletonized)
             self.isSkeletonized = True
             self.showImage()
-
+            self.brightnessValue = 0
+            self.contrastValue = 0
             self.skelControl = SkeletonizationControl(self.master)
             self.master.wait_window(self.skelControl.top)
         else:
@@ -505,6 +508,8 @@ class App(tk.Toplevel):
             self.drawLines(subpixelImage)
             self.isSubpixel = True
             self.showImage()
+            self.brightnessValue = 0
+            self.contrastValue = 0
         else:
             messagebox.showerror("Error", "Debes seleleccionar un polígono")
 

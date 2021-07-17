@@ -76,7 +76,7 @@ class Processing:
         return self.mergeCropAndOriginal(result)
 
     def getCleanedSkeleton(self):
-        return cleanSkeleton(self.whiteSkeleton)
+        return self.whiteSkeleton
 
     def enhance(self):
         if self.enhanced is not None:
