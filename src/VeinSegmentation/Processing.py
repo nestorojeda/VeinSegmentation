@@ -14,7 +14,7 @@ class Processing:
         self.crops = []
         self.enhanced = None
         self.skeleton = None
-        self.subpixel = None
+        self.subpixelImage = None
         self.transparentSkeleton = None
 
     def getROICrop(self):
@@ -89,18 +89,21 @@ class Processing:
         return self.mergeCropAndOriginal(enhancedCrop)
 
     def subpixel(self, iters=2, threshold=1.5, order=2):
-        if self.subpixel is not None:
-            return self.mergeCropAndOriginal(self.subpixel.copy())
+        if self.subpixelImage is not None:
+            return self.mergeCropAndOriginal(self.subpixelImage.copy())
         crop = self.getROICrop()
         if self.enhanced is None:
             crop = Enhance.enhanceMedicalImage(crop).astype(np.uint8)
-            self.enhanced = crop
+            self.enhanced = cv2.cvtColor(crop.copy(), cv2.COLOR_GRAY2RGB)
         else:
             crop = self.enhanced
+            crop = cv2.cvtColor(crop, cv2.COLOR_RGB2GRAY)
+
 
         edges = subpixel_edges(crop.astype(float), threshold, iters, order)
 
         edgedCrop = cv2.cvtColor(crop.astype(np.uint8), cv2.COLOR_GRAY2BGR)
+        self.subpixelImage = edgedCrop
 
         for point in np.array((edges.x, edges.y)).T.astype(np.uint):
             cv2.circle(edgedCrop, tuple(point), 1, (0, 0, 255))
