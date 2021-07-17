@@ -14,7 +14,6 @@ class Processing:
         self.crops = []
         self.enhanced = None
         self.transparentSkeleton = None
-        self.getROICrop()
 
     def getROICrop(self):
         contours, hierarchy = cv2.findContours(self.mask, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)[-2:]
