@@ -42,7 +42,7 @@ class Processing:
             crop = Enhance.enhanceMedicalImage(crop).astype(np.uint8)
             self.enhanced = crop.copy()
         else:
-            crop = cv2.cvtColor(self.enhanced.copy().astype(np.uint8), cv2.COLOR_RGB2GRAY)
+            crop = self.enhanced.copy()
 
         skelCrop, self.skeletonContours = skeletonization(crop)
         self.whiteSkeleton = cleanSkeleton(skelCrop)
@@ -80,7 +80,7 @@ class Processing:
 
     def enhance(self):
         if self.enhanced is not None:
-            return self.mergeCropAndOriginal(self.enhanced.copy())
+            return self.mergeCropAndOriginal(self.enhanced)
         crop = self.getROICrop()
         enhancedCrop = Enhance.enhanceMedicalImage(crop)  # Corte mejorado
         enhancedCrop = cv2.cvtColor(enhancedCrop.astype(np.uint8).copy(), cv2.COLOR_GRAY2RGB)
@@ -94,13 +94,14 @@ class Processing:
         crop = self.getROICrop()
         if self.enhanced is None:
             crop = Enhance.enhanceMedicalImage(crop).astype(np.uint8)
-            self.enhanced = cv2.cvtColor(crop.copy(), cv2.COLOR_GRAY2RGB)
+            self.enhanced = crop.copy()
         else:
-            crop = self.enhanced
+            crop = self.enhanced.copy()
+
+        if len(crop.shape) != 2:
             crop = cv2.cvtColor(crop, cv2.COLOR_RGB2GRAY)
 
         edges = subpixel_edges(crop.astype(float), threshold, iters, order)
-
         edgedCrop = cv2.cvtColor(crop.astype(np.uint8), cv2.COLOR_GRAY2BGR)
         self.subpixelImage = edgedCrop
 
@@ -114,6 +115,8 @@ class Processing:
         return self.mergeCropAndOriginal(modifiedCrop)
 
     def mergeCropAndOriginal(self, processedCrop):
+        if len(processedCrop.shape) != 3:
+            processedCrop = cv2.cvtColor(processedCrop, cv2.COLOR_GRAY2RGB)
         merged = self.image.copy()
         x, y, w, h = self.getCropCoordinates()
         merged[y:y + h, x:x + w] = processedCrop
