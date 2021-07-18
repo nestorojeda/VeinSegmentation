@@ -27,18 +27,13 @@ class BrightnessContrastDialog:
         self.brightnessSlider.set(self.parent.brightnessValue)
         self.brightnessSlider.configure(command=self.brightAndContrastController)
         self.brightnessSlider.pack()
-        print('Initial brightness value {}'.format(self.parent.brightnessValue))
-
         contrastLabelText = "Seleccione un valor para el contraste"
         tk.Label(self.top, text=contrastLabelText).pack()
         self.contrastSlider = tk.Scale(self.top, length=200, from_=-127, to=127, orient=tk.HORIZONTAL)
         self.contrastSlider.set(self.parent.contrastValue)
         self.contrastSlider.configure(command=self.brightAndContrastController)
         self.contrastSlider.pack()
-        print('Initial contrast value {}'.format(self.parent.contrastValue))
-
         self.brightAndContrastController()
-
         self.button = tk.Button(self.top, text="Reiniciar", command=self.reset)
         self.button.pack()
 
@@ -46,20 +41,14 @@ class BrightnessContrastDialog:
         print('BrightnessContrastDialog::reset')
         self.contrastSlider.set(0)
         self.brightnessSlider.set(0)
-
         self.parent.brightnessValue = 0
         self.parent.contrastValue = 0
-
         self.brightAndContrastController()
 
     def brightAndContrastController(self, event=None, reset=False):
         brightness = self.brightnessSlider.get()
         contrast = self.contrastSlider.get()
-
-        print('Controler values b={} c={}'.format(brightness, contrast))
-
         img = PILtoOpenCV(self.pil_image.copy())
-
         self.parent.brightnessValue = brightness
         self.parent.contrastValue = contrast
 

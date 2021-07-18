@@ -13,8 +13,9 @@ class Processing:
         self.mask = cv2.cvtColor(mask.astype(np.uint8), cv2.COLOR_RGB2GRAY)
         self.crops = []
         self.enhanced = None
+        self.skeleton = None
+        self.subpixelImage = None
         self.transparentSkeleton = None
-        self.getROICrop()
 
     def getROICrop(self):
         contours, hierarchy = cv2.findContours(self.mask, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)[-2:]
@@ -33,7 +34,10 @@ class Processing:
             return x, y, w, h
 
     def skeletonization(self):
+        if self.skeleton is not None:
+            return self.mergeCropAndOriginal(self.skeleton.copy())
         crop = self.getROICrop()
+
         if self.enhanced is None:
             crop = Enhance.enhanceMedicalImage(crop).astype(np.uint8)
             self.enhanced = crop.copy()
@@ -72,28 +76,33 @@ class Processing:
         return self.mergeCropAndOriginal(result)
 
     def getCleanedSkeleton(self):
-        return cleanSkeleton(self.whiteSkeleton)
+        return self.whiteSkeleton
 
     def enhance(self):
+        if self.enhanced is not None:
+            return self.mergeCropAndOriginal(self.enhanced)
         crop = self.getROICrop()
-        enhancedCrop = Enhance.enhanceMedicalImage(crop)  # Corte mejorado
-        self.enhanced = enhancedCrop.astype(np.uint8)
-        enhancedCrop = cv2.cvtColor(enhancedCrop.astype(np.uint8).copy(), cv2.COLOR_GRAY2RGB)
+        enhancedCrop = Enhance.enhanceMedicalImage(crop).astype(np.uint8)  # Corte mejorado
+        self.enhanced = enhancedCrop.copy()
 
         return self.mergeCropAndOriginal(enhancedCrop)
 
     def subpixel(self, iters=2, threshold=1.5, order=2):
+        if self.subpixelImage is not None:
+            return self.mergeCropAndOriginal(self.subpixelImage.copy())
         crop = self.getROICrop()
-
         if self.enhanced is None:
             crop = Enhance.enhanceMedicalImage(crop).astype(np.uint8)
-            self.enhanced = crop
+            self.enhanced = crop.copy()
         else:
-            crop = self.enhanced
+            crop = self.enhanced.copy()
+
+        if len(crop.shape) != 2:
+            crop = cv2.cvtColor(crop, cv2.COLOR_RGB2GRAY)
 
         edges = subpixel_edges(crop.astype(float), threshold, iters, order)
-
         edgedCrop = cv2.cvtColor(crop.astype(np.uint8), cv2.COLOR_GRAY2BGR)
+        self.subpixelImage = edgedCrop
 
         for point in np.array((edges.x, edges.y)).T.astype(np.uint):
             cv2.circle(edgedCrop, tuple(point), 1, (0, 0, 255))
@@ -105,6 +114,8 @@ class Processing:
         return self.mergeCropAndOriginal(modifiedCrop)
 
     def mergeCropAndOriginal(self, processedCrop):
+        if len(processedCrop.shape) != 3:
+            processedCrop = cv2.cvtColor(processedCrop, cv2.COLOR_GRAY2RGB)
         merged = self.image.copy()
         x, y, w, h = self.getCropCoordinates()
         merged[y:y + h, x:x + w] = processedCrop
