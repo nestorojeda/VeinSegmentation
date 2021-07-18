@@ -207,10 +207,13 @@ class App(tk.Toplevel):
         """ Manejo del evento del click derecho """
         if self.drawing:
             self.clickDrawPolygon(event)
+            return
         if self.selectReference:
             self.clickSelectReference(event)
+            return
         if self.measuring.get():
             self.clickSelectMeasure(event)
+            return
 
     def moveFrom(self, event):
         """ Guardamos la coordenada desde la que se ha lanzado el evento """
