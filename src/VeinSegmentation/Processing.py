@@ -82,9 +82,8 @@ class Processing:
         if self.enhanced is not None:
             return self.mergeCropAndOriginal(self.enhanced)
         crop = self.getROICrop()
-        enhancedCrop = Enhance.enhanceMedicalImage(crop)  # Corte mejorado
-        enhancedCrop = cv2.cvtColor(enhancedCrop.astype(np.uint8).copy(), cv2.COLOR_GRAY2RGB)
-        self.enhanced = enhancedCrop.astype(np.uint8)
+        enhancedCrop = Enhance.enhanceMedicalImage(crop).astype(np.uint8)  # Corte mejorado
+        self.enhanced = enhancedCrop.copy()
 
         return self.mergeCropAndOriginal(enhancedCrop)
 
