@@ -411,16 +411,19 @@ class App(tk.Toplevel):
                 self.drawing = False
                 self.measuring.set(False)
                 self.selectReference = True
+                self.preMeasureImage = self.image.copy()
 
         else:
             self.drawing = False
             self.measuring.set(False)
             self.selectReference = True
+            self.preMeasureImage = self.image.copy()
 
     def toggleMeasureMode(self):
         """ Cambio de modo a medida """
 
         if self.drawing or self.selectReference:
+            if self.drawing: self.preMeasureImage = self.image.copy()
             if self.pixelSize:
                 print('Mode changed to measure mode')
                 self.drawing = False
@@ -439,7 +442,10 @@ class App(tk.Toplevel):
         self.drawing = True
         self.measuring.set(False)
         self.selectReference = False
-        self.clean()
+        if self.preMeasureImage:
+            self.image = self.preMeasureImage.copy()
+            self.openCVImage = PILtoOpenCV(self.preMeasureImage.copy())
+            self.showImage()
 
     def clean(self, event=None):
         """ Limpieza del canvas y los procesamientos """
