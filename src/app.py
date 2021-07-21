@@ -288,8 +288,10 @@ class App(tk.Toplevel):
         self.canvas.scale('all', x, y, scale, scale)  # Reescalamos el canvas
         if self.isSkeletonized and self.skelControl:
             if self.skelControl.applyContour.get():
-                if self.imscale < 1:
+                if self.imscale < 0.5:
                     newLineWidth = 3
+                elif 0.5 > self.imscale > 1:
+                    newLineWidth = 2
                 else:
                     newLineWidth = 1
                 if newLineWidth != self.lineWidth:
