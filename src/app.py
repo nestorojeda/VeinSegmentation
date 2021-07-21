@@ -294,7 +294,8 @@ class App(tk.Toplevel):
                     newLineWidth = 1
                 if newLineWidth != self.lineWidth:
                     self.lineWidth = newLineWidth
-                    self.drawLines(self.processing.skeletonSettings(self.skelControl.applyContour.get(),
+                    self.drawLines(self.processing.skeletonSettings(self.skelControl.applyCenterline.get(),
+                                                                    self.skelControl.applyContour.get(),
                                                                     self.skelControl.applyTrasparency.get(),
                                                                     self.lineWidth))
         self.showImage()

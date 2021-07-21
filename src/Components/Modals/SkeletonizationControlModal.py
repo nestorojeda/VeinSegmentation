@@ -16,8 +16,13 @@ class SkeletonizationControl:
 
         self.applyTrasparency = BooleanVar(self.top)
         self.applyContour = BooleanVar(self.top)
+        self.applyCenterline = BooleanVar(self.top)
         self.applyContour.set(True)
+        self.applyCenterline.set(True)
 
+        Checkbutton(self.top, text="Esqueleto",
+                    variable=self.applyCenterline,
+                    command=self.checkBoxClicked).pack()
         Checkbutton(self.top, text="Contornos",
                     variable=self.applyContour,
                     command=self.checkBoxClicked).pack()
@@ -30,7 +35,7 @@ class SkeletonizationControl:
         self.top.destroy()
 
     def checkBoxClicked(self):
-        self.parent.drawLines(self.parent.processing.skeletonSettings(self.applyContour.get(), self.applyTrasparency.get()))
+        self.parent.drawLines(self.parent.processing.skeletonSettings(self.applyCenterline.get(), self.applyContour.get(), self.applyTrasparency.get()))
         self.parent.isSkeletonized = True
         self.parent.showImage()
 

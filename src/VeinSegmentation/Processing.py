@@ -57,15 +57,22 @@ class Processing:
 
         return self.mergeCropAndOriginal(result)
 
-    def skeletonSettings(self, contour, transparency, pixelWidth=1):
+    def skeletonSettings(self, centerLine, contour, transparency, pixelWidth=1):
         crop = self.getROICrop()
-        result = self.skeleton.copy()
+        if centerLine:
+            result = self.skeleton.copy()
+        else:
+            result = np.zeros(crop.shape)
+
         if transparency:
-            if self.transparentSkeleton is None:
-                result[np.where((self.skeleton[:, :, 2] != 255))] = crop[np.where((self.skeleton[:, :, 2] != 255))]
-                self.transparentSkeleton = result.copy()
+            if centerLine:
+                if self.transparentSkeleton is None:
+                    result[np.where((self.skeleton[:, :, 2] != 255))] = crop[np.where((self.skeleton[:, :, 2] != 255))]
+                    self.transparentSkeleton = result.copy()
+                else:
+                    result = self.transparentSkeleton.copy()
             else:
-                result = self.transparentSkeleton.copy()
+                result = crop.copy()
 
         if contour:
             openContours, closedContours = Contour.sortContours(self.skeletonContours)
