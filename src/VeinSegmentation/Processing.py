@@ -51,7 +51,11 @@ class Processing:
         skelCrop[np.where((skelCrop[:, :, 2] == 255))] = (0, 0, 255)
 
         self.skeleton = skelCrop
-        return self.mergeCropAndOriginal(skelCrop)
+
+        openContours, closedContours = Contour.sortContours(self.skeletonContours)
+        result = cv2.drawContours(skelCrop.copy(), closedContours, -1, (0, 255, 0), 1)
+
+        return self.mergeCropAndOriginal(result)
 
     def skeletonSettings(self, contour, transparency, pixelWidth=1):
         crop = self.getROICrop()

@@ -16,6 +16,7 @@ class SkeletonizationControl:
 
         self.applyTrasparency = BooleanVar(self.top)
         self.applyContour = BooleanVar(self.top)
+        self.applyContour.set(True)
 
         Checkbutton(self.top, text="Contornos",
                     variable=self.applyContour,
