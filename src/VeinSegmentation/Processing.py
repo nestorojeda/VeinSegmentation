@@ -61,10 +61,7 @@ class Processing:
         result = self.skeleton.copy()
         if transparency:
             if self.transparentSkeleton is None:
-                for j in range(0, self.skeleton.shape[0]):
-                    for i in range(0, self.skeleton.shape[1]):
-                        if np.array_equal(self.skeleton[j, i], np.array([0, 0, 0])):
-                            result[j, i] = crop[j, i]
+                result[np.where((self.skeleton[:, :, 2] != 255))] = self.enhanced[np.where((self.skeleton[:, :, 2] != 255))]
                 self.transparentSkeleton = result.copy()
             else:
                 result = self.transparentSkeleton.copy()

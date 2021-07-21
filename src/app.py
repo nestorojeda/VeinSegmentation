@@ -49,8 +49,8 @@ class App(tk.Toplevel):
         self.brightnessValue = 0
         self.contrastValue = 0
 
-        self.pixelSize = None
-        self.rpd = None
+        self.pixelSize = None  # referencia de la medida
+        self.referencePointsDialog = None  # dialogo de los puntos de referencia
 
         # ARRAYS DE PUNTOS
         self.polygonPoints = np.array([])  # Puntos que forman el poligono
@@ -62,21 +62,21 @@ class App(tk.Toplevel):
 
         self.isEnhanced = False  # Flag para saber si la imagen está mejorada
         self.isSkeletonized = False  # Flag para saber si la imagen está esqueletonizada
-        self.isSubpixel = False
+        self.isSubpixel = False  # Flag para saber si a la imagen se le ha aplicado el algoritmo de subpixel
 
         self.imscale = 1.0  # Escala del canvas
         self.delta = 1.3  # Magnitud del zoom
-        self.lineWidth = 1
-        self.drawing = True
-        self.measuring = tk.BooleanVar()
+        self.lineWidth = 1  # Ancho de la linea de los contornos
+        self.drawing = True  # Flag que indica si se esta seleccionando poligono
+        self.measuring = tk.BooleanVar()  # Flag que indica si se esta midiendo
         self.measuring.set(False)
-        self.selectReference = False
+        self.selectReference = False  # Flag que indica si se está seleccionando la medida
         self.metrics = None
         self.skelControl = None
 
         self.imageWithPoints = None  # Imagen con los puntos dibujados
 
-        self.processing = None
+        self.processing = None  # Instancia de la clase Processig
 
         if file:
             self.filename = file
@@ -295,15 +295,15 @@ class App(tk.Toplevel):
                 if newLineWidth != self.lineWidth:
                     self.lineWidth = newLineWidth
                     self.drawLines(self.processing.skeletonSettings(self.skelControl.applyContour.get(),
-                                                                self.skelControl.applyTrasparency.get(),
-                                                                self.lineWidth))
+                                                                    self.skelControl.applyTrasparency.get(),
+                                                                    self.lineWidth))
         self.showImage()
 
     def clickSelectReference(self, event):
         """ Manejo del evento de selección de la referencia """
 
-        if self.rpd:
-            self.rpd.cancel()
+        if self.referencePointsDialog:
+            self.referencePointsDialog.cancel()
         if (event.x + self.x1) / self.imscale >= 0 and (event.y + self.y1) / self.imscale >= 0:
             clickX = int((event.x + self.x1) / self.imscale)
             clickY = int((event.y + self.y1) / self.imscale)
@@ -328,8 +328,8 @@ class App(tk.Toplevel):
 
                 self.image = openCVToPIL(image_with_line)
                 self.showImage()
-                self.rpd = ReferencePointsDialog(self.master)
-                self.master.wait_window(self.rpd.top)
+                self.referencePointsDialog = ReferencePointsDialog(self.master)
+                self.master.wait_window(self.referencePointsDialog.top)
                 self.referencePoints = []
                 if self.pixelSize:
                     self.toggleMeasureMode()
