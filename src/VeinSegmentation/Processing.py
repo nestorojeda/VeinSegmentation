@@ -48,10 +48,7 @@ class Processing:
         self.whiteSkeleton = cleanSkeleton(skelCrop)
         skelCrop = cv2.cvtColor(skelCrop.astype(np.uint8), cv2.COLOR_GRAY2RGB)
 
-        for j in range(0, skelCrop.shape[0]):
-            for i in range(0, skelCrop.shape[1]):
-                if np.array_equal(skelCrop[j, i], np.array([255, 255, 255])):
-                    skelCrop[j, i] = (0, 0, 255)
+        skelCrop[np.where((skelCrop[:, :, 2] == 255))] = (0, 0, 255)
 
         self.skeleton = skelCrop
         return self.mergeCropAndOriginal(skelCrop)
