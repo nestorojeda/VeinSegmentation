@@ -61,7 +61,7 @@ class Processing:
         result = self.skeleton.copy()
         if transparency:
             if self.transparentSkeleton is None:
-                result[np.where((self.skeleton[:, :, 2] != 255))] = self.enhanced[np.where((self.skeleton[:, :, 2] != 255))]
+                result[np.where((self.skeleton[:, :, 2] != 255))] = crop[np.where((self.skeleton[:, :, 2] != 255))]
                 self.transparentSkeleton = result.copy()
             else:
                 result = self.transparentSkeleton.copy()
