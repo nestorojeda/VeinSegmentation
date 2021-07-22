@@ -610,8 +610,11 @@ class App(tk.Toplevel):
     def selectionInfo(self):
         """ Lanzamiento de la ventana de información sobre la seleccion """
         if len(self.polygonPoints) > 1:
-            self.metrics = VeinMetricsModal(self.master)
-            self.master.wait_window(self.metrics.top)
+            if self.pixelSize:
+                self.metrics = VeinMetricsModal(self.master)
+                self.master.wait_window(self.metrics.top)
+            else:
+                messagebox.showerror("Error", "Debes seleccionar una medida de referencia")
         else:
             messagebox.showerror("Error", "Debes seleleccionar un polígono")
 

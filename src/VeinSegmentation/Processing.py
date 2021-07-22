@@ -70,11 +70,8 @@ class Processing:
 
         if transparency:
             if centerLine:
-                if self.transparentSkeleton is None:
-                    result[np.where((self.skeleton[:, :, 2] != 255))] = crop[np.where((self.skeleton[:, :, 2] != 255))]
-                    self.transparentSkeleton = result.copy()
-                else:
-                    result = self.transparentSkeleton.copy()
+                result[np.where((self.skeleton[:, :, 2] != 255))] = crop[np.where((self.skeleton[:, :, 2] != 255))]
+                self.transparentSkeleton = result.copy()
             else:
                 result = crop.copy()
 
