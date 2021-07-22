@@ -344,6 +344,8 @@ class App(tk.Toplevel):
                 self.master.wait_window(self.referencePointsDialog.top)
                 self.referencePoints = []
                 if self.pixelSize:
+                    self.image = self.preMeasureImage
+                    self.showImage()
                     self.toggleMeasureMode()
                 else:
                     self.selectDrawingMode()
@@ -388,8 +390,7 @@ class App(tk.Toplevel):
 
         if (event.x + self.x1) / self.imscale >= 0 and (event.y + self.y1) / self.imscale >= 0:
             if self.isEnhanced or self.isSkeletonized or self.isSubpixel:
-                self.skelControl.top.destroy()
-                self.clean()
+                return
 
             self.polygonPoints = np.append(self.polygonPoints,
                                            [(event.x + self.x1) / self.imscale, (event.y + self.y1) / self.imscale])
@@ -435,10 +436,14 @@ class App(tk.Toplevel):
 
                 self.processing.correctSkeleton(self.correctionPoints)
 
+                self.drawLines(self.processing.skeletonSettings(self.skelControl.applyCenterline.get(),
+                                                                self.skelControl.applyContour.get(),
+                                                                self.skelControl.applyTrasparency.get(),
+                                                                self.lineWidth))
+
                 self.image = openCVToPIL(imageWithLine)
                 self.showImage()
                 self.correctionPoints = []
-                self.toggleCorrectSkeletonization()
 
     def selectReferenceMode(self):
         """ Cambio de modo a selección de referencia """
@@ -481,13 +486,14 @@ class App(tk.Toplevel):
 
     def toggleCorrectSkeletonization(self):
         if self.isSkeletonized and self.drawing:
-            self.correctSkeletonization.set(True)
             self.drawing = False
-        elif self.correctSkeletonization.get():
+        elif self.isSkeletonized and not self.correctSkeletonization.get():
+            self.correctionPoints = []
             self.selectDrawingMode()
             return
         else:
-            messagebox.showinfo('Aviso', 'Debes haber aplicado la esqueletonización', icon='error')
+            messagebox.showinfo('Aviso', 'Debes haber aplicado la esqueletonización y estar en modo lazo poligonal', icon='error')
+            self.correctSkeletonization.set(False)
 
     def selectDrawingMode(self):
         """ Cambio de modo a dibujar """
@@ -515,6 +521,7 @@ class App(tk.Toplevel):
         self.isSkeletonized = False
         self.isSubpixel = False
         self.correctSkeletonization.set(False)
+        self.selectDrawingMode()
         self.openCVImage = cv2.imread(self.filename, cv2.IMREAD_GRAYSCALE)
         self.openCVImage = cv2.cvtColor(self.openCVImage, cv2.COLOR_GRAY2RGB)
         self.originalOpenCVImage = self.openCVImage.copy()
@@ -533,6 +540,9 @@ class App(tk.Toplevel):
             enhanced = self.processing.enhance()
             self.drawLines(enhanced)
             self.isEnhanced = True
+            self.isSkeletonized = False
+            self.isSubpixel = False
+            self.selectDrawingMode()
             self.showImage()
             self.brightnessValue = 0
             self.contrastValue = 0
@@ -545,7 +555,10 @@ class App(tk.Toplevel):
         if len(self.polygonPoints) > 1:
             skeletonized = self.processing.skeletonization()
             self.drawLines(skeletonized)
+            self.isEnhanced = False
             self.isSkeletonized = True
+            self.isSubpixel = False
+            self.selectDrawingMode()
             self.showImage()
             self.brightnessValue = 0
             self.contrastValue = 0
@@ -569,7 +582,10 @@ class App(tk.Toplevel):
                 return
 
             self.drawLines(subpixelImage)
+            self.isEnhanced = False
+            self.isSkeletonized = False
             self.isSubpixel = True
+            self.selectDrawingMode()
             self.showImage()
             self.brightnessValue = 0
             self.contrastValue = 0
