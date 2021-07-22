@@ -533,6 +533,11 @@ class App(tk.Toplevel):
     def enhance(self):
         """ Mejora automática de la imagen """
 
+        if not self.drawing:
+            messagebox.showerror("Error", "Debes estar en modo lazo poligonal para realizar un procesamiento")
+            return
+        if self.isEnhanced:
+            return
         if len(self.polygonPoints) > 1:
             if self.skelControl:
                 self.skelControl.top.destroy()
@@ -542,7 +547,6 @@ class App(tk.Toplevel):
             self.isEnhanced = True
             self.isSkeletonized = False
             self.isSubpixel = False
-            self.selectDrawingMode()
             self.showImage()
             self.brightnessValue = 0
             self.contrastValue = 0
@@ -552,13 +556,17 @@ class App(tk.Toplevel):
     def skeletonize(self):
         """ Esqueletonización de la imagen """
 
+        if not self.drawing:
+            messagebox.showerror("Error", "Debes estar en modo lazo poligonal para realizar un procesamiento")
+            return
+        if self.isSkeletonized:
+            return
         if len(self.polygonPoints) > 1:
             skeletonized = self.processing.skeletonization()
             self.drawLines(skeletonized)
             self.isEnhanced = False
             self.isSkeletonized = True
             self.isSubpixel = False
-            self.selectDrawingMode()
             self.showImage()
             self.brightnessValue = 0
             self.contrastValue = 0
@@ -569,7 +577,11 @@ class App(tk.Toplevel):
 
     def subpixel(self):
         """ Detección de bordes por subpixel de la imagen """
-
+        if not self.drawing:
+            messagebox.showerror("Error", "Debes estar en modo lazo poligonal para realizar un procesamiento")
+            return
+        if self.isSubpixel:
+            return
         if len(self.polygonPoints) > 1:
             if self.skelControl:
                 self.skelControl.top.destroy()
@@ -585,7 +597,6 @@ class App(tk.Toplevel):
             self.isEnhanced = False
             self.isSkeletonized = False
             self.isSubpixel = True
-            self.selectDrawingMode()
             self.showImage()
             self.brightnessValue = 0
             self.contrastValue = 0
