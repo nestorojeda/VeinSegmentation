@@ -500,7 +500,7 @@ class App(tk.Toplevel):
             self.image = self.preMeasureImage.copy()
             self.openCVImage = PILtoOpenCV(self.preMeasureImage.copy())
             self.showImage()
-            self.preMeasureImage =None
+            self.preMeasureImage = None
 
     def clean(self, event=None):
         """ Limpieza del canvas y los procesamientos """
