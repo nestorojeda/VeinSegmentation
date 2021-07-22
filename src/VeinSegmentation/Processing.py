@@ -37,7 +37,9 @@ class Processing:
 
     def skeletonization(self):
         if self.skeleton is not None:
-            return self.mergeCropAndOriginal(self.skeleton.copy())
+            openContours, closedContours = Contour.sortContours(self.skeletonContours)
+            result = cv2.drawContours(self.skeleton.copy(), closedContours, -1, (0, 255, 0), 1)
+            return self.mergeCropAndOriginal(result)
         crop = self.getROICrop()
 
         if self.enhanced is None:
