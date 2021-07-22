@@ -56,6 +56,7 @@ class App(tk.Toplevel):
         self.polygonPoints = np.array([])  # Puntos que forman el poligono
         self.referencePoints = []  # Puntos de referencia
         self.measurePoints = []  # Puntos para medir
+        self.correctionPoints = []
 
         self.isClosed = False  # Define si el poligono se cierra autmáticamente al poner los puntos
         self.thickness = 2  # Ancho de la línea
@@ -74,10 +75,13 @@ class App(tk.Toplevel):
         self.metrics = None
         self.skelControl = None
 
+        self.correctSkeletonization = tk.BooleanVar()  # Flag que indica si se esta midiendo
+        self.correctSkeletonization.set(False)
+
         self.imageWithPoints = None  # Imagen con los puntos dibujados
 
         self.processing = None  # Instancia de la clase Processig
-
+        self.preMeasureImage = None
         if file:
             self.filename = file
             self.openCVImage = cv2.imread(self.filename, cv2.IMREAD_GRAYSCALE)
@@ -154,6 +158,8 @@ class App(tk.Toplevel):
         editMenu = Menu(menubar, tearoff=0)
         editMenu.add_command(label="Auto mejorar", command=self.enhance)
         editMenu.add_command(label="Esqueletonizar", command=self.skeletonize)
+        editMenu.add_checkbutton(label="Corregir esqueletonización", variable=self.correctSkeletonization,
+                                 command=self.toggleCorrectSkeletonization)
         editMenu.add_command(label="Subpixel", command=self.subpixel)
         editMenu.add_command(label="Contraste y brillo", command=self.openContrastBrightnessMenu)
         menubar.add_cascade(label="Edicion", menu=editMenu)
@@ -210,6 +216,9 @@ class App(tk.Toplevel):
             return
         if self.measuring.get():
             self.clickSelectMeasure(event)
+            return
+        if self.correctSkeletonization.get():
+            self.clickCorrectSkeletonization(event)
             return
 
     def moveFrom(self, event):
@@ -401,6 +410,36 @@ class App(tk.Toplevel):
             self.zeroBrightnessAndContrastImage = self.image.copy()
             self.showImage()
 
+    def clickCorrectSkeletonization(self, event):
+        if (event.x + self.x1) / self.imscale >= 0 and (event.y + self.y1) / self.imscale >= 0:
+            clickX = int((event.x + self.x1) / self.imscale)
+            clickY = int((event.y + self.y1) / self.imscale)
+
+            self.correctionPoints.append((clickX, clickY))
+
+            if len(self.correctionPoints) <= 1:
+                self.imageWithPoints = cv2.circle(self.openCVImage.copy(),
+                                                  (clickX, clickY), radius=0, color=(0, 0, 255),
+                                                  thickness=1)
+                self.image = openCVToPIL(self.imageWithPoints)
+                self.showImage()
+
+            if len(self.correctionPoints) == 2:
+                self.imageWithPoints = cv2.circle(self.imageWithPoints,
+                                                  (clickX, clickY), radius=0, color=(0, 0, 255),
+                                                  thickness=1)
+                imageWithLine = cv2.line(self.imageWithPoints,
+                                         self.correctionPoints[0], self.correctionPoints[1],
+                                         color=(0, 0, 255),
+                                         thickness=1)
+
+                self.processing.correctSkeleton(self.correctionPoints)
+
+                self.image = openCVToPIL(imageWithLine)
+                self.showImage()
+                self.correctionPoints = []
+                self.toggleCorrectSkeletonization()
+
     def selectReferenceMode(self):
         """ Cambio de modo a selección de referencia """
 
@@ -426,7 +465,8 @@ class App(tk.Toplevel):
         """ Cambio de modo a medida """
 
         if self.drawing or self.selectReference:
-            if self.drawing: self.preMeasureImage = self.image.copy()
+            if self.drawing:
+                self.preMeasureImage = self.image.copy()
             if self.pixelSize:
                 print('Mode changed to measure mode')
                 self.drawing = False
@@ -439,16 +479,28 @@ class App(tk.Toplevel):
         else:
             self.selectDrawingMode()
 
+    def toggleCorrectSkeletonization(self):
+        if self.isSkeletonized and self.drawing:
+            self.correctSkeletonization.set(True)
+            self.drawing = False
+        elif self.correctSkeletonization.get():
+            self.selectDrawingMode()
+            return
+        else:
+            messagebox.showinfo('Aviso', 'Debes haber aplicado la esqueletonización', icon='error')
+
     def selectDrawingMode(self):
         """ Cambio de modo a dibujar """
         print('Mode changed to drawing mode')
         self.drawing = True
         self.measuring.set(False)
+        self.correctSkeletonization.set(False)
         self.selectReference = False
-        if self.preMeasureImage:
+        if self.preMeasureImage is not None:
             self.image = self.preMeasureImage.copy()
             self.openCVImage = PILtoOpenCV(self.preMeasureImage.copy())
             self.showImage()
+            self.preMeasureImage =None
 
     def clean(self, event=None):
         """ Limpieza del canvas y los procesamientos """
@@ -458,9 +510,11 @@ class App(tk.Toplevel):
             self.skelControl.top.destroy()
         if self.metrics:
             self.metrics.top.destroy()
+
         self.isEnhanced = False
         self.isSkeletonized = False
         self.isSubpixel = False
+        self.correctSkeletonization.set(False)
         self.openCVImage = cv2.imread(self.filename, cv2.IMREAD_GRAYSCALE)
         self.openCVImage = cv2.cvtColor(self.openCVImage, cv2.COLOR_GRAY2RGB)
         self.originalOpenCVImage = self.openCVImage.copy()

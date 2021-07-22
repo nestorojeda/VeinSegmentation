@@ -28,7 +28,6 @@ class VeinMetricsModal:
         if not pixelSize and not isSkeletonized:
             tk.Label(self.top, text="Debes seleccionar una referencia para poder obtener información").pack()
 
-
-    def cancel(self, event=None):
+    def cancel(self):
         self.parent.focus_set()
         self.top.destroy()

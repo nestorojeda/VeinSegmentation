@@ -1,4 +1,5 @@
 import cv2
+import matplotlib.pyplot as plt
 import numpy as np
 from subpixel_edges import subpixel_edges
 
@@ -16,6 +17,7 @@ class Processing:
         self.skeleton = None
         self.subpixelImage = None
         self.transparentSkeleton = None
+        self.whiteSkeleton = None
 
     def getROICrop(self):
         contours, hierarchy = cv2.findContours(self.mask, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)[-2:]
@@ -138,3 +140,16 @@ class Processing:
             area += cv2.contourArea(cnt)
 
         return area
+
+    def correctSkeleton(self, points):
+        x, y, w, h = self.getCropCoordinates()
+        pointCrop = [(points[0][0] - x, points[0][1] - y), (points[1][0] - x, points[1][1] - y)]
+
+        self.whiteSkeleton = cv2.line(self.whiteSkeleton,
+                                      pointCrop[0], pointCrop[1],
+                                      color=255,
+                                      thickness=1)
+        self.skeleton = cv2.line(self.skeleton,
+                                 pointCrop[0], pointCrop[1],
+                                 color=(0, 0, 255),
+                                 thickness=1)
