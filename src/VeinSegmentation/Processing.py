@@ -1,4 +1,5 @@
 import cv2
+import matplotlib.pyplot as plt
 import numpy as np
 from subpixel_edges import subpixel_edges
 
@@ -16,6 +17,7 @@ class Processing:
         self.skeleton = None
         self.subpixelImage = None
         self.transparentSkeleton = None
+        self.whiteSkeleton = None
 
     def getROICrop(self):
         contours, hierarchy = cv2.findContours(self.mask, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)[-2:]
@@ -35,7 +37,9 @@ class Processing:
 
     def skeletonization(self):
         if self.skeleton is not None:
-            return self.mergeCropAndOriginal(self.skeleton.copy())
+            openContours, closedContours = Contour.sortContours(self.skeletonContours)
+            result = cv2.drawContours(self.skeleton.copy(), closedContours, -1, (0, 255, 0), 1)
+            return self.mergeCropAndOriginal(result)
         crop = self.getROICrop()
 
         if self.enhanced is None:
@@ -48,26 +52,28 @@ class Processing:
         self.whiteSkeleton = cleanSkeleton(skelCrop)
         skelCrop = cv2.cvtColor(skelCrop.astype(np.uint8), cv2.COLOR_GRAY2RGB)
 
-        for j in range(0, skelCrop.shape[0]):
-            for i in range(0, skelCrop.shape[1]):
-                if np.array_equal(skelCrop[j, i], np.array([255, 255, 255])):
-                    skelCrop[j, i] = (0, 0, 255)
+        skelCrop[np.where((skelCrop[:, :, 2] == 255))] = (0, 0, 255)
 
         self.skeleton = skelCrop
-        return self.mergeCropAndOriginal(skelCrop)
 
-    def skeletonSettings(self, contour, transparency, pixelWidth=1):
+        openContours, closedContours = Contour.sortContours(self.skeletonContours)
+        result = cv2.drawContours(skelCrop.copy(), closedContours, -1, (0, 255, 0), 1)
+
+        return self.mergeCropAndOriginal(result)
+
+    def skeletonSettings(self, centerLine, contour, transparency, pixelWidth=1):
         crop = self.getROICrop()
-        result = self.skeleton.copy()
+        if centerLine:
+            result = self.skeleton.copy()
+        else:
+            result = np.zeros(crop.shape)
+
         if transparency:
-            if self.transparentSkeleton is None:
-                for j in range(0, self.skeleton.shape[0]):
-                    for i in range(0, self.skeleton.shape[1]):
-                        if np.array_equal(self.skeleton[j, i], np.array([0, 0, 0])):
-                            result[j, i] = crop[j, i]
+            if centerLine:
+                result[np.where((self.skeleton[:, :, 2] != 255))] = crop[np.where((self.skeleton[:, :, 2] != 255))]
                 self.transparentSkeleton = result.copy()
             else:
-                result = self.transparentSkeleton.copy()
+                result = crop.copy()
 
         if contour:
             openContours, closedContours = Contour.sortContours(self.skeletonContours)
@@ -133,3 +139,16 @@ class Processing:
             area += cv2.contourArea(cnt)
 
         return area
+
+    def correctSkeleton(self, points):
+        x, y, w, h = self.getCropCoordinates()
+        pointCrop = [(points[0][0] - x, points[0][1] - y), (points[1][0] - x, points[1][1] - y)]
+
+        self.whiteSkeleton = cv2.line(self.whiteSkeleton,
+                                      pointCrop[0], pointCrop[1],
+                                      color=255,
+                                      thickness=1)
+        self.skeleton = cv2.line(self.skeleton,
+                                 pointCrop[0], pointCrop[1],
+                                 color=(0, 0, 255),
+                                 thickness=1)
