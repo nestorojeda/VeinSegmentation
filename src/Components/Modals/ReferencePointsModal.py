@@ -16,8 +16,7 @@ class ReferencePointsDialog:
         y = self.parent.winfo_y()
         self.top.geometry("+%d+%d" % (x + 300, y + 200))
 
-        vcmd = (self.top.register(self.validate),
-                '%d', '%i', '%P', '%s', '%S', '%v', '%V', '%W')
+
 
         if len(self.parent.referencePoints) >= 1:
             firstPointLabel = self.parent.referencePoints[0]
@@ -32,20 +31,15 @@ class ReferencePointsDialog:
         tk.Label(self.top, text="Posición del primer punto: {}".format(firstPointLabel)).pack()
         tk.Label(self.top, text="Posición del segunto punto: {}".format(secondPointLabel)).pack()
         tk.Label(self.top, text="Introduce la medida en centímetros").pack()
-        self.entry = tk.Entry(self.top, validate='key', validatecommand=vcmd)
+        vcmd = (self.top.register(self.callback))
+        self.entry = tk.Entry(self.top, validate='key', validatecommand=(vcmd, '%P'))
         self.entry.pack()
         self.button = tk.Button(self.top, text="Aceptar", command=self.saveReference)
         self.button.pack()
 
-    def validate(self, action, index, value_if_allowed,
-                 prior_value, text, validation_type, trigger_type, widget_name):
-        # https://stackoverflow.com/questions/8959815/restricting-the-value-in-tkinter-entry-widget
-        if value_if_allowed:
-            try:
-                float(value_if_allowed)
-                return True
-            except ValueError:
-                return False
+    def callback(self, P):
+        if str.isdigit(P) or P == "":
+            return True
         else:
             return False
 
