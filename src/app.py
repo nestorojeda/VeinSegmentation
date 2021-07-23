@@ -440,7 +440,9 @@ class App(tk.Toplevel):
                                                                 self.skelControl.applyContour.get(),
                                                                 self.skelControl.applyTrasparency.get(),
                                                                 self.lineWidth))
-
+                if self.metrics:
+                    self.metrics.top.destroy()
+                    self.metrics = VeinMetricsModal(self.master)
                 self.image = openCVToPIL(imageWithLine)
                 self.showImage()
                 self.correctionPoints = []
@@ -459,12 +461,14 @@ class App(tk.Toplevel):
                 self.measuring.set(False)
                 self.selectReference = True
                 self.preMeasureImage = self.image.copy()
+                self.correctSkeletonization.set(False)
 
         else:
             self.drawing = False
             self.measuring.set(False)
             self.selectReference = True
             self.preMeasureImage = self.image.copy()
+            self.correctSkeletonization.set(False)
 
     def toggleMeasureMode(self):
         """ Cambio de modo a medida """
